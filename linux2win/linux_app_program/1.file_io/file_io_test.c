@@ -19,7 +19,6 @@ void myOpen(const char *path, int flag, ...)
 		//return;	// 程序继续运行，只有main函数返回，程序才终止
 		_exit(-1);  // 程序挂掉
 	}
-	
 }
 
 
@@ -40,9 +39,10 @@ int main(void)
 	//printf("strlen(writeBuffTmp) = %d\n", strlen(writeBuffTmp));	// 11
 	
 	//fd = open("test.txt", O_RDWR);				// const char *, 有限制
+	//fd = open("test.txt", O_APPEND);				// 默认是O_RDONLY
 	//fd = open("test.txt", (O_RDWR | O_TRUNC));	// 丢弃以前内容 readCount = 0
-	//fd = open("test.txt", (O_RDWR | O_APPEND));	// 保留以前内容, write后面增加, 且无限制
-	//fd = open("test.txt", O_APPEND);
+	fd = open("test.txt", (O_RDWR | O_APPEND));		// 保留以前内容, write后面增加, 且无限制
+	
 	if (fd < 0)	// file descriptor
 	{
 		printf("fun@open() exe error\n");
@@ -53,8 +53,17 @@ int main(void)
 		printf("fun@open() exe success fd = %d\n", fd);
 	}
 	
+	int fd1 = -1;	
 	//myOpen("test1.txt", O_RDWR); // 测试 return && _exit()
-
+	fd1 = open("test3.txt", (O_RDWR | O_CREAT | O_EXCL));
+	//fd = open("test2.txt", (O_RDWR | O_CREAT), 0666);
+	//fd1 = open("test3.txt", (O_RDWR));
+	if (fd1 < 0)
+	{
+		printf("test3.txt exe error\n");
+		_exit(-1);
+	}
+		
 	memset(readFileBuff, 0, READ_BYTE_NUM);
 	count = read(fd, readFileBuff, READ_BYTE_NUM);
 	if (count < 0)
