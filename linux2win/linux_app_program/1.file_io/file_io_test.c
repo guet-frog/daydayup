@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#define	READ_BYTE_NUM	20
+#define	READ_BYTE_NUM	30
 
 void myOpen(const char *path, int flag, ...)
 {
@@ -32,16 +32,15 @@ int main(void)
 	char readFileBuff[READ_BYTE_NUM] = {0};
 	const char *writeBuffTmp = "hello world";
 	
-	//char a[5] = "hello";		// 字符串定义
-	//char a[]  = "hello";
-	//char *a   = "hello";
-	//printf("sizeof(writeBuffTmp) = %d\n", sizeof(writeBuffTmp));	// 4
-	//printf("strlen(writeBuffTmp) = %d\n", strlen(writeBuffTmp));	// 11
-	
-	//fd = open("test.txt", O_RDWR);				// const char *, 有限制
+	// char a[5] = "hello";     // sizeof(a) = 5
+	// char b[]  = "hello";     // sizeof(b) = 6
+	// char *c   = "hello";     // sizeof(c) = 4
+
+	//fd = open("test.txt", O_RDWR);				// const char *, 不加O_APPEND, write的时候有限制
 	//fd = open("test.txt", O_APPEND);				// 默认是O_RDONLY
 	//fd = open("test.txt", (O_RDWR | O_TRUNC));	// 丢弃以前内容 readCount = 0
-	fd = open("test.txt", (O_RDWR | O_APPEND));		// 保留以前内容, write后面增加, 且无限制
+	//fd = open("test.txt", (O_RDWR | O_APPEND | O_CREAT | O_EXCL));		// 文件存在则报错, 保留以前内容, write后面增加, 且无限制
+    fd = open("test.txt", (O_RDWR | O_APPEND));
 	
 	if (fd < 0)	// file descriptor
 	{
@@ -50,19 +49,12 @@ int main(void)
 	}
 	else
 	{
+        //perror("成功");                                 // success + \n
 		printf("fun@open() exe success fd = %d\n", fd);
 	}
 	
-	int fd1 = -1;	
 	//myOpen("test1.txt", O_RDWR); // 测试 return && _exit()
-	fd1 = open("test3.txt", (O_RDWR | O_CREAT | O_EXCL));
-	//fd = open("test2.txt", (O_RDWR | O_CREAT), 0666);
-	//fd1 = open("test3.txt", (O_RDWR));
-	if (fd1 < 0)
-	{
-		printf("test3.txt exe error\n");
-		_exit(-1);
-	}
+	//fd1 = open("test3.txt", (O_RDWR | O_CREAT | O_EXCL), 0666);   // 没有文件则创建文件(并设置rom文件权限)open, 有文件则报错
 		
 	memset(readFileBuff, 0, READ_BYTE_NUM);
 	count = read(fd, readFileBuff, READ_BYTE_NUM);
@@ -76,7 +68,7 @@ int main(void)
 		printf("fun@read() exe success read_count = %d\n", count);
 	}
 	
-	printf("read = %s\n", readFileBuff);
+	printf("read = %s\n", readFileBuff);    // %s
 
 //-------------------------------------------------------------
 #if 1
@@ -91,6 +83,13 @@ int main(void)
 		printf("fun@write() exe success write_count = %d\n", count);
 	}
 #endif
+
+    ret = close(fd);
+    fd = open("test.txt", O_RDWR);
+    if (fd < 0)
+    {
+        perror("open函数执行");
+    }
 
 	memset(readFileBuff, 0, READ_BYTE_NUM);
 	count = read(fd, readFileBuff, READ_BYTE_NUM);
