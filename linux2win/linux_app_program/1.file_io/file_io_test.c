@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#define	READ_BYTE_NUM	30
+#define	READ_BYTE_NUM	11
 
 void myOpen(const char *path, int flag, ...)
 {
@@ -31,17 +31,17 @@ int main(void)
 	
 	char readFileBuff[READ_BYTE_NUM] = {0};
 	const char *writeBuffTmp = "hello world";
+	const char *writeBuffTmp1 = "wwwww qqqqq";
 	
 	// char a[5] = "hello";     // sizeof(a) = 5
 	// char b[]  = "hello";     // sizeof(b) = 6
 	// char *c   = "hello";     // sizeof(c) = 4
 
-	//fd = open("test.txt", O_RDWR);				// const char *, 不加O_APPEND, write的时候有限制
+	//fd = open("test.txt", O_RDWR);				// const char *, 不加O_APPEND, 注意filePoint
 	//fd = open("test.txt", O_APPEND);				// 默认是O_RDONLY
 	//fd = open("test.txt", (O_RDWR | O_TRUNC));	// 丢弃以前内容 readCount = 0
-	//fd = open("test.txt", (O_RDWR | O_APPEND | O_CREAT | O_EXCL));		// 文件存在则报错, 保留以前内容, write后面增加, 且无限制
-    fd = open("test.txt", (O_RDWR | O_APPEND));
-	
+	//fd = open("test.txt", (O_RDWR | O_APPEND | O_CREAT | O_EXCL));    // 文件存在则报错, 保留以前内容, write后面增加, 且无限制
+    fd = open("test.txt", (O_RDWR | O_APPEND));	
 	if (fd < 0)	// file descriptor
 	{
 		printf("fun@open() exe error\n");
@@ -52,12 +52,30 @@ int main(void)
         //perror("成功");                                 // success + \n
 		printf("fun@open() exe success fd = %d\n", fd);
 	}
+
+#if 0 /* test repeat open file */
+    int fd1 = -1;
+    fd1 = open("test.txt", (O_RDWR | O_APPEND));
+    if (fd1 < 0)
+    {
+        printf("repeat open file ok, fd1 = %d\n", fd1);
+        _exit(-1);
+    }
+    else
+    {
+        //perror("repeat open file");
+        printf("repeat open file success fd1 = %d\n", fd1);
+    }
+#endif /* test repeat open file */
 	
 	//myOpen("test1.txt", O_RDWR); // 测试 return && _exit()
 	//fd1 = open("test3.txt", (O_RDWR | O_CREAT | O_EXCL), 0666);   // 没有文件则创建文件(并设置rom文件权限)open, 有文件则报错
-		
-	memset(readFileBuff, 0, READ_BYTE_NUM);
-	count = read(fd, readFileBuff, READ_BYTE_NUM);
+
+#if 1 /* test read file */
+	//memset(readFileBuff, 0, READ_BYTE_NUM);
+    memset(readFileBuff, 0, sizeof(readFileBuff)); // 进程中内存err：stack smashing detected, Aborted (core dumped)
+	//count = read(fd, readFileBuff, /*READ_BYTE_NUM*/ 20); // error：readFileBuff overflow
+    count = read(fd, readFileBuff, READ_BYTE_NUM);
 	if (count < 0)
 	{
 		printf("fun@read() exe error\n");
@@ -69,9 +87,10 @@ int main(void)
 	}
 	
 	printf("read = %s\n", readFileBuff);    // %s
+#endif /* test read file*/
 
 //-------------------------------------------------------------
-#if 1
+#if 1 /* test write file */
 	count = write(fd, writeBuffTmp, strlen(writeBuffTmp));
 	if (count < 0)
 	{
@@ -82,15 +101,25 @@ int main(void)
 	{
 		printf("fun@write() exe success write_count = %d\n", count);
 	}
-#endif
+#endif /* test write file */
 
+// in this, we can use read fun or add param O_APPEND to avoid coverage (remove file point fd1) -- 2018-4-12
+
+#if 0 /* test file point */
     ret = close(fd);
-    fd = open("test.txt", O_RDWR);
+    if (ret < 0)
+    {
+        perror("fun@close exe err");
+        _exit(-1);
+    }
+    fd = open("test.txt", O_RDWR);  // repeat open file: file point point will be init location
     if (fd < 0)
     {
         perror("open函数执行");
     }
+#endif /* test file point */
 
+#if 0 /* test repeat read */
 	memset(readFileBuff, 0, READ_BYTE_NUM);
 	count = read(fd, readFileBuff, READ_BYTE_NUM);
 	if (count < 0)
@@ -104,8 +133,10 @@ int main(void)
 	}
 
 	printf("readFileBuff = %s\n", readFileBuff);
+#endif /* test repeat read*/
 //-------------------------------------------------------------	
-	ret = close(fd);
+	
+    ret = close(fd);
 	if (ret < 0)
 	{
 		printf("fun@close() exe error\n");
