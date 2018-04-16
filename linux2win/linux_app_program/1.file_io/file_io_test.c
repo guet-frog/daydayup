@@ -7,7 +7,9 @@
 #include <stdint.h>
 #include <string.h>
 
-#define	READ_BYTE_NUM	11
+#define	READ_BYTE_NUM	    11
+//#define FILE_POINT_OFFSET   READ_BYTE_NUN
+#define FILE_POINT_OFFSET   11
 
 void myOpen(const char *path, int flag, ...)
 {
@@ -72,9 +74,11 @@ int main(void)
 	//fd1 = open("test3.txt", (O_RDWR | O_CREAT | O_EXCL), 0666);   // 没有文件则创建文件(并设置rom文件权限)open, 有文件则报错
 
 #if 1 /* test read file */
-	//memset(readFileBuff, 0, READ_BYTE_NUM);
+	
+    //memset(readFileBuff, 0, READ_BYTE_NUM);
     memset(readFileBuff, 0, sizeof(readFileBuff)); // 进程中内存err：stack smashing detected, Aborted (core dumped)
-	//count = read(fd, readFileBuff, /*READ_BYTE_NUM*/ 20); // error：readFileBuff overflow
+	
+    //count = read(fd, readFileBuff, /*READ_BYTE_NUM*/ 20); // error：readFileBuff overflow(爆了)
     count = read(fd, readFileBuff, READ_BYTE_NUM);
 	if (count < 0)
 	{
@@ -89,8 +93,21 @@ int main(void)
 	printf("read = %s\n", readFileBuff);    // %s
 #endif /* test read file*/
 
+#if 0 /* test lseek */
+    ret = lseek(fd, FILE_POINT_OFFSET, SEEK_CUR);
+    if (fd < 0)
+    {
+        perror("fun@lseek");
+        _exit(-1);
+    }
+    else
+    {
+        printf("file:fd=%d current file point location is %d\n", fd, ret);
+    }
+#endif /* test lseek */
+
 //-------------------------------------------------------------
-#if 1 /* test write file */
+#if 0 /* test write file */
 	count = write(fd, writeBuffTmp, strlen(writeBuffTmp));
 	if (count < 0)
 	{
@@ -103,9 +120,9 @@ int main(void)
 	}
 #endif /* test write file */
 
-// in this, we can use read fun or add param O_APPEND to avoid coverage (remove file point fd1) -- 2018-4-12
+// in this, we can use lseek fun or add param O_APPEND to avoid coverage (remove file point fd1) -- 2018-4-12
 
-#if 0 /* test file point */
+#if 0 /* test reopen file to modify file point */
     ret = close(fd);
     if (ret < 0)
     {
@@ -119,8 +136,8 @@ int main(void)
     }
 #endif /* test file point */
 
-#if 0 /* test repeat read */
-	memset(readFileBuff, 0, READ_BYTE_NUM);
+#if 1 /* test repeat read */
+	memset(readFileBuff, 0, sizeof(readFileBuff));
 	count = read(fd, readFileBuff, READ_BYTE_NUM);
 	if (count < 0)
 	{
@@ -134,6 +151,7 @@ int main(void)
 
 	printf("readFileBuff = %s\n", readFileBuff);
 #endif /* test repeat read*/
+
 //-------------------------------------------------------------	
 	
     ret = close(fd);
