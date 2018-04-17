@@ -23,10 +23,13 @@ void myOpen(const char *path, int flag, ...)
 	}
 }
 
+int curFilePointLocation(int fd)
+{
+    return lseek(fd, 0, SEEK_CUR);
+}
 
 int main(void)
 {
-	
 	int fd = -1;
 	int ret = -1;
 	int count = 0;
@@ -73,8 +76,7 @@ int main(void)
 	//myOpen("test1.txt", O_RDWR); // 测试 return && _exit()
 	//fd1 = open("test3.txt", (O_RDWR | O_CREAT | O_EXCL), 0666);   // 没有文件则创建文件(并设置rom文件权限)open, 有文件则报错
 
-#if 1 /* test read file */
-	
+#if 0 /* test read file */
     //memset(readFileBuff, 0, READ_BYTE_NUM);
     memset(readFileBuff, 0, sizeof(readFileBuff)); // 进程中内存err：stack smashing detected, Aborted (core dumped)
 	
@@ -107,7 +109,7 @@ int main(void)
 #endif /* test lseek */
 
 //-------------------------------------------------------------
-#if 0 /* test write file */
+#if 1 /* test write file */
 	count = write(fd, writeBuffTmp, strlen(writeBuffTmp));
 	if (count < 0)
 	{
@@ -117,28 +119,15 @@ int main(void)
 	else
 	{
 		printf("fun@write() exe success write_count = %d\n", count);
-	}
+	} 
 #endif /* test write file */
+
 
 // in this, we can use lseek fun or add param O_APPEND to avoid coverage (remove file point fd1) -- 2018-4-12
 
-#if 0 /* test reopen file to modify file point */
-    ret = close(fd);
-    if (ret < 0)
-    {
-        perror("fun@close exe err");
-        _exit(-1);
-    }
-    fd = open("test.txt", O_RDWR);  // repeat open file: file point point will be init location
-    if (fd < 0)
-    {
-        perror("open函数执行");
-    }
-#endif /* test file point */
-
-#if 1 /* test repeat read */
+#if 0 /* test repeat read */
 	memset(readFileBuff, 0, sizeof(readFileBuff));
-	count = read(fd, readFileBuff, READ_BYTE_NUM);
+	count = read(fd1, readFileBuff, READ_BYTE_NUM);
 	if (count < 0)
 	{
 		printf("fun@read_2() exe error\n");
@@ -151,9 +140,11 @@ int main(void)
 
 	printf("readFileBuff = %s\n", readFileBuff);
 #endif /* test repeat read*/
-
 //-------------------------------------------------------------	
-	
+    
+    //printf("current file point location is %d\n", curFilePointLocation(fd));
+    //printf("current file point location is %d\n", curFilePointLocation(fd1));
+
     ret = close(fd);
 	if (ret < 0)
 	{
