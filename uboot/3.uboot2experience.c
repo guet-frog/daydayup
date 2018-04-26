@@ -1,7 +1,7 @@
 
 2.3.2.2、配置
 	(1)uboot和linux kernel等复杂项目, 都不能直接编译, 需要先配置才能编译
-	(2)uboot配置方法: 在uboot源码根目录执行: make x210_sd_config
+	(2)uboot配置方法: make x210_sd_config
 		执行配置命令后: Configuring for x210_sd board... // config ok
 
 2.3.2.3、编译得到uboot.bin
@@ -44,7 +44,7 @@
 					但是linux是操作系统而uboot只是个裸机程序, 因此这种移植会有不同
 					//uboot中的驱动其实是linux中的驱动的一部分
 	(9)examples
-	(10)fs			from linux src, 用来管理Flash等资源。
+	(10)fs			from linux src, 用来管理flash等资源
 	(11)include		uboot和linux kernel在管理头文件时, 把所有的头文件全部集中存放在include目录下
 	(12)lib_*		典型的lib_arm(arm架构)和lib_generic架构(其他架构通用) 
 	(13)libfdt		设备树相关, linux kernel 3.4 更改了启动时传参的机制, 改用设备树来进行启动传参，进行硬件信息的描述
