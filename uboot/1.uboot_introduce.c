@@ -1,28 +1,4 @@
 
-
-2.1.3.uboot必须解决哪些问题
-	本节分析uboot必须解决的一些问题，这些问题也正是uboot中的主要代码
-2.1.4.uboot的工作方式
-	本节主要介绍uboot的命令行工作方式，重点强调了命令和环境变量这两个关键点。
-2.1.5.uboot的常用命令1
-	本节开始介绍uboot的常用命令。首先讲了uboot命令的一些特征如行缓冲、命令别名、参数等然后讲了print命令。
-2.1.6.uboot的常用命令2
-	本节讲述uboot常用命令中设置、保存环境变量的命令、ping命令。
-2.1.7.开发板和主机的ping通
-	本节详细介绍开发板和主机windows、虚拟机ubuntu的ping通及设置。
-2.1.8.uboot的常用命令3
-	本节继续介绍uboot的常用命令，主要是tftp和nfs命令，这两个命令都是uboot用来和主机进行网络连接获取文件相关的。
-2.1.9.uboot的常用命令4
-	本节主要介绍了uboot操作iNand的movi命令和操作内存的mm、mw、md命令
-2.1.10.uboot的常用环境变量1
-	本节总结了uboot的环境的原理和使用方法，并以bootdelay等环境变量来演示这种使用效果。
-2.1.11.uboot的常用环境变量2
-	本节主要讲解uboot的2个重要环境变量bootcmd和bootargs。
-2.1.12.uboot中对Flash和DDR的管理
-	本节讲述uboot对Flash和DDR的分区管理，其中最重要的是Flash的分区。
-
-
-
 2.1.1.为什么要有uboot
     2.2.1.1、计算机系统的主要部件
         (1)计算机系统就是用CPU来做核心进行运行的系统	// warning: PC System
@@ -30,7 +6,7 @@
 
 	2.2.1.2、PC机的启动过程
 		(1)典型的/*PC机的部署*/: BIOS在PC机主板上, OS在硬盘上, 内存在掉电时无作用, CPU在掉电时不工作
-		(2)启动过程: PC上电后先执行BIOS程序(in NorFlash), 
+		(2)启动过程: PC上电后先执行BIOS程序(in NorFlash)
 			// BIOS init DDR && disk, copy OS to DDR, then jump to DDR to exe OS
 
 	2.2.1.3、典型嵌入式linux系统启动过程
@@ -62,7 +38,7 @@
 		(2)uboot必须进行和硬件相对应的代码级别的更改和移植, 才能够保证可以从相应的启动介质启动
 			uboot中第一阶段的start.S文件中具体处理了这一块
 
-	2.1.3.2、能够引导操作系统内核启动并给内核传参
+	2.1.3.2、能够 /*引导操作系统内核启动*/并/*给内核传参*/
 		(1)uboot的终极目标就是/*启动内核*/
 		(2)linux内核在设计的时候, 设计为可以被传参
 			uboot中事先给linux内核准备一些启动参数/*放在内存中特定位置*/然后传给内核 // ShareMemory
@@ -123,64 +99,56 @@
 			//环境变量被存储在flash的另一块专门区域(flash上环境变量分区)
 			
 2.1.6.uboot的常用命令2
-	2.1.6.1、设置（添加/更改）环境变量：
+	2.1.6.1 设置(添加/更改）环境变量：
 		(1)/*设置/添加*/环境变量: set name value	// setenv/set
 		(2)/*保存*/环境变量: saveenv/save			// 块设备属性所决定, CR600可能考虑到传输参数的开销
 
+	2.1.7.2、开发板运行linux下和虚拟机ubuntu的ping通
+		(1)虚拟机网卡设置: 常用的就是NAT和桥接(bridged)
+		(2)虚拟机要和开发板进行网络通信，只能通过桥接方式连接
+		(3)设置: "虚拟网络编辑器"注意网卡设置 //win10需要权限
+		//查看Ubuntu虚拟机网卡信息: ifconfig
+		//设置Ubuntu虚拟机网卡信息: /etc/network/interfaces		//重启网卡: sudo ifdown eth0
 
-2.1.7.2、开发板运行linux下和虚拟机ubuntu的ping通
-(1)在linux基础课中讲过：虚拟机的网卡设置可以选择好几种方式，常用的就是NAT和桥接（bridged）。
-(2)虚拟机要和开发板进行网络通信，只能通过桥接方式连接。
-(3)虚拟机要想被开发板ping通，设置步骤如下：
-第一步：虚拟机设置成桥接方式。
-第二步：虚拟机的菜单中有个“虚拟网络编辑器”，这里面要设置为桥接到有线网卡。（默认是自动的，自动的一般会影响ping通。因为电脑现在一般都有2个网卡：一个有线的一个无线的。如果选了自动，那么虚拟机会自动桥接到无线网卡上，但是我们却是通过有线网卡来连接开发板的，自然ping不通）
-第三步：在虚拟机ubuntu中设置IP地址为192.168.1.141（可以通过/etc/network/interfaces文件来设置静态的然后重启；也可以直接命令行ifconfig去设置）
-(4)此时开发板ping虚拟机ubuntu应该就通了。
-(5)此时虚拟机ubuntu中ping开发板也是通的。
-
-2.1.7.3、开发板运行uboot下和主机Windows的ping通
-(1)刚才开发板运行linux时和主机windows、虚拟机ubuntu都ping通了，说明硬件和连接和主机设置没错。
-(2)此时开发板重启进入uboot，设置好ipaddr、gatewayip，然后去ping windows发现还是不通。 怀疑uboot本身网络驱动有问题。
-(3)然后同样情况下尝试去ping通虚拟机ubuntu，理论分析应该也不通，但是实际发现是通的。
-
-2.1.7.4、开发板运行uboot下和虚拟机ubuntu的ping通
-(1)uboot和虚拟机ubuntu互相ping通（前提是虚拟机ubuntu设置为桥接，且桥接到有线网卡，且ip地址设置正确的情况下）
-结论：开发板中运行的uboot有点小bug，ping windows就不通，ping虚拟机ubuntu就通。
-
+	2.1.7.3、开发板运行uboot下和主机Windows的ping通
+	2.1.7.4、开发板运行uboot下和虚拟机ubuntu的ping通
+		(1)uboot和虚拟机ubuntu互相ping通(前提是虚拟机ubuntu网络适配器设置为桥接(桥接到有线网卡))
+		结论: 开发板中运行的uboot有点小bug, ping windows就不通, ping虚拟机ubuntu就通
 
 2.1.8.uboot常用命令3
-2.1.8.1、tftp下载指令：tftp
-(1)uboot本身主要目标是启动内核，为了完成启动内核必须要能够部署内核，uboot为了部署内核就需要将内核镜像从主机中下载过来然后烧录到本地flash中。uboot如何从主机（windows或者虚拟机ubuntu）下载镜像到开发板上？有很多种方式，主流方式是：fastboot和tftp。
-fastboot的方式是通过USB线进行数据传输。
-tftp的方式是通过有线网络的。典型的方式就是通过网络，fastboot是近些年才新发展的。
-(2)tftp方式下载时实际上uboot扮演的是tftp客户端程序角色，主机windows或虚拟机ubuntu中必须有一个tftp服务器，然后将要下载的镜像文件放在服务器的下载目录中，然后开发板中使用uboot的tftp命令去下载即可。
-(3)有些人习惯在windows中搭建tftp服务器，一般是用一些软件来搭建（譬如tftpd32，使用起来比较简单）；有些人习惯在linux下搭建tftp服务器，可以参考网盘中的虚拟机下载目录下的一个教程《嵌入式开发环境搭建-基于14.04.pdf》，这里面有ubuntu中搭建tftp服务器的教程，也可以自己上网搜索教程尝试。（如果你直接就用我的虚拟机，那就已经搭建好了，不用再搭建了；如果是自己新装的那就参考文档搭建；如果你的版本和我的不一样那搭建过程可能不一样）
-(4)我的虚拟机搭建的时候设置的tftp下载目录是/tftpboot，将要被下载的镜像复制到这个目录下。
-(5)检查开发板uboot的环境变量，注意serverip必须设置为虚拟机ubuntu的ip地址。（serverip这个环境变量的意义就是主机tftp服务器的ip地址）
-(6)然后在开发板的uboot下先ping通虚拟机ubuntu，然后再尝试下载：tftp 0x30000000 zImage-qt（意思是将服务器上名为zImage-qt的文件下载到开发板内存的0x30000000地址处。）
-(7)镜像下载到开发板的DDR中后，uboot就可以用movi指令进行镜像的烧写了。
-注意：
-1）如果你是用的windows下的tftp服务器，那uboot的serverip就要设置为和windwos下tftp服务器的ip地址一样（windows下的tftp服务器软件设置的时候就有个步骤是让你设置服务器的ip地址，这个ip地址和主机windows必须在一个网段）。
-2）整个过程中间环节比较多，实际做的时候可能最后会下载不下来。这时候可能的问题非常多，不要问我，自己对照视频课程讲的思路来排查。（譬如：第一步应该先保证uboot和ubuntu可以ping通；第二步再保证ubuntu中tftp服务器搭建没错；第三步再实现tftp下载。如果第一步有问题参考网络设置部分，第二步有问题（tftp本地测试下载ok，但是开发板就是不行），有一个解决方案就是使用windows下的tftp服务器）
+	2.1.8.1、tftp下载指令: tftp
+		(1)*/uboot主要目标是启动内核, 为了完成启动内核必须要能够部署内核
+			/*uboot为了部署内核就需要将内核镜像从主机中下载过来然后烧录到本地flash*/
+			uboot从主机(windows或者虚拟机ubuntu)下载镜像到开发板上:
+				1. fastboot: 通过USB线进行数据传输
+				2. tftp	   : 通过有线网络			//典型的方式是通过网络, fastboot is new skill
+		(2)tftp方式下载时uboot作为tftp客户端, 主机windows或虚拟机ubuntu中有一个作为tftp服务器
+			将要下载的镜像文件放在服务器的下载目录中, 设备uboot的tftp命令去下载即可
+		(3)windows中搭建TFTP服务器(如: tftpd32)
+		(4)linux  中搭建TFTP服务器参考文档, (tftp下载目录是/tftpboot, 将要被下载的镜像复制到这个目录下)
+		(5)检查开发板uboot的环境变量serverip(serverip:主机tftp服务器的ip地址)
+		(6)操作: 在开发板的uboot下先ping通虚拟机ubuntu, 然后再尝试下载: tftp 0x30000000 zImage-qt
+			//将服务器上名为zImage-qt的文件下载到开发板内存的0x30000000地址处
+		(7)镜像下载到开发板的DDR中后, uboot就可以用movi指令进行镜像的烧写	// ram -> rom
+		
+		//serverip meaning of tftp ip
 
-2.1.8.2、nfs启动内核命令：nfs
-(1)uboot中也支持nfs命令，但是我基本没用过。
-
+	2.1.8.2、nfs启动内核命令：nfs
+		(1)uboot支持nfs命令
 
 2.1.9.uboot的常用命令4
     2.1.9.1 SD卡/iNand操作指令movi
-        (1)开发板如果用SD卡/EMMC/iNand等作为Flash，则在uboot中操作flash的指令为movi（或mmc）
+        (1)开发板如果用SD卡/EMMC/iNand等作为Flash, 则在uboot中操作flash的指令为movi(或mmc)
             movei init S3C_HSMMC-0
-        (2)movi指令是一个命令集，有很多子命令，具体用法可以help movi查看。
         (3)movi的指令都是movi read和movi write一组的, movi read用来读取iNand到DDR上
             movi write用来将DDR中的内容写入iNand中。理解这些指令时一定要注意涉及到的2个硬件：iNand和DDR内存。
         (4)movi read  {u-boot | kernel} {addr}   
-            这个命令使用了一种通用型的描述方法来描述: movi和read外面没有任何标记说明每一次使用这个指令都是必选的；
+            命令使用通用型的描述方法: movi和read外面没有任何标记说明每一次使用这个指令都是必选的；
             一对大括号{}括起来的部分必选1个, 大括号中的竖线表是多选一
             中括号[]表示可选参数(可以有也可以没有)
         (5)指令有多种用法，譬如 movi read u-boot 0x30000000  // inand 中 u-boot分区 (起始地址 + 终止地址)
             把iNand中的u-boot分区读出到DDR的0x30000000起始的位置处
-            (uboot代码中将iNand分成了很多个分区, 每个分区有地址范围和分区名
+            uboot代码中将iNand分成了很多个分区, 每个分区有地址范围和分区名	// uboot进行系统部署
             uboot程序操作中可以使用直接地址来操作iNand分区, 也可以使用分区名来操作分区
             //uboot shell下默认是十六进制
     
@@ -188,10 +156,9 @@ tftp的方式是通过有线网络的。典型的方式就是通过网络，fast
         (1)理解方法和操作方法完全类似于movi指令
 
     2.1.9.3、内存操作指令：mm、mw、md
-        (1)*/DDR中是没有分区的(只听说过对硬盘、Flash进行分区)
-            但是内存使用时要注意，千万不能越界踩到别人了
-            uboot是一个裸机程序，操作系统会由系统整体管理所有内存，系统负责分配和管理，系统会保证内存不会随便越界
-            然后裸机程序中uboot并不管理所有内存，内存是散的随便用的，
+        (1)*/DDR中是没有分区的(对硬盘、Flash进行分区)
+            uboot裸机程序, 并不对内存进行管理
+			操作系统会所有内存, 系统负责分配和管理, 系统会保证内存不会随便越界
             所以如果程序员（使用uboot的人）自己不注意就可能出现自己把自己的数据给覆盖了
             //思考: dnw(usb刷机时)uboot放在23E00000地址处
             uboot中实际链接地址在0x30000000中(可能使uboot中开启了虚拟地址映射)
@@ -211,7 +178,7 @@ tftp的方式是通过有线网络的。典型的方式就是通过网络，fast
 2.1.10.uboot的常用环境变量1
     2.1.10.2环境变量如何参与程序运行
         (1)environment variable in DDR && ROM
-        (2)环境变量在uboot中是用/*字符串*/表示，uboot是按照/*字符匹配*/的方式来区分各个环境变量 // ASCII码
+        (2)环境变量在uboot中是用/*字符串*/表示, uboot是按照/*字符匹配*/的方式来区分各个环境变量 // ASCII码
             
     2.1.10.3自动运行倒数时间：bootdelay
 
