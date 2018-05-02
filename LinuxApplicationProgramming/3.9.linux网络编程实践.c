@@ -1,42 +1,5 @@
 
 
-第二部分、章节介绍
-3.9.1.linux网络编程框架
-	本节讲述网络编程的框架，分层思想和TCP/IP协议的介绍，BS架构和CS架构的介绍等。
-3.9.2.TCP协议的学习1
-	本节详细介绍TCP协议的特点，其中重点讲述了TCP协议保证实现可靠传输的机制。
-3.9.3.TCP协议的学习2
-	本节接上节继续讲解TCP协议，主要讲了TCP协议建立连接和关闭连接时的握手方法，最后讲了使用TCP来实现的常见应用层协议。
-3.9.4.socket编程接口介绍
-	本节介绍linux API中与网络编程相关的接口函数，后面的实战编程中都要用到这些函数。
-3.9.5.IP地址格式转换函数实践
-	本节通过代码实践来给大家演示IP地址格式转换的几个函数
-3.9.6.soekct实践编程1
-	本节开始编写基于TCP的客户端和服务器连接通信程序
-3.9.7.soekct实践编程2
-	本节接上节继续编写，并且已经实现客户端和服务器的连接。
-3.9.8.socket实践编程3
-	本节实现客户端和服务器之间的任意发送和接收、反复发送接收等功能
-3.9.9.socket编程实践4	
-	本节通过定义一个简单的应用层协议，来向大家介绍TCP连接建立后如何通过应用层协议来实现业务逻辑。
-	
-	
-
-第三部分、随堂记录
-3.9.1.linux网络编程框架
-3.9.1.1、网络是分层的
-(1)OSI 7层模型
-(2)网络为什么要分层
-(3)网络分层的具体表现
-3.9.1.2、TCP/IP协议引入
-(1)TCP/IP协议是用的最多的网络协议实现
-(2)TCP/IP分为4层，对应OSI的7层
-(3)我们编程时最关注应用层，了解传输层，网际互联层和网络接入层不用管
-3.9.1.3、BS和CS
-(1)CS架构介绍（client server，客户端服务器架构）
-(2)BS架构介绍（broswer server，浏览器服务器架构）
-
-
 3.9.2.TCP协议的学习1
 3.9.2.1、关于TCP理解的重点
 (1)TCP协议工作在传输层，对上服务socket接口，对下调用IP层
@@ -71,74 +34,60 @@
 
 
 3.9.4.socket编程接口介绍
-3.9.4.1、建立连接
-(1)socket。socket函数类似于open，用来打开一个网络连接，如果成功则返回一个网络文件描述符（int类型），
-	之后我们操作这个网络连接都通过这个网络文件描述符。
-(2)bind 【绑定ip地址】
-(3)listen
-(4)connect
-3.9.4.3、发送和接收
-(1)send和write
-(2)recv和read
-3.9.4.4、辅助性函数
-(1)inet_aton、inet_addr、inet_ntoa
-(2)inet_ntop、inet_pton					// net to point   warning: return const char *
-3.9.4.5、表示IP地址相关数据结构
+	3.9.4.1、建立连接
+		(1)socket	//socket函数类似于open, 打开一个网络连接, 成功则返回一个网络文件描述符(int类型)
+					//以后操作这个网络连接都通过这个网络文件描述符
+		(2)bind 	//绑定local ip地址
+		(3)listen
+		(4)connect
+		(5)accept	返回值是一个fd, 表示已经和前来连接的客户端之间建立了一个TCP连接
+					通过这个连接(new fd)来和客户端进行/*读写操作*/
+			
+			//注意: socket返回的fd叫做监听fd, 是用来监听客户端的, 不能用来和任何客户端进行读写 	\
+					accept返回的fd叫做连接fd, 用来和连接那端的客户端程序进行读写				\
+					-- tcp udp的socket返回值代表的含义不同
 
-	(1)都定义在 netinet/in.h
+	3.9.4.3、发送和接收
+		(1)send和write
+		(2)recv和read
+		
+	3.9.4.4、辅助性函数
+		(1)inet_addr, inet_aton, inet_ntoa		// inet_addr
+		(2)inet_ntop、inet_pton					// net to point   warning: return const char *
 
-	(2)struct sockaddr，这个结构体是网络编程接口中用来表示一个IP地址的，注意这个IP地址是不区分IPv4和IPv6的（或者说是兼容IPv4和IPv6的）
+	3.9.4.5、表示IP地址相关数据结构
+		(1)都定义在 netinet/in.h
 
-	(3)typedef uint32_t in_addr_t;		网络内部用来表示IP地址的类型
+		(2)struct sockaddr，这个结构体是网络编程接口中用来表示一个IP地址的，注意这个IP地址是不区分IPv4和IPv6的（或者说是兼容IPv4和IPv6的）
 
-	(4)struct in_addr				// struct in_addr     struct in6_addr
-	  {
-		in_addr_t s_addr;			//【封装为了某一层次的一致性】
-	  };
-	  
-	  // struct in_addr addr = 0; 	// invalid initialize 初始化结构体 类似于 数组初始化
-	  
-	(5)struct sockaddr_in			// sockadd_in  sockadd_in6
-	  {
-		__SOCKADDR_COMMON (sin_);
-		in_port_t sin_port;                 /* Port number.  */
-		struct in_addr sin_addr;            /* Internet address.  */
+		(3)typedef uint32_t in_addr_t;		网络内部用来表示IP地址的类型
 
-		/* Pad to size of `struct sockaddr'.  */
-		unsigned char sin_zero[sizeof (struct sockaddr) -
-							   __SOCKADDR_COMMON_SIZE -
-							   sizeof (in_port_t) -
-							   sizeof (struct in_addr)];
-	  };
-	
-	(6)struct sockaddr			
-		这个结构体是linux的网络编程接口中用来表示IP地址的标准结构体
-		bind、connect等函数中都需要这个结构体, 这个结构体是兼容IPV4和IPV6的
-		在实际编程中这个结构体会被一个 struct sockaddr_in 或者一个 struct sockaddr_in6 所填充
+		(4)struct in_addr				// struct in_addr && struct in6_addr
+		  {
+			in_addr_t s_addr;			// 封装为了某一层次的一致性
+		  };							// struct in_addr addr = 0;
+										// invalid initialize 初始化结构体类似于数组初始化
+		(5)struct sockaddr_in			// sockaddr_in  sockaddr_in6
+		  {
+			__SOCKADDR_COMMON (sin_);
+			in_port_t sin_port;
+			struct in_addr sin_addr;	// warning: 分号
 
+			unsigned char sin_zero[sizeof (struct sockaddr) - __SOCKADDR_COMMON_SIZE - sizeof (in_port_t) - sizeof (struct in_addr)]; // calculate pad size
+		  };							// warning: 分号
+		
+		(6)struct sockaddr{}			// 实际编程中sockaddr使用sockaddr_in或者sockaddr_in6填充
 
 3.9.5.IP地址格式转换函数实践
-3.9.5.1、inet_addr、inet_ntoa、inet_aton  // 区别 htons
-3.9.5.2、inet_pton、inet_ntop
+	3.9.5.1、inet_addr, inet_ntoa, inet_aton
+	3.9.5.2、inet_pton, inet_ntop
+		// in_addr_t inet_addr(const char *cp);		//
+		// char *inet_ntoa(struct in_addr in);		// sockaddr_in.sin_addr
 
-
-3.9.6_7.soekct实践编程1_2
-3.9.6.1、服务器端程序编写
-(1)socket
-(2)bind
-(3)listen
-(4)accept，	返回值是一个fd，accept正确返回就表示我们已经和前来连接我的客户端之间建立了一个TCP连接了，
-			以后我们就要通过这个连接来和客户端进行读写操作，读写操作就需要一个fd，这个fd就由accept来返回了。
-			
-			注意：socket返回的fd叫做监听fd，是用来监听客户端的，不能用来和任何客户端进行读写；
-				  accept返回的fd叫做连接fd，用来和连接那端的客户端程序进行读写
-3.9.6.2、客户端程序编写
-(1)socket
-(2)connect
 
  // 客户端端口号可以自动分配
 
-概念：端口号，实质就是一个数字编号，用来在我们一台主机中（主机的操作系统中）唯一的标识一个能上网的进程。
+概念: 端口号，实质就是一个数字编号，用来在我们一台主机中（主机的操作系统中）唯一的标识一个能上网的进程。
 	端口号和IP地址一起会被打包到当前进程发出或者接收到的每一个数据包中。
 	每一个数据包将来在网络上传递的时候，内部都包含了发送方和接收方的信息（就是IP地址和端口号），
 	所以IP地址和端口号这两个往往是打包在一起不分家的。
