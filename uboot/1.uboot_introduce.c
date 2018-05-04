@@ -2,12 +2,12 @@
 2.1.1.为什么要有uboot
     2.2.1.1、计算机系统的主要部件
         (1)计算机系统就是用CPU来做核心进行运行的系统	// warning: PC System
-        (2)PC System core: CPU + 内部存储器(DDR/SDRAM/SRAM) + 外部存储器(Flash/硬盘)
+        (2)PC System: CPU + 内部存储器(DDR/SDRAM/SRAM) + 外部存储器(Flash/硬盘)
 
 	2.2.1.2、PC机的启动过程
 		(1)典型的/*PC机的部署*/: BIOS在PC机主板上, OS在硬盘上, 内存在掉电时无作用, CPU在掉电时不工作
 		(2)启动过程: PC上电后先执行BIOS程序(in NorFlash)
-			// BIOS init DDR && disk, copy OS to DDR, then jump to DDR to exe OS
+			// BIOS init DDR && disk, copy OS(in disk) to DDR, then jump to DDR to exe OS
 
 	2.2.1.3、典型嵌入式linux系统启动过程
 		(1)embedded system deployment && boot is refer to PC	// warning: system deployment
@@ -18,7 +18,7 @@
 
 	2.2.1.4、android系统启动过程
 		(1)android系统的启动和linux系统几乎一样, 只是在内核启动后加载根文件系统后不同了
-		(2)可以认为启动分为2个阶段: (1)uboot到OS启动; (2)OS启动后到rootfs加载到命令行执行
+		(2)可以认为启动分为2个阶段: (1)uboot到OS启动 (2)OS启动后到rootfs加载到命令行执行
 
 	2.2.1.5、总结：uboot的作用
 		(1)uboot主要作用/*启动操作系统内核*/
@@ -33,10 +33,10 @@
 
 2.1.3.uboot必须解决哪些问题
 	2.1.3.1、自身可开机直接启动
-		(1)一般的SoC都支持多种启动方式, 譬如SD卡启动, NorFlash启动, NandFlash启动等
+		(1)一般的SoC都支持多种启动方式, 譬如SD卡启动, NorFlash启动, NandFlash启动, usb启动等
 			uboot要能够开机启动, 必须根据具体的SoC的启动设计来设计uboot
-		(2)uboot必须进行和硬件相对应的代码级别的更改和移植, 才能够保证可以从相应的启动介质启动
-			uboot中第一阶段的start.S文件中具体处理了这一块
+		(2)//uboot必须进行和硬件相对应的代码级别的更改和移植, 才能够保证可以从相应的启动介质启动 \
+			 uboot中第一阶段的start.S文件中具体处理了这一块
 
 	2.1.3.2、能够 /*引导操作系统内核启动*/并/*给内核传参*/
 		(1)uboot的终极目标就是/*启动内核*/
@@ -57,8 +57,6 @@
 		//选择dnw启动就将uboot事先烧录到ram中
 
 2.1.4.uboot的工作方式
-	2.1.4.1、从裸机程序镜像uboot.bin说起
-
 	2.1.4.2、uboot的命令式shell界面
 		(2)有些程序需要进行交互, 程序中就需要实现了一个shell, uboot就实现了一个shell
 			注意: 	shell并不是操作系统, 和操作系统一点关系都没有
@@ -99,7 +97,7 @@
 			//环境变量被存储在flash的另一块专门区域(flash上环境变量分区)
 			
 2.1.6.uboot的常用命令2
-	2.1.6.1 设置(添加/更改）环境变量：
+	2.1.6.1 设置(添加/更改)环境变量：
 		(1)/*设置/添加*/环境变量: set name value	// setenv/set
 		(2)/*保存*/环境变量: saveenv/save			// 块设备属性所决定, CR600可能考虑到传输参数的开销
 
@@ -113,7 +111,7 @@
 	2.1.7.3、开发板运行uboot下和主机Windows的ping通
 	2.1.7.4、开发板运行uboot下和虚拟机ubuntu的ping通
 		(1)uboot和虚拟机ubuntu互相ping通(前提是虚拟机ubuntu网络适配器设置为桥接(桥接到有线网卡))
-		结论: 开发板中运行的uboot有点小bug, ping windows就不通, ping虚拟机ubuntu就通
+			结论: 开发板中运行的uboot有点小bug, ping windows就不通, ping虚拟机ubuntu就通
 
 2.1.8.uboot常用命令3
 	2.1.8.1、tftp下载指令: tftp
@@ -130,7 +128,7 @@
 		(6)操作: 在开发板的uboot下先ping通虚拟机ubuntu, 然后再尝试下载: tftp 0x30000000 zImage-qt
 			//将服务器上名为zImage-qt的文件下载到开发板内存的0x30000000地址处
 		(7)镜像下载到开发板的DDR中后, uboot就可以用movi指令进行镜像的烧写	// ram -> rom
-		
+
 		//serverip meaning of tftp ip
 
 	2.1.8.2、nfs启动内核命令：nfs
@@ -156,11 +154,11 @@
         (1)理解方法和操作方法完全类似于movi指令
 
     2.1.9.3、内存操作指令：mm、mw、md
-        (1)*/DDR中是没有分区的(对硬盘、Flash进行分区)
+        (1)*/DDR中没有分区(对硬盘、Flash进行分区)
             uboot裸机程序, 并不对内存进行管理
 			操作系统会所有内存, 系统负责分配和管理, 系统会保证内存不会随便越界
             所以如果程序员（使用uboot的人）自己不注意就可能出现自己把自己的数据给覆盖了
-            //思考: dnw(usb刷机时)uboot放在23E00000地址处
+            //思考: dnw(usb刷机时)uboot放在0x23E0_0000地址处
             uboot中实际链接地址在0x30000000中(可能使uboot中开启了虚拟地址映射)
             1. uboot中源码对内存地址的处理方式 2. 虚拟地址映射表, 如何建立页表映射
 
@@ -173,13 +171,13 @@
         (2)差别: bootm启动内核同时给内核传参, 而go命令启动内核不传参
                  go命令内部其实就是一个函数指针指向一个内存地址然后直接调用那个函数
                  go命令的实质就是PC直接跳转到一个内存地址去运行
-                 调试裸机程序的方法就是事先启动uboot，然后在uboot中去下载裸机程序，用go命令去执行裸机程序
+                 调试裸机程序的一种方法: 事先启动uboot, 然后在uboot中去下载裸机程序, 用go命令去执行裸机程序
 
 2.1.10.uboot的常用环境变量1
     2.1.10.2环境变量如何参与程序运行
         (1)environment variable in DDR && ROM
         (2)环境变量在uboot中是用/*字符串*/表示, uboot是按照/*字符匹配*/的方式来区分各个环境变量 // ASCII码
-            
+
     2.1.10.3自动运行倒数时间：bootdelay
 
     2.1.10.4网络设置：ipaddr、serverip 
@@ -204,46 +202,44 @@
         (3)'bootargs=console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3'
             'console=ttySAC2,115200'	控制台使用串口2, 波特率115200
             'root=/dev/mmcblk0p2 rw'	rootfs在SD卡端口0设备(iNand)第2分区, 根文件系统是可读可写
-            'init=/linuxrc'			    linux的进程1（init进程）的路径
+            'init=/linuxrc'			    linux的进程1(init进程)的路径
             'rootfstype=ext3'			根文件系统的类型是ext3
-        (4)内核传参非常重要(不传参或传参错误导致内核启动失败)
+        (4)内核传参很重要(不传参或传参错误导致内核启动失败)
 
     2.1.11.3、新建、更改、删除一个环境变量的方法
-        (1)新建一个环境变量，使用set var value
-        (2)更改一个环境变量，使用set var value
-        (3)删除一个环境变量，使用set var
+        (1)新建一个环境变量: 使用set var value
+        (2)更改一个环境变量: 使用set var value
+        (3)删除一个环境变量: 使用set var
 
     2.1.11.4、注意：环境变量更改后的保存
 
-    2.1.12.uboot中对Flash和DDR的管理
-        2.1.12.1、uboot阶段Flash的分区
-            (1)分区: Flash进行分块管理 // uboot var kernel rootfs
-            (2)PC整个硬盘由OS统一管理, OS使用文件系统管理硬盘空间
-            (3)uboot运行时需要手动管理flash分区, 对Flash的管理必须事先使用/*分区界定*/
-                /*实际上在uboot中和kernel中都有个分区表*/(分区表: 系统移植时对Flash的整体管理分配方法)
-                在部署系统时按照/*分区表*/中分区界定方法来部署
-            (4)分区方法不是固定的, 可以变动的, 一般在设计系统移植时就会定好：
-                // sd卡启动时：烧录脚本中seek=1
-                uboot分区的大小必须保证uboot肯定能放下，一般设计为512KB或者1MB
-                环境变量：环境变量分区一般紧贴着uboot来存放，大小为32KB或者更多一点。
-                kernel：kernel大小一般为3MB或5MB
-                rootfs：······
-                剩下的就是自由分区，一般kernel启动后将自由分区挂载到rootfs下使用
+2.1.12.uboot中对Flash和DDR的管理
+	2.1.12.1、uboot阶段Flash的分区
+		(1)分区: Flash进行分块管理 // uboot var kernel rootfs
+		(2)PC整个硬盘由OS统一管理, OS使用文件系统管理硬盘空间
+		(3)uboot运行时需要手动管理flash分区, 对Flash的管理必须事先使用/*分区界定*/
+			/*实际上在uboot中和kernel中都有个分区表*/(分区表: 系统移植时对Flash的整体管理分配方法)
+			在部署系统时按照/*分区表*/中分区界定方法来部署
+		(4)分区方法不是固定的, 可以变动的, 一般在设计系统移植时就会定好:
+			// sd卡启动时：烧录脚本中seek=1
+			uboot分区的大小必须保证uboot肯定能放下, 一般设计为512KB或者1MB
+			环境变量: 环境变量分区一般紧贴着uboot来存放, 大小为32KB或者更多一点
+			kernel：kernel大小一般为3MB或5MB
+			rootfs：······
+			剩下的就是自由分区, 一般kernel启动后将自由分区挂载到rootfs下使用
 
-            总结: 
-            (1)各分区彼此相连
-            (3)uboot必须在Flash开头/*soc决定*/, 其他分区相对位置是可变 //SOC bootROM决定
-            (5)分区在系统移植前确定好, 在uboot中和kernel中使用同一个分区表
-                将来在/*系统部署时和系统代码*/中的分区方法也必须一样
+		总结: 
+		(1)各分区彼此相连
+		(3)uboot必须在Flash开头/*soc决定*/, 其他分区相对位置是可变 //SOC bootROM决定
+		(5)分区在系统移植前确定好, 在uboot中和kernel中使用同一个分区表
+			将来在/*系统部署时和系统代码*/中的分区方法也必须一样
 
-            //fastboot通过系统分区表来部署系统(或者通过手动设置内存地址)
+		//fastboot通过系统分区表来部署系统(或者通过手动设置内存地址)
 
-    2.1.12.2、uboot阶段DDR的分区
-        (3)内存分区关键就在于内存中哪一块用来干什么必须分配好
-            以避免各个不同功能使用了同一块内存造成的互相踩踏
-            譬如: tftp 0x23E00000 zImage error //uboot image in here
-
-
+2.1.12.2、uboot阶段DDR的分区
+	(3)内存分区关键就在于内存中哪一块用来干什么必须分配好
+		以避免各个不同功能使用了同一块内存造成的互相踩踏
+		譬如: tftp 0x23E00000 zImage error //uboot image in here
 
 
 
@@ -257,47 +253,16 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			

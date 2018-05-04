@@ -15,7 +15,7 @@
 
 int main(void)
 {	
-	int sock_fd = -1, ret = -1, link_sock_fd = -1;
+	int listen_fd = -1, ret = -1, connect_fd = -1;
 	struct sockaddr_in 	serverAddr = {0};
 	struct sockaddr 	clientAddr = {0};	// fill infor automatic
 	int clientAddrLen = 0;
@@ -29,31 +29,31 @@ int main(void)
 	serverAddr.sin_addr.s_addr = inet_addr(SERVER_ADDR);
 	
 // -- create socket
-	sock_fd = socket(AF_INET, SOCK_STREAM, 0);	// domain：selects protocol family which will be used for communication -- AF_INET
-	if (sock_fd < 0)
+	listen_fd = socket(AF_INET, SOCK_STREAM, 0);	// domain：selects protocol family which will be used for communication -- AF_INET
+	if (listen_fd < 0)
 	{
 		perror("socket");	// already has ':' && '\n'
 		_exit(-1);
 	}
 	perror("socket");
-	printf("sock_fd = %d\n", sock_fd);
+	printf("listen_fd = %d\n", listen_fd);
 	
 // -- bind local addr
-	ret = bind(sock_fd, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
+	ret = bind(listen_fd, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
 	if (ret < 0)
 	{
 		perror("bind");
-		close(sock_fd);
+		close(listen_fd);
 		_exit(-1);
 	}
 	perror("bind");
 	
 // -- listen
-	ret = listen(sock_fd, MAX_CONNECT_NUM);	// socket referred to by sockfd(形参) as a passive socket
-	if (ret < 0)
+	ret = listen(listen_fd, MAX_CONNECT_NUM);	// socket referred to by sockfd(形参) as a passive socket
+	if (ret < 0)								// listen_fd成为一个监听描述符
 	{
 		perror("listen");
-		close(sock_fd);
+		close(listen_fd);
 		_exit(-1);
 	}
 	perror("listen");
@@ -61,44 +61,44 @@ int main(void)
 	//while(1); // connect OK, multiple connect OK -- 2018-5-2 20:27:19
 	
 // -- accept
-	link_sock_fd = accept(sock_fd, &clientAddr, &clientAddrLen);	// it extracts(抽取) the first connection request
-	if (link_sock_fd < 0)
-	{
-		perror("accept");
-		close(sock_fd);
+	connect_fd = accept(listen_fd, &clientAddr, &clientAddrLen);	// extracts(抽取) the first connection request
+	if (connect_fd < 0)												// connect_fd应该与client_addr已经绑定
+	{																// 阻塞等待客户端连接
+		perror("accept");											// accept return新的描述符connect_fd和客户端通信
+		close(listen_fd);
 		_exit(-1);
 	}
-	printf("link_sock_fd = %d\n", link_sock_fd);
+	printf("connect_fd = %d\n", connect_fd);
 	
 // -- recv && send
 	uint8_t tcp_buff[TCP_BUFF_SIZE] = {0};
 	while(1)
 	{
-		//ret = send(link_sock_fd, "hello world", sizeof("hello world"), 0);	// sizeof("字符串") OK; ret = 12
-		//ret = send(link_sock_fd, "hello world", strlen("hello world"), 0);	// strlen("字符串") OK; ret = 11
+		//ret = send(connect_fd, "hello world", sizeof("hello world"), 0);	// sizeof("字符串") OK; ret = 12
+		//ret = send(connect_fd, "hello world", strlen("hello world"), 0);	// strlen("字符串") OK; ret = 11
 		
 		memset(tcp_buff, 0, sizeof(tcp_buff));	// need reflect: use buff(memory) -> clean
 		
-		ret = recv(link_sock_fd, tcp_buff, TCP_BUFF_SIZE, 0);	// len is buff max size -- overflow?
+		ret = recv(connect_fd, tcp_buff, TCP_BUFF_SIZE, 0);	// len is buff max size -- overflow?
 		printf("============in block just now============\n");
 		if (ret < 0)
 		{
 			perror("send");
-			close(link_sock_fd);
-			close(sock_fd);
+			close(connect_fd);
+			close(listen_fd);
 		}
 		else if (0 == ret)
 		{
-			close(link_sock_fd);		// warning: important
+			close(connect_fd);		// warning: important
 			printf("disconnect\n");
-			link_sock_fd = accept(sock_fd, &clientAddr, &clientAddrLen);
+			connect_fd = accept(listen_fd, &clientAddr, &clientAddrLen);
 			printf("============in block just now============\n");
 			printf("connect\n");
-			printf("link_sock_fd = %d\n", link_sock_fd);
-			if (link_sock_fd < 0)
+			printf("connect_fd = %d\n", connect_fd);
+			if (connect_fd < 0)
 			{
 				perror("accept");
-				close(sock_fd);
+				close(listen_fd);
 				_exit(-1);
 			}
 		}
@@ -107,8 +107,8 @@ int main(void)
 			printf("receive num   = %d\n", ret);
 			printf("receive infor = %s\n", tcp_buff);
 			
-			//ret = send(link_sock_fd, tcp_buff, TCP_BUFF_SIZE, 0);		// send num always: 128
-			ret = send(link_sock_fd, tcp_buff, strlen(tcp_buff), 0);	// len is actual size
+			//ret = send(connect_fd, tcp_buff, TCP_BUFF_SIZE, 0);		// send num always: 128
+			ret = send(connect_fd, tcp_buff, strlen(tcp_buff), 0);	// len is actual size
 			if (ret < 0)
 			{
 				perror("send");
@@ -131,7 +131,11 @@ int main(void)
 // receive
 // send		-- intended recipient is known	预期的接收者
 
-
+/* connect: 发送SYN段
+ * close  : 发送FIN段 
+ * read   : 返回0, 代表收到FIN段 
+ */
+ 
 /*
  *	accept调试记录
  */
@@ -139,13 +143,13 @@ int main(void)
 // while(1)
 // {
 	// printf("has sleep - 1 \n");
-	// link_sock_fd = accept(sock_fd, (struct sockaddr *)&clientAddr, &clientAddrLen);
+	// connect_fd = accept(listen_fd, (struct sockaddr *)&clientAddr, &clientAddrLen);
 	// printf("has sleep - 2\n");
 	
-	// if (tmp_sock_fd != link_sock_fd)
+	// if (tmp_sock_fd != connect_fd)
 	// {
-		// tmp_sock_fd = link_sock_fd;
-		// printf("link_sock_fd = %d\n", link_sock_fd);
+		// tmp_sock_fd = connect_fd;
+		// printf("connect_fd = %d\n", connect_fd);
 		// printf("clientAddr = %s, clientPort = %d\n", inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port);	// inet_ntoa
 	// }
 // }
@@ -153,16 +157,17 @@ int main(void)
 // MAX_CONNECT_NUM 并不是最大链接数
 // while(1); 仍然可以connect成功, 需要进一步测试accept
 
-// clientAddr = 192.168.0.129, clientPort = 64565	// warning: close(link_sock_fd) && inet_ntoa();
-// link_sock_fd = 16
+// clientAddr = 192.168.0.129, clientPort = 64565	// warning: close(connect_fd) && inet_ntoa();
+// connect_fd = 16
 // clientAddr = 192.168.0.129, clientPort = 9526	// client ip is same, client port is random
-// link_sock_fd = 17
+// connect_fd = 17
 // clientAddr = 192.168.0.129, clientPort = 11062
-// link_sock_fd = 18
+// connect_fd = 18
 // clientAddr = 192.168.0.129, clientPort = 18742
 
 // clientAddrLen 			= 16
 // sizeof(struct sockaddr) 	= 16
+
 
 
 

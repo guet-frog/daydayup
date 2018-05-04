@@ -1,4 +1,4 @@
 #!/bin/sh
-make distclean
+make distclean			#dist 分散的?
 make x210_sd_config
 make -j4
