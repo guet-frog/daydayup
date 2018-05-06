@@ -40,7 +40,7 @@ HOSTARCH := $(shell uname -m | \
 HOSTOS := $(shell uname -s | tr '[:upper:]' '[:lower:]' | \
 	    sed -e 's/\(cygwin\).*/cygwin/')
                                                                         # $(shell uname -m |)  (1)`uname -m` (2) | 管道
-export	HOSTARCH HOSTOS                                                 # export 导出environment variable
+export	HOSTARCH HOSTOS                                                 # 导出这两个环境变量的作用 HOSTARCH 与 ARCH之间的关系
 
 # Deal with colliding definitions from tcsh etc.
 VENDOR=
@@ -98,7 +98,7 @@ TOPDIR		:= $(SRCTREE)
 LNDIR		:= $(OBJTREE)
 export	TOPDIR SRCTREE OBJTREE
 
-MKCONFIG	:= $(SRCTREE)/mkconfig      # 源码根目录下面的mkconfig
+MKCONFIG	:= $(SRCTREE)/mkconfig      # 源码根目录下面的mkconfig, 对uboot进行配置的脚本
 export MKCONFIG                         # config script
 
 ifneq ($(OBJTREE),$(SRCTREE))
@@ -107,9 +107,9 @@ export REMOTE_BUILD
 endif
 
 # $(obj) and (src) are defined in config.mk but here in main Makefile
-# we also need them before config.mk is included which is the case for
-# some targets like unconfig, clean, clobber, distclean, etc.
-ifneq ($(OBJTREE),$(SRCTREE))           # 测试两个变量未定义 -- equal, 这里两个变量都是CURDIR
+# we also need them before config.mk is included which is the case for		# line 185 include"config.mk" -- ①这里提前定义和后面include展开的定义应该不会冲突, 没有定义赋值的概念
+# some targets like unconfig, clean, clobber, distclean, etc.											  -- ②这里提前定义和后面include展开, 对targets执行有什么影响
+ifneq ($(OBJTREE),$(SRCTREE))           # 测试两个变量未定义 -- equal, 当前环境下这里两个变量都是CURDIR
 obj := $(OBJTREE)/
 src := $(SRCTREE)/
 else
@@ -130,10 +130,10 @@ endif
 ifeq ($(obj)include/config.mk,$(wildcard $(obj)include/config.mk))  # 自动配置的一种思想, x210_sd_config配置过程中, 自动生成
 
 # load ARCH, BOARD, and CPU configuration
-include $(obj)include/config.mk             # line 2589: make x210_sd_config执行mkconfig脚本, 将arch...作为参数传入, 生成config.mk
-export	ARCH CPU BOARD VENDOR SOC           # ARCH -> CROSS_COMPILE // line 147
+include $(obj)include/config.mk             						# line 2589: make x210_sd_config执行mkconfig脚本, 将ARCH, CPU...作为参数传入, 生成config.mk
+export	ARCH CPU BOARD VENDOR SOC           						# ARCH -> CROSS_COMPILE // line 147
 
-ifndef CROSS_COMPILE                        #ifndef CROSS_COMPILE //传参优先级高        make CROSS_COMPILE=xxx not O=
+ifndef CROSS_COMPILE                        						# ifndef CROSS_COMPILE //传参优先级高        make "CROSS_COMPILE=xxx" not "O=xxx"
 ifeq ($(HOSTARCH),$(ARCH))
 CROSS_COMPILE =
 else

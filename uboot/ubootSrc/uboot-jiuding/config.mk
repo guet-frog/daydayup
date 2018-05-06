@@ -126,7 +126,7 @@ else
 BOARDDIR = $(BOARD)
 endif
 ifdef	BOARD
-sinclude $(TOPDIR)/board/$(BOARDDIR)/config.mk	# include board specific rules		# TEXT_BASE = 0xc3e00000
+sinclude $(TOPDIR)/board/$(BOARDDIR)/config.mk	# include board specific rules		# TEXT_BASE = 0xc3e00000  // text_base与link文件相关联, 都放在board/vendor/board目录下
 endif
 
 #########################################################################
@@ -153,7 +153,7 @@ gccincdir := $(shell $(CC) -print-file-name=include)
 
 CPPFLAGS := $(DBGFLAGS) $(OPTFLAGS) $(RELFLAGS)		\
 	-D__KERNEL__
-ifneq ($(TEXT_BASE),)											# TEXT_BASE在配置时生成, 前面已经include, 这里判断不为空, CPPFLAGS += TEXT_BASE
+ifneq ($(TEXT_BASE),)											# TEXT_BASE 在配置时生成, 前面已经include, 这里判断不为空, CPPFLAGS += TEXT_BASE
 CPPFLAGS += -DTEXT_BASE=$(TEXT_BASE)
 endif
 
@@ -247,7 +247,7 @@ ifndef REMOTE_BUILD
 
 else
 
-$(obj)%.s:	%.S
+$(obj)%.s:	%.S						# 中间文件放在 $(obj)
 	$(CPP) $(AFLAGS) -o $@ $<
 $(obj)%.o:	%.S
 	$(CC) $(AFLAGS) -c -o $@ $<

@@ -65,6 +65,10 @@
 		3. 设备信息相关		include/config.mk					// 配置生成
 		4. 工具链配置相关	./config.mk							// 源码
 		5. 宏定义			include/autoconf.mk					// 编译生成
+        
+    
+    mkconfig生成文件:
+        1. ./include/asm            // ln -s asm-$2 asm
 
 
 

@@ -47,7 +47,7 @@
  */
 
 #if defined(CONFIG_EVT1) && !defined(CONFIG_FUSED)
-	.word 0x2000
+	.word 0x2000									// .word GNU汇编伪指令 相当于int类型变量
 	.word 0x0
 	.word 0x0
 	.word 0x0
@@ -82,7 +82,7 @@ _pad:
 .global _end_vect
 _end_vect:
 
-	.balignl 16,0xdeadbeef
+	.balignl 16,0xdeadbeef				// 内存对齐--16字节 伪指令 
 /*
  *************************************************************************
  *
@@ -96,8 +96,8 @@ _end_vect:
  *************************************************************************
  */
 
-_TEXT_BASE:
-	.word	TEXT_BASE
+_TEXT_BASE:								// 符号 -> 地址 
+	.word	TEXT_BASE					// .word类型 存入TEXT_BASE		ldr r0 _TEXT_BASE
 
 /*
  * Below variable is very important because we use MMU in U-Boot.
@@ -105,9 +105,9 @@ _TEXT_BASE:
  * by scsuh.
  */
 _TEXT_PHY_BASE:
-	.word	CFG_PHY_UBOOT_BASE
+	.word	CFG_PHY_UBOOT_BASE			// for virtual addr
 
-.globl _armboot_start
+.globl _armboot_start					// for clean bss && relocation
 _armboot_start:
 	.word _start
 
@@ -122,7 +122,7 @@ _bss_start:
 _bss_end:
 	.word _end
 
-#if defined(CONFIG_USE_IRQ)
+#if defined(CONFIG_USE_IRQ)							// uboot一般不使用中断
 /* IRQ stack memory (calculated at run-time) */
 .globl IRQ_STACK_START
 IRQ_STACK_START:
@@ -146,7 +146,7 @@ reset:
 	@;bic	r0,r0,#0x1f
 	@;orr	r0,r0,#0xd3
 	@;msr	cpsr,r0
-	msr	cpsr_c, #0xd3		@ I & F disable, Mode: 0x13 - SVC
+	msr	cpsr_c, #0xd3		@ I & F disable, Mode: 0x13 - SVC		// cpsr 程序状态寄存器  cpsr_c程序状态寄存器的c位(模式位)
 
 
 /*
@@ -222,7 +222,7 @@ lp2:
 
 
         /* Read booting information */
-        ldr	r0, =PRO_ID_BASE
+        ldr	r0, =PRO_ID_BASE				// define reg.h
         ldr	r1, [r0,#OMR_OFFSET]
         bic	r2, r1, #0xffffffc1
 

@@ -11,7 +11,7 @@
 
 	我们常说有多少种shell, 其实就是说的是shell脚本解释器	// 常见shell脚本解释器bash, sh, csh, ksh
 
-	编译型语言与解释型语言 // 解释器(interpreter)读取源代码(source code)并转换为目标代码(object code) 每次执行程序都多了编译的过程，因此效率有所下降  
+	编译型语言与解释型语言 // 解释器(interpreter)读取源代码(source code)并转换为目标代码(object code) 每次执行程序都多了编译的过程, 因此效率有所下降  
 
 2.2.2.动手写第一个shell
     2.2.2.1、编辑器、编译器、运行方法    //脚本的3种执行方法
@@ -80,7 +80,7 @@
 
     2.2.5.3、echo的创建和追加输入文件
         (1)在shell中可以直接使用echo指令新建一个文件, 并且将一些内容传入这个文件中 // echo `ll` > a.txt
-        (2)还可以使用echo指令配合追加符号    // echo hellow world >> a.txt
+        (2)还可以使用echo指令配合追加符号    // echo hello world >> a.txt
 
 2.2.6.shell中其他值得关注的知识点
     2.2.6.1、case语句
@@ -91,9 +91,9 @@
         (2)shell程序在调用时可以传参
             $#: 传参的个数(only param); $0、$1: param[0] param[1]
 
-            C语言: ./a.out aa bb cc 	argc = 4, argv[0] = ./a.out, argv[1]是第一个有效参数···
-            shell: source a.sh aa bb cc  $# = 3, $0是执行这个shell程序的解析程序的名字, 
-												 $1是第一个有效参数的值，$2是第2个有效参数的值···
+            C语言: ./a.out aa bb cc 		argc = 4, 	argv[0] = ./a.out, argv[1]是第一个有效参数···
+            shell: source a.sh aa bb cc  	$# = 3, 	$0是执行这个shell程序的解析程序的名字
+														$1是第一个有效参数的值，$2是第2个有效参数的值···
 
     2.2.6.3、while循环和case语言和传参结合
         (1)shell中break只用于循环跳出 //当while中内嵌case语句时, case中的break是跳出外层的while循环的, 不是用来跳出case语句的
@@ -141,15 +141,15 @@
 		(1)makefile中用export导出的就是环境变量
 			一般情况下要求环境变量名用大写, 普通变量名用小写
 		(2)环境变量和普通变量不同
-			可以这样理解: 环境变量类似于整个工程中所有Makefile之间可以共享的全局变量，
-			而普通变量只是当前本Makefile中使用的局部变量。
+			可以这样理解: 环境变量类似于整个工程中所有Makefile之间可以共享的全局变量
+			而普通变量只是当前本Makefile中使用的局部变量
 			warning: 定义了一个环境变量会影响到工程中别的Makefile文件
 		(3)Makefile中有一些环境变量
 			可能是makefile本身自己定义的内部的环境变量或者是当前的执行环境提供的环境变量
-			（譬如我们在make执行时给makefile传参。
-			make CC=arm-linux-gcc，其实就是给当前Makefile传了一个环境变量CC，值是arm-linux-gcc。
-			我们在make时给makefile传的环境变量值优先级最高的，可以覆盖makefile中的赋值）
-			这就好像C语言中编译器预定义的宏__LINE__ __FUNCTION__等一样。
+			(譬如我们在make执行时给makefile传参
+			make CC=arm-linux-gcc, 其实就是给当前Makefile传了一个环境变量CC, 值是arm-linux-gcc
+			我们在make时给makefile传的环境变量值优先级最高的, 可以覆盖makefile中的赋值
+			这就好像C语言中编译器预定义的宏__LINE__ __FUNCTION__等一样
 
 2.2.9.Makefile补充学习2
 	2.2.9.1、Makefile中使用通配符

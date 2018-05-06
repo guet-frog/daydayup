@@ -11,16 +11,16 @@
 APPEND=no	# Default: Create new config file
 BOARD_NAME=""	# Name to print in make output
 
-while [ $# -gt 0 ] ; do
+while [ $# -gt 0 ] ; do									# ($# = 6) > 0
 	case "$1" in
 	--) shift ; break ;;
-	-a) shift ; APPEND=yes ;;
+	-a) shift ; APPEND=yes ;;							# 处理'-a'后, shift, 和没有'-a'时参数是一样的
 	-n) shift ; BOARD_NAME="${1%%_config}" ; shift ;;
-	*)  break ;;
+	*)  break ;;										# '*'相当于default
 	esac
 done
 
-[ "${BOARD_NAME}" ] || BOARD_NAME="$1"
+[ "${BOARD_NAME}" ] || BOARD_NAME="$1"					# 简写的if语句
 
 [ $# -lt 4 ] && exit 1
 [ $# -gt 6 ] && exit 1
@@ -43,14 +43,14 @@ if [ "$SRCTREE" != "$OBJTREE" ] ; then
 	mkdir asm-$2
 	ln -s asm-$2 asm
 else
-	cd ./include
+	cd ./include									# cd ./include
 	rm -f asm
 	ln -s asm-$2 asm
 fi
 
 rm -f asm-$2/arch
 
-if [ -z "$6" -o "$6" = "NULL" ] ; then
+if [ -z "$6" -o "$6" = "NULL" ] ; then				# 使用 -o 连接   warning: -z ?
 	ln -s ${LNPREFIX}arch-$3 asm-$2/arch
 else
 	ln -s ${LNPREFIX}arch-$6 asm-$2/arch
@@ -82,10 +82,10 @@ fi
 
 # create link for s5pc11x SoC
 if [ "$3" = "s5pc11x" ] ; then
-        rm -f regs.h
+        rm -f regs.h							# 注意当前目录 
         ln -s $6.h regs.h
         rm -f asm-$2/arch
-        ln -s arch-$3 asm-$2/arch
+        ln -s arch-$3 asm-$2/arch				# arch-s5pc11x并不在 ./include目录   注意符号链接路径
 fi
 
 # create link for s5p64xx SoC
@@ -120,7 +120,7 @@ fi
 #
 # Create include file for Make
 #
-echo "ARCH   = $2" >  config.mk
+echo "ARCH   = $2" >  config.mk					# warning: current dir
 echo "CPU    = $3" >> config.mk
 echo "BOARD  = $4" >> config.mk
 
