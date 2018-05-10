@@ -1,25 +1,13 @@
 
 
-2.4.2.uboot主Makefile分析2
-	本节主要讲解uboot的静默编译的实现、本地编译和设置输出目录的编译这两种不同的编译方法。
-2.4.3.uboot主Makefile分析3
-	本节引入include/config.mk文件，并分析了ARCH、CROSS_COMPILE这两个环境变量。
-2.4.4.uboot主Makefile分析4
-	本节引入顶层目录下config.mk文件，并分析了autoconfig.mk文件的来源和作用。
-2.4.5.uboot主Makefile分析5
-	本节介绍链接脚本的引入、TEXT_BASE变量及链接地址的指定、Makefile的自动推导规则等。
-2.4.6.uboot主Makefile分析6
-	本节介绍主Makefile中剩下的部分，重点介绍了开发板配置的目标和依赖、命令等，这些是我们配置uboot时的重点。
-2.4.7.uboot配置过程详解1
-	本节分析uboot的配置过程，主要是mkconfig脚本及传给他的6个参数。
-2.4.8.uboot配置过程详解2
-	本节接上节来继续分析mkconfig脚本，主要是board目录下的config.mk文件的生成和include目录下config.h文件的生成。
-2.4.9.uboot的链接脚本
-	本节介绍uboot的链接脚本。通过回顾裸机程序中的链接脚本和相关概念帮大家来深入理解uboot的整体结构。
-
-
 // uboot配置目的, 指定需要用到的源文件路径, 配置uboot version
 // 学习uboot类似复杂项目, 首先确定该项目是如何管理(整体代码架构, 管理方式), 代码细节是另一个层次
+
+// 1, 执行make_xx_config 传入ARCH, CPU, BOARD, SOC参数
+// 2, mkconfig根据参数在include文件夹: 1.创建symbolic link; 2.生成config.h
+// 3, 执行make分别调用各子目录的Makefile生成.obj文件和.a文件
+// 4, 链接目标文件, 生成镜像
+
 
 2.4.1.uboot主Makefile分析1
 	2.4.1.1 uboot version
@@ -30,10 +18,10 @@
 		(1)shell中执行uname -m得到i686(当前CPU版本号)
 		(2)shell中的|叫做管道
 			管道的作用: 把管道前面一个运算式的输出作为后面一个的输入再去做处理, 最终的输出才是整个式子的输出
-		(4)HOSTARCH: 主机的CPU架构; HOSTOS: 主机的操作系统		// 作用
+		(4)HOSTARCH: 主机的CPU架构; HOSTOS: 主机的操作系统		// 判断HOSTARCH与ARCH是否相等
 
 2.4.2.uboot主Makefile分析2
-	2.4.2.1、静默编译	// line 50-54
+	2.4.2.1、静默编译	// line50-54
 		(1)静默编译: 屏蔽编译信息(后台编译)
 		(2)使用方法就是编译时make -s, -s会作为MAKEFLAGS传给Makefile	// MAKEFLAGS
 			XECHO变量赋值	// default: echo
@@ -51,7 +39,7 @@
 			默认为原地编译
 			指定具体的输出目录编译:
 				①: make O=输出目录							// high priority, not MAKEFLAGS
-				②: export BUILD_DIR=输出目录 然后再make		// contrast PATH
+				②: export BUILD_DIR=输出目录 然后再make		// contrast(对照) PATH
 
 2.4.3.uboot主Makefile分析3
 	2.4.3.1、OBJTREE、SRCTREE、TOPDIR
@@ -59,49 +47,43 @@
 		(2)SRCTREE: 源代码根目录
 			//在默认编译下OBJTREE和SRCTREE相等; 在O=xx这种编译下OBJTREE和SRCTREE不相等
 
-    2.4.3.2、MKCONFIG // line 101
+    2.4.3.2、MKCONFIG // line101
         (1)Makefile定义的一个变量: MKCONFIG := $(SRCTREE)/mkconfig
             //mkconfig是uboot配置阶段的配置脚本
 
-	2.4.3.3 include $(obj)include/config.mk // line 133
-		(1)include/config.mk 要在配置过程生成(make x210_sd_config)
-		(2)X210在iNand情况下配置生成的config.mk内容为
-			ARCH   = arm
-			CPU    = s5pc11x
-			BOARD  = x210
-			VENDOR = samsung
-			SOC    = s5pc110
-		(3)自动配置的一种思想, x210_sd_config配置过程中, 自动生成
-		(4)// line 2589 -- @$(MKCONFIG) $(@:_config=) arm s5pc11x x210 samsung s5pc110 
+	2.4.3.3 include $(obj)include/config.mk // line133
+		(1)include/config.mk要在配置过程生成(make x210_sd_config)
+		(3)自动配置思想: 编译前配置"make x210_sd_config" 自动生成config.mk文件, 从而可以导出以上环境变量
+		(4)//line2589 -- @$(MKCONFIG) $(@:_config=) arm s5pc11x x210 samsung s5pc110 
+           //generated file: include/config.mk
 
 	2.4.3.4 ARCH CROSS_COMPILE
 		(1)ARCH: 配置过程中指定		//ARCH -> CROSS_COMPILE // path(/usr/local/arm) + name(arm-linux-*)
 		(2)CROSS_COMPILE: 交叉编译工具 前缀 + 路径
-			//不同CPU架构上的交叉编译工具链, 前缀不一样后缀一样
-			//设置CROSS_COMPILE的值: 找到那个交叉编译工具链, 绝对路径或相对路径
+			//不同CPU架构上的交叉编译工具链, 前缀不一样, 后缀一样
+			//设置CROSS_COMPILE: 交叉编译工具链的绝对路径或相对路径
 			//可以在Makefile中去更改设置CROSS_COMPILE的值 -- 修改导出的环境变量CROSS_COMPILE
 			//编译时用"make CROSS_COMPILE=xxxx", 而且编译时传参可以覆盖Makefile内部设置, 优先级较高
-
 
 //makefile文件下编译, 与cmdline下编译, 本质是相同的
 
 2.4.4.uboot主Makefile分析4
 	2.4.4.1、$(TOPDIR)/config.mk	// line 185
 		//设置交叉编译工具链属性: 预处理属性, 编译属性, 链接属性
-	
+
 	2.4.4.2、编译工具定义
 		//交叉编译工具链是一系列工具的集合
-		//config.mk line 97-107完整交叉编译工具链定义
-	
+		//config.mk line97-107完整交叉编译工具链定义
+
 	2.4.4.3、包含开发板配置项目
-		(1)include/autoconfig.mk编译后生成 		//-- include/config.mk文件是配置生成
+		(1)include/autoconf.mk编译后生成
 		(2)文件内容: 很多CONFIG_开头的变量(宏)
 		   文件作用: 指导整个uboot的编译过程(条件编译)
 			//条件编译是用来实现可移植性(uboot包含了各种开发板的适用代码, 源码用条件编译组合一起)
-		(3)配置过程也是需要原材料来产生这个文件 //inlcude/configs/x210_sd.h
+		(3)配置过程所需要的源文件 // inlcude/configs/x210_sd.h
 			//头文件里面全都是宏定义, 这些宏定义是对当前开发板的移植			\
 			  每个开发板的移植对应这个目录下的一个头文件						\
-			  这些配置的宏定义就是我们移植uboot的关键所在	// 强调开发板
+			  这些配置的宏定义就是移植uboot的关键所在	// 强调开发板
 
 2.4.5.uboot主Makefile分析5
     2.4.5.1、链接脚本    // line 142-149
@@ -109,10 +91,10 @@
         (3)u-boot.lds: board\samsung\x210    // $(TOPDIR)/board/$(BOARDDIR)/u-boot.lds
 
     2.4.5.2、TEXT_BASE   // line 156-158
-        (1)makefile在配置过程中: board/samsung/x210目录下生成了config.mk    // TEXT_BASE = 0xc3e0_0000
+        (1)makefile在配置过程中: board/samsung/x210/config.mk    // TEXT_BASE = 0xc3e0_0000
         (2)TEXT_BASE是整个uboot链接时指定的链接地址, uboot中启用了虚拟地址映射
-            //因此0xC3E0_0000地址就相当于0x23E0_0000(具体地址要取决于uboot虚拟地址映射关系)
-        (3)回顾裸机中讲的链接地址的问题，
+            //因此0xC3E0_0000地址就相当于0x33E0_0000(uboot中虚拟地址映射的设置)
+        (3)回顾裸机中讲的链接地址的问题
             //dnw方式先下载x210_usb.bin, 然后再下载uboot.bin时设置第二个地址: 0x23E0_0000
 
 2.4.6.uboot主Makefile分析6
@@ -120,58 +102,51 @@
     (2)u-boot.elf
     (3)x210_sd_config: unconfig
 
-
 2.4.7.uboot配置过程详解1
     (1)mkconfig脚本的6个参数
-        $(@:_config=) arm s5pc11x x210 samsung s5pc110
-
-        x210_sd_config里的_config部分用空替换，得到：x210_sd，这就是第一个参数，所以：
-        $1:	x210_sd
-        $2:	arm
-        $3: s5pc11x
-        $4:	x210
-        $5: samsumg
-        $6:	s5pc110
-        所以，$# = 6
-
-    (2)第23行：其实就是看BOARD_NAME变量是否有值，如果有值就维持不变；如果无值就给他赋值为$1，实际分析结果：BOARD_NAME=x210_sd
-    (3)第25行：如果$#小于4，则exit 1（mkconfig脚本返回1）
-    (4)第26行：如果$#大于6，则也返回1.
-        所以：mkconfig脚本传参只能是4、5、6，如果大于6或者小于4都不行。
-    (5)从第33行到第118行，都是在创建符号链接。为什么要创建符号链接？这些符号链接文件的存在就是整个配置过程的核心，这些符号链接文件（文件夹）的主要作用是给头文件包含等过程提供指向性连接。根本目的是让uboot具有可移植性。
-        uboot可移植性的实现原理：在uboot中有很多彼此平行的代码，各自属于各自不同的架构/CPU/开发板，我们在具体到一个开发板的编译时用符号连接的方式提供一个具体的名字的文件夹供编译时使用。这样就可以在配置的过程中通过不同的配置使用不同的文件，就可以正确的包含正确的文件。
+        $1:	x210_sd     // BOARD_NAME
+        $2:	arm         // ARC
+        $3: s5pc11x     // CPU
+        $4:	x210        // BOARD
+        $5: samsumg     // VENDOR
+        $6:	s5pc110     // SOC
+        // $# = 6
 
     (6)创建的符号链接：
-        第一个：在include目录下创建asm文件，指向asm-arm。（46-48行）
-        第二个：在inlcude/asm-arm下创建一个arch文件，指向include/asm-arm/arch-s5pc110
-        第三个：在include目录下创建regs.h文件，指向include/s5pc110.h
-        删除第二个。
-        第四个：在inlcude/asm-arm下创建一个arch文件，指向include/asm-arm/arch-s5pc11x
-        第五个：在include/asm-arm下创建一个proc文件，指向include/asm-arm/proc-armv
-
-        总结：一共创建了4个符号链接。这4个符号链接将来在写代码过程中，头文件包含时非常有用。譬如一个头文件包含可能是：#include <asm/xx.h>
-
+        ① ./include/asm             -> ./include/asm-arm
+        ② ./include/asm-arm/arch    -> ./include/asm-arm/arch-s5pc110  // for transplant tmp
+        ③ ./include/regs.h          -> ./include/s5pc110.h
+        ④ ./include/asm-arm/arch    -> ./include/asm-arm/arch-s5pc11x
+        ⑤ ./include/asm-arm/proc    -> ./include/asm-arm/proc-armv
 
 2.4.8.uboot配置过程详解2
-    (1)创建include/config.mk文件（mkconfig文件123-129行）
-    (2)创建include/config.mk文件是为了让主Makefile在第133行去包含的（详解见2.4.3.3节）。
-    (3)思考：uboot的配置和编译过程的配合。编译的时候需要ARCH=arm、CPU=xx等这些变量来指导编译，配置的时候就是为编译阶段提供这些变量。那为什么不在Makefile中直接定义这些变量去使用，而要在mkconfig脚本中创建config.mk文件然后又在Makefile中include这些文件呢？
-    (4)理解这些脚本时，时刻要注意自己当前所处的路径。
-    (5)创建（默认情况）/追加（make -a时追加）include/config.h文件（mkconfig文件的134-141行）。
-    (6)这个文件里面的内容就一行#include <configs/x210_sd.h>，这个头文件是我们移植x210开发板时，对开发板的宏定义配置文件。这个文件是我们移植x210时最主要的文件。
-    (7)x210_sd.h文件会被用来生成一个autoconfig.mk文件，这个文件会被主Makefile引入，指导整个编译过程。这里面的这些宏定义会影响我们对uboot中大部分.c文件中一些条件编译的选择。从而实现最终的可移植性。
-
-        注意：uboot的整个配置过程，很多文件之间是有关联的（有时候这个文件是在那个文件中创建出来的；有时候这个文件被那个文件包含进去；有时候这个文件是由那个文件的内容生成的决定的）
-        注意：uboot中配置和编译过程，所有的文件或者全局变量都是字符串形式的（不是指的C语言字符串的概念，指的是都是字符组成的序列）。这意味着我们整个uboot的配置过程都是字符串匹配的，所以一定要细节，注意大小写，要注意不要输错字符，因为一旦错一个最后会出现一些莫名其妙的错误，很难排查，这个是uboot移植过程中新手来说最难的地方。
-
+    (1)创建include/config.mk   // for 主Makefile line123
+    (3)uboot的/*配置*/和/*编译*/过程的配合:
+        编译的时候需要ARCH=arm、CPU=xx等这些变量来指导编译, 配置的时候就是为编译阶段提供这些变量
+        //为什么不在Makefile中直接定义这些变量去使用, 而要在mkconfig脚本中创建config.mk文件然后又在Makefile中include这些文件
+    (4)分析脚本时需要注意current dir
+    (6)创建config.h    //#include <configs/x210_sd.h>，
+        这个头文件是移植x210开发板时, 对开发板的宏定义配置文件  // 特定开发板移植的主要文件 
+    (7)x210_sd.h文件会被用来生成autoconfig.mk文件, 这个文件会被主Makefile引入, 指导整个编译过程
+        文件中的宏定义会影响对uboot中大部分.c文件中一些条件编译的选择, 从而实现最终的可移植性
 
 2.4.9.uboot的链接脚本
-    (1)uboot的链接脚本和我们之前裸机中的链接脚本并没有本质区别，只是复杂度高一些，文件多一些，使用到的技巧多一些。
-    (2)ENTRY(_start)用来指定整个程序的入口地址。所谓入口地址就是整个程序的开头地址，可以认为就是整个程序的第一句指令。有点像C语言中的main。
-    (3)之前在裸机中告诉大家，指定程序的链接地址有2种方法：一种是在Makefile中ld的flags用-Ttext 0x20000000来指定；第二种是在链接脚本的SECTIONS开头用.=0x20000000来指定。两种都可以实现相同效果。其实，这两种技巧是可以共同配合使用的，也就是说既在链接脚本中指定也在ld flags中用-Ttext来指定。两个都指定以后以-Ttext指定的为准。
-    (4)uboot的最终链接起始地址就是在Makefile中用-Ttext 来指定的，具体参见2.4.5.2节，注意TEXT_BASE变量。最终来源是Makefile中配置对应的命令中，在make xxx_config时得到的。
-    (5)在代码段中注意文件排列的顺序。指定必须放在前面部分的那些文件就是那些必须安排在前16KB内的文件，这些文件中的函数在前16KB会被调用。在后面第二部分（16KB之后）中调用的程序，前后顺序就无所谓了。
-    (6)链接脚本中除了.text  .data .rodata .bss段等编译工具自带的段之外，编译工具还允许我们自定义段。譬如uboot总的.u_boot_cmd段就是自定义段。自定义段很重要。
+    (2)ENTRY(_start)用来指定整个程序的入口地址。
+        所谓入口地址就是整个程序的开头地址, 可以认为就是整个程序的第一句指令     // C main
+    (3)指定程序的链接地址的2种方法:
+        ① Makefile中ld的flags用-Ttext 0x20000000
+        ② 在链接脚本的SECTIONS开头  .=0x20000000
+        // 两个都指定以-Ttext指定的为准
+    (4)uboot的最终链接起始地址在Makefile中用-Ttext指定   // 配置时设定: TEXT_BASE = 0xC3E0_0000
+    (5)在代码段中注意文件排列的顺序   //理论上main链接到后面地址也是可以正常运行, 但是bootROM仅加载前16K
+    (6)链接脚本中除了.text  .data .rodata .bss段等/*编译工具*/自带的段之外
+        编译工具还允许自定义段, 譬如uboot总的.u_boot_cmd段就是自定义段    //自定义段很重要
+        
+    
+    // mkconfig主要做了三件事:
+        创建相应软链接
+        生成./include/config.mk
+        生成./include/config.h
 
 
 
@@ -190,6 +165,27 @@
 
 
 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
 
 

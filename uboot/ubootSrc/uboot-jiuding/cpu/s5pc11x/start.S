@@ -25,7 +25,7 @@
  * Base codes by scsuh (sc.suh)
  */
 
-#include <config.h>
+#include <config.h>					// start.S的源码路径      " " or < >
 #include <version.h>
 #if defined(CONFIG_ENABLE_MMU)
 #include <asm/proc/domain.h>
@@ -47,16 +47,16 @@
  */
 
 #if defined(CONFIG_EVT1) && !defined(CONFIG_FUSED)
-	.word 0x2000									// .word GNU汇编伪指令 相当于int类型变量
-	.word 0x0
+	.word 0x2000									// .word GNU汇编伪指令 相当于int类型变量  -- effect?
+	.word 0x0										// 这里定义, 代表在start.o文件的开头 ?
 	.word 0x0
 	.word 0x0
 #endif
 
 .globl _start
-_start: b	reset
-	ldr	pc, _undefined_instruction
-	ldr	pc, _software_interrupt
+_start: b	reset									// 编译器会根据start.s中vector定义, 将中断向量表link到相应位置
+	ldr	pc, _undefined_instruction					// 此时PC指向reset, 其他异常向量表位置应该为空, 此时在程序运行时手动填充中断向量表
+	ldr	pc, _software_interrupt						// 这里是不执行的...
 	ldr	pc, _prefetch_abort
 	ldr	pc, _data_abort
 	ldr	pc, _not_used
@@ -82,13 +82,13 @@ _pad:
 .global _end_vect
 _end_vect:
 
-	.balignl 16,0xdeadbeef				// 内存对齐--16字节 伪指令 
+	.balignl 16,0xdeadbeef				// 内存对齐--16字节 伪指令
 /*
  *************************************************************************
  *
  * Startup Code (reset vector)
  *
- * do important init only if we don't start from memory!
+ * do important init only if we do not start from memory!
  * setup Memory and board specific bits prior to relocation.
  * relocate armboot to ram
  * setup stack
@@ -96,8 +96,8 @@ _end_vect:
  *************************************************************************
  */
 
-_TEXT_BASE:								// 符号 -> 地址 
-	.word	TEXT_BASE					// .word类型 存入TEXT_BASE		ldr r0 _TEXT_BASE
+_TEXT_BASE:								// 符号 -> 地址		// 汇编里的符号, 应理解为 &变量名
+	.word	TEXT_BASE					// .word类型 存入TEXT_BASE(外部已导出)	ldr r0 _TEXT_BASE		// memory -> reg
 
 /*
  * Below variable is very important because we use MMU in U-Boot.
@@ -105,9 +105,9 @@ _TEXT_BASE:								// 符号 -> 地址
  * by scsuh.
  */
 _TEXT_PHY_BASE:
-	.word	CFG_PHY_UBOOT_BASE			// for virtual addr
+	.word	CFG_PHY_UBOOT_BASE			// for virtual addr, clean bss && relocation
 
-.globl _armboot_start					// for clean bss && relocation
+.globl _armboot_start
 _armboot_start:
 	.word _start
 
@@ -122,7 +122,7 @@ _bss_start:
 _bss_end:
 	.word _end
 
-#if defined(CONFIG_USE_IRQ)							// uboot一般不使用中断
+#if defined(CONFIG_USE_IRQ)							// uboot一般不使用中断 not exception
 /* IRQ stack memory (calculated at run-time) */
 .globl IRQ_STACK_START
 IRQ_STACK_START:
@@ -159,10 +159,10 @@ reset:
  *
  *************************************************************************
  */
-         /*
-         * we do sys-critical inits only at reboot,
-         * not when booting from ram!
-         */
+ /*
+ * we do sys-critical inits only at reboot,
+ * not when booting from ram!
+ */
 cpu_init_crit:
 
 #ifndef CONFIG_EVT1
@@ -195,7 +195,7 @@ lp2:
 	
 	bl	enable_l2cache
 #endif
-#endif
+#endif /*CONFIG_EVT1*/
 	
 	bl	disable_l2cache
 
@@ -203,30 +203,30 @@ lp2:
 
 	bl	enable_l2cache
 	
-       /*
-        * Invalidate L1 I/D
-        */
-        mov	r0, #0                  @ set up for MCR
-        mcr	p15, 0, r0, c8, c7, 0   @ invalidate TLBs
-        mcr	p15, 0, r0, c7, c5, 0   @ invalidate icache
+   /*
+	* Invalidate L1 I/D
+	*/
+	mov	r0, #0                  @ set up for MCR
+	mcr	p15, 0, r0, c8, c7, 0   @ invalidate TLBs
+	mcr	p15, 0, r0, c7, c5, 0   @ invalidate icache
 
-       /*
-        * disable MMU stuff and caches
-        */
-        mrc	p15, 0, r0, c1, c0, 0
-        bic	r0, r0, #0x00002000     @ clear bits 13 (--V-)
-        bic	r0, r0, #0x00000007     @ clear bits 2:0 (-CAM)
-        orr	r0, r0, #0x00000002     @ set bit 1 (--A-) Align
-        orr	r0, r0, #0x00000800     @ set bit 12 (Z---) BTB
-        mcr 	p15, 0, r0, c1, c0, 0
+   /*
+	* disable MMU stuff and caches
+	*/
+	mrc	p15, 0, r0, c1, c0, 0
+	bic	r0, r0, #0x00002000     @ clear bits 13 (--V-)
+	bic	r0, r0, #0x00000007     @ clear bits 2:0 (-CAM)
+	orr	r0, r0, #0x00000002     @ set bit 1 (--A-) Align
+	orr	r0, r0, #0x00000800     @ set bit 12 (Z---) BTB
+	mcr 	p15, 0, r0, c1, c0, 0
 
 
-        /* Read booting information */
-        ldr	r0, =PRO_ID_BASE				// define reg.h
-        ldr	r1, [r0,#OMR_OFFSET]
-        bic	r2, r1, #0xffffffc1
+	/* Read booting information */
+	ldr	r0, =PRO_ID_BASE				// defined in reg.h -> ./include/s5pc110.h
+	ldr	r1, [r0,#OMR_OFFSET]
+	bic	r2, r1, #0xffffffc1				// 1100-0001	r2 for boot mode
 
-#ifdef CONFIG_VOGUES
+#ifdef CONFIG_VOGUES	// -- not defined
 	/* PS_HOLD(GPH0_0) set to output high */
 	ldr	r0, =ELFIN_GPIO_BASE
 	ldr	r1, =0x00000001
@@ -256,7 +256,7 @@ lp2:
 	moveq	r3, #BOOT_ONENAND
 
 	/* SD/MMC BOOT */
-	cmp     r2, #0xc
+	cmp     r2, #0xc				// judge boot mode
 	moveq   r3, #BOOT_MMCSD	
 
 	/* NOR BOOT */
@@ -275,42 +275,42 @@ lp2:
 	moveq   r3, #BOOT_SEC_DEV
 	
 	ldr	r0, =INF_REG_BASE
-	str	r3, [r0, #INF_REG3_OFFSET]     
+	str	r3, [r0, #INF_REG3_OFFSET]		// store r3 in memory 0xe010_f00c
 
 	/*
 	 * Go setup Memory and board specific bits prior to relocation.
 	 */
 
-	ldr	sp, =0xd0036000 /* end of sram dedicated to u-boot */
-	sub	sp, sp, #12	/* set stack */
+	ldr	sp, =0xd0036000 /* end of sram dedicated to u-boot */		// stack in sram  	dedicated: 专用的, 把...用于
+	sub	sp, sp, #12	/* set stack */									// for function call, for store lr
 	mov	fp, #0
 	
-	bl	lowlevel_init	/* go setup pll,mux,memory */
+	bl	lowlevel_init	/* go setup pll,mux,memory */				// ./board/samsung/x210/lowlevel_init.S
 	/* To hold max8698 output before releasing power on switch,
 	 * set PS_HOLD signal to high
 	 */
-	ldr	r0, =0xE010E81C  /* PS_HOLD_CONTROL register */
-	ldr	r1, =0x00005301	 /* PS_HOLD output high	*/
+	ldr	r0, =0xE010E81C  /* PS_HOLD_CONTROL register */				// 软开关相关
+	ldr	r1, =0x00005301	 /* PS_HOLD output high	*/					// 一般为"读 改 写" -- reflect
 	str	r1, [r0]
 
 	/* get ready to call C functions */
-	ldr	sp, _TEXT_PHY_BASE	/* setup temp stack pointer */
-	sub	sp, sp, #12
-	mov	fp, #0			/* no previous frame, so fp=0 */
+	ldr	sp, _TEXT_PHY_BASE	/* setup temp stack pointer */			// stack in ddr 代码段物理基地址	0xc3e0_0000
+	sub	sp, sp, #12													// uboot stack in low addr for uboot txt
+	mov	fp, #0				/* no previous frame, so fp=0 */
 
-	/* when we already run in ram, we don't need to relocate U-Boot.
+	/* when we already run in ram, we do not need to relocate U-Boot.
 	 * and actually, memory controller must be configured before U-Boot
 	 * is running in ram.
 	 */
 	ldr	r0, =0xff000fff
-	bic	r1, pc, r0		/* r0 <- current base addr of code */
-	ldr	r2, _TEXT_BASE		/* r1 <- original base addr in ram */
-	bic	r2, r2, r0		/* r0 <- current base addr of code */
-	cmp     r1, r2                  /* compare r0, r1                  */
+	bic	r1, pc, r0			/* r0 <- current base addr of code */	// 第一次判断运行地址: lowlevel_init	-- 是否执行clock ddr init
+	ldr	r2, _TEXT_BASE		/* r1 <- original base addr in ram */	// 第二次判断运行地址: here				-- 是否进行relocate
+	bic	r2, r2, r0			/* r0 <- current base addr of code */
+	cmp     r1, r2      	/* compare r0, r1                  */
 	beq     after_copy		/* r0 == r1 then skip flash copy   */
 
 #if defined(CONFIG_EVT1)
-	/* If BL1 was copied from SD/MMC CH2 */
+	/* If BL1 was copied from SD/MMC CH2 */		// line260 已经判断过 boot mode
 	ldr	r0, =0xD0037488
 	ldr	r1, [r0]
 	ldr	r2, =0xEB200000
@@ -318,7 +318,7 @@ lp2:
 	beq     mmcsd_boot
 #endif
 
-	ldr	r0, =INF_REG_BASE
+	ldr	r0, =INF_REG_BASE				// 读取 boot mode
 	ldr	r1, [r0, #INF_REG3_OFFSET]
 	cmp	r1, #BOOT_NAND		/* 0x0 => boot device is nand */
 	beq	nand_boot
@@ -341,7 +341,7 @@ onenand_boot:
 	b	after_copy
 
 mmcsd_boot:
-#if DELETE
+#if DELETE						// #if 0
 	ldr     sp, _TEXT_PHY_BASE      
 	sub     sp, sp, #12
 	mov     fp, #0
@@ -363,7 +363,7 @@ enable_mmu:
 	mcr	p15, 0, r5, c3, c0, 0		@load domain access register
 
 	/* Set the TTB register */
-	ldr	r0, _mmu_table_base
+	ldr	r0, _mmu_table_base			// 计算转换表在ddr中的基地址
 	ldr	r1, =CFG_PHY_UBOOT_BASE
 	ldr	r2, =0xfff00000
 	bic	r0, r0, r2
@@ -461,7 +461,7 @@ compare_failed:
 
 /*
  * we assume that cache operation is done before. (eg. cleanup_before_linux())
- * actually, we don't need to do anything about cache if not use d-cache in U-Boot
+ * actually, we do not need to do anything about cache if not use d-cache in U-Boot
  * So, in this function we clean only MMU. by scsuh
  *
  * void	theLastJump(void *kernel, int arch_num, uint boot_params);
@@ -586,7 +586,7 @@ phy_last_jump:
 
 	.macro get_bad_stack_swi
 	sub	r13, r13, #4			@ space on current stack for scratch reg.
-	str	r0, [r13]			@ save R0's value.
+	str	r0, [r13]			@ save R0 value.
 	ldr	r0, _armboot_start		@ get data regions start
 	sub	r0, r0, #(CFG_MALLOC_LEN)	@ move past malloc pool
 	sub	r0, r0, #(CFG_GBL_DATA_SIZE+8)	@ move past gbl and a couple spots for abort stack

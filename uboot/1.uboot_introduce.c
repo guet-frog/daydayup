@@ -25,7 +25,7 @@
 		(2)uboot其他作用: 部署整个计算机系统, 操作flash等板子上硬盘的驱动, 提供一个命令行界面 
 
 	2.1.2.2、uboot的发展历程
-		(1)uboot: universal BootLoader
+		(1)uboot: universal bootLoader
 		(2)事实上的业内bootloader标准, 大部分的嵌入式设备都会默认使用uboot来做为bootloader
 		(3)早期uboot版本号: /*uboot1.3.4*/
 		   后来uboot版本号: /*uboot-2010.06*/
@@ -117,7 +117,7 @@
 	2.1.8.1、tftp下载指令: tftp
 		(1)*/uboot主要目标是启动内核, 为了完成启动内核必须要能够部署内核
 			/*uboot为了部署内核就需要将内核镜像从主机中下载过来然后烧录到本地flash*/
-			uboot从主机(windows或者虚拟机ubuntu)下载镜像到开发板上:
+			uboot/*从主机*/(windows或者虚拟机ubuntu)下载镜像到开发板上:
 				1. fastboot: 通过USB线进行数据传输
 				2. tftp	   : 通过有线网络			//典型的方式是通过网络, fastboot is new skill
 		(2)tftp方式下载时uboot作为tftp客户端, 主机windows或虚拟机ubuntu中有一个作为tftp服务器
@@ -127,7 +127,7 @@
 		(5)检查开发板uboot的环境变量serverip(serverip:主机tftp服务器的ip地址)
 		(6)操作: 在开发板的uboot下先ping通虚拟机ubuntu, 然后再尝试下载: tftp 0x30000000 zImage-qt
 			//将服务器上名为zImage-qt的文件下载到开发板内存的0x30000000地址处
-		(7)镜像下载到开发板的DDR中后, uboot就可以用movi指令进行镜像的烧写	// ram -> rom
+		(7)/*镜像下载到开发板的DDR中*/后, uboot就可以用movi指令进行镜像的烧写	// ram -> rom
 
 		//serverip meaning of tftp ip
 
@@ -139,7 +139,7 @@
         (1)开发板如果用SD卡/EMMC/iNand等作为Flash, 则在uboot中操作flash的指令为movi(或mmc)
             movei init S3C_HSMMC-0
         (3)movi的指令都是movi read和movi write一组的, movi read用来读取iNand到DDR上
-            movi write用来将DDR中的内容写入iNand中。理解这些指令时一定要注意涉及到的2个硬件：iNand和DDR内存。
+            movi write用来将DDR中的内容写入iNand中. 理解这些指令时一定要注意涉及到的2个硬件：iNand和DDR内存
         (4)movi read  {u-boot | kernel} {addr}   
             命令使用通用型的描述方法: movi和read外面没有任何标记说明每一次使用这个指令都是必选的；
             一对大括号{}括起来的部分必选1个, 大括号中的竖线表是多选一

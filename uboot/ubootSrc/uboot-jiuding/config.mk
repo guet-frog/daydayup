@@ -108,11 +108,11 @@ RANLIB	= $(CROSS_COMPILE)RANLIB
 
 #########################################################################
 
-# Load generated board configuration												# when generated && how generated
+# Load generated board configuration												# when generated && how generated 		-- still unknow
 sinclude $(OBJTREE)/include/autoconf.mk												# autoconf.mk配置阶段没有生成, 编译生成
-
+																					# =====================================================================================
 ifdef	ARCH
-sinclude $(TOPDIR)/$(ARCH)_config.mk	# include architecture dependend rules		# not ./include/config.mk	各个级别specific rules(编译属性...)
+sinclude $(TOPDIR)/$(ARCH)_config.mk	# include architecture dependend rules		# 各个级别specific rules(编译属性...)
 endif
 ifdef	CPU
 sinclude $(TOPDIR)/cpu/$(CPU)/config.mk	# include  CPU	specific rules
@@ -126,7 +126,7 @@ else
 BOARDDIR = $(BOARD)
 endif
 ifdef	BOARD
-sinclude $(TOPDIR)/board/$(BOARDDIR)/config.mk	# include board specific rules		# TEXT_BASE = 0xc3e00000  // text_base与link文件相关联, 都放在board/vendor/board目录下
+sinclude $(TOPDIR)/board/$(BOARDDIR)/config.mk	# include board specific rules		# TEXT_BASE = 0xC3e0_0000  // text_base与link文件相关联, 都放在board/vendor/board目录下
 endif
 
 #########################################################################
@@ -141,10 +141,10 @@ DBGFLAGS= -g # -DDEBUG
 OPTFLAGS= -Os #-fomit-frame-pointer
 ifndef LDSCRIPT
 #LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot.lds.debug
-ifeq ($(CONFIG_NAND_U_BOOT),y)									# ./include/autoconf.mk  -- no define CONFIG_NAND_U_BOOT
+ifeq ($(CONFIG_NAND_U_BOOT),y)														# ./include/autoconf.mk  -- no define CONFIG_NAND_U_BOOT
 LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot-nand.lds
 else
-LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot.lds				# u-boot 链接脚本     := $(BOARDDIR)
+LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot.lds									# u-boot 链接脚本     := $(BOARDDIR)
 endif
 endif
 OBJCFLAGS += --gap-fill=0xff
@@ -153,7 +153,7 @@ gccincdir := $(shell $(CC) -print-file-name=include)
 
 CPPFLAGS := $(DBGFLAGS) $(OPTFLAGS) $(RELFLAGS)		\
 	-D__KERNEL__
-ifneq ($(TEXT_BASE),)											# TEXT_BASE 在配置时生成, 前面已经include, 这里判断不为空, CPPFLAGS += TEXT_BASE
+ifneq ($(TEXT_BASE),)																# TEXT_BASE 在配置时生成, 前面已经include, 这里判断不为空, CPPFLAGS += TEXT_BASE
 CPPFLAGS += -DTEXT_BASE=$(TEXT_BASE)
 endif
 

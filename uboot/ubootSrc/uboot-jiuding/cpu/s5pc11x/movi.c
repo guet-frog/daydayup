@@ -19,10 +19,10 @@ typedef u32(*copy_sd_mmc_to_mem)
 void movi_bl2_copy(void)
 {
 	ulong ch;
-#if defined(CONFIG_EVT1)
-	ch = *(volatile u32 *)(0xD0037488);
+#if defined(CONFIG_EVT1)    // defined
+	ch = *(volatile u32 *)(0xD0037488);                 // store boot channel
 	copy_sd_mmc_to_mem copy_bl2 =
-	    (copy_sd_mmc_to_mem) (*(u32 *) (0xD0037F98));
+	    (copy_sd_mmc_to_mem) (*(u32 *) (0xD0037F98));   // store function point
 
 	#if defined(CONFIG_SECURE_BOOT)
 	ulong rv;

@@ -50,7 +50,7 @@ fi
 
 rm -f asm-$2/arch
 
-if [ -z "$6" -o "$6" = "NULL" ] ; then				# 使用 -o 连接   warning: -z ?
+if [ -z "$6" -o "$6" = "NULL" ] ; then				# 使用 -o 连接	// -or 
 	ln -s ${LNPREFIX}arch-$3 asm-$2/arch
 else
 	ln -s ${LNPREFIX}arch-$6 asm-$2/arch
@@ -85,7 +85,7 @@ if [ "$3" = "s5pc11x" ] ; then
         rm -f regs.h							# 注意当前目录 
         ln -s $6.h regs.h
         rm -f asm-$2/arch
-        ln -s arch-$3 asm-$2/arch				# arch-s5pc11x并不在 ./include目录   注意符号链接路径
+        ln -s arch-$3 asm-$2/arch				# 注意符号链接路径  // 要保证arch通过相对路径或绝对路径找到arch-s5pc11x
 fi
 
 # create link for s5p64xx SoC

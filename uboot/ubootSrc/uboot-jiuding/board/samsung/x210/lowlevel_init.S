@@ -43,18 +43,18 @@ lowlevel_init:
 
 	/* check reset status  */
 	
-	ldr	r0, =(ELFIN_CLOCK_POWER_BASE+RST_STAT_OFFSET)
+	ldr	r0, =(ELFIN_CLOCK_POWER_BASE+RST_STAT_OFFSET)	// 0xe010_a000
 	ldr	r1, [r0]
 	bic	r1, r1, #0xfff6ffff
-	cmp	r1, #0x10000
+	cmp	r1, #0x10000				// reset by sleep mode wake-up
 	beq	wakeup_reset_pre
-	cmp	r1, #0x80000
+	cmp	r1, #0x80000				// arm reset from deep-idle
 	beq	wakeup_reset_from_didle
 
-	/* IO Retention release */
-	ldr	r0, =(ELFIN_CLOCK_POWER_BASE + OTHERS_OFFSET)
+	/* IO Retention release */							// retention: 保留, 保持, 记忆力
+	ldr	r0, =(ELFIN_CLOCK_POWER_BASE + OTHERS_OFFSET)	// 0xe010_e000
 	ldr	r1, [r0]
-	ldr	r2, =IO_RET_REL
+	ldr	r2, =IO_RET_REL		// (1 << 31)
 	orr	r1, r1, r2
 	str	r1, [r0]
 
@@ -99,20 +99,20 @@ lowlevel_init:
 	/* PS_HOLD pin(GPH0_0) set to high */
 	ldr	r0, =(ELFIN_CLOCK_POWER_BASE + PS_HOLD_CONTROL_OFFSET)
 	ldr	r1, [r0]
-	orr	r1, r1, #0x300	
-	orr	r1, r1, #0x1	
+	orr	r1, r1, #0x300											# 供电锁存 "读, 改, 写"
+	orr	r1, r1, #0x1
 	str	r1, [r0]
 
-	/* when we already run in ram, we don't need to relocate U-Boot.
+	/* when we already run in ram, we do not need to relocate U-Boot.
 	 * and actually, memory controller must be configured before U-Boot
 	 * is running in ram.
 	 */
-	ldr	r0, =0xff000fff
-	bic	r1, pc, r0		/* r0 <- current base addr of code */
-	ldr	r2, _TEXT_BASE		/* r1 <- original base addr in ram */
-	bic	r2, r2, r0		/* r0 <- current base addr of code */
-	cmp     r1, r2                  /* compare r0, r1                  */
-	beq     1f			/* r0 == r1 then skip sdram init   */
+	ldr	r0, =0xff000fff												# 判断运行地址在 sram or ddr
+	bic	r1, pc, r0			/* r0 <- current base addr of code */	// pc=0xd002_0010 -> r1=0x00020000
+	ldr	r2, _TEXT_BASE		/* r1 <- original base addr in ram */	// r2=0xc3e00000
+	bic	r2, r2, r0			/* r0 <- current base addr of code */	// r2=0x00e00000
+	cmp     r1, r2      	/* compare r0, r1                  */
+	beq     1f				/* r0 == r1 then skip sdram init   */	// forward back
 
 	/* init system clock */
 	bl system_clock_init

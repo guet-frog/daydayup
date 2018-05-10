@@ -38,12 +38,12 @@ typedef	struct	global_data {
 	unsigned long	flags;
 	unsigned long	baudrate;
 	unsigned long	have_console;	/* serial_init() was called */
-	unsigned long	reloc_off;	/* Relocation Offset */
-	unsigned long	env_addr;	/* Address  of Environment struct */
-	unsigned long	env_valid;	/* Checksum of Environment valid? */
-	unsigned long	fb_base;	/* base address of frame buffer */
+	unsigned long	reloc_off;	    /* Relocation Offset */
+	unsigned long	env_addr;	    /* Address  of Environment struct */
+	unsigned long	env_valid;	    /* Checksum of Environment valid? */
+	unsigned long	fb_base;	    /* base address of frame buffer */
 #ifdef CONFIG_VFD
-	unsigned char	vfd_type;	/* display type */
+	unsigned char	vfd_type;	    /* display type */
 #endif
 #if 0
 	unsigned long	cpu_clk;	/* CPU clock in Hz!		*/
