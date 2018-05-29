@@ -34,7 +34,7 @@
 #include <s5pc110.h>
 #include "smdkc110_val.h"
 
-_TEXT_BASE:
+_TEXT_BASE:					// 以文件为单位编译, 这里的 _TEXT_BASE 与 start.s(line99) 在链接的时候会不会冲突
 	.word	TEXT_BASE
 
 	.globl lowlevel_init

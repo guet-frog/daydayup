@@ -111,7 +111,7 @@ void movi_write_env(ulong addr)
 
 void movi_read_env(ulong addr)
 {
-	movi_read(raw_area_control.image[2].start_blk,
+	movi_read(raw_area_control.image[2].start_blk,          /*raw_area_control 原始信息分区表 获取env 起始扇区号                 fastboot用到*/
 		  raw_area_control.image[2].used_blk, addr);
 }
 

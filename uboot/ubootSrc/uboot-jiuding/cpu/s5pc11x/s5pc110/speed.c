@@ -129,7 +129,7 @@ ulong get_PCLK(void)
 	uint div = CLK_DIV0_REG;
 	uint pclk_msys_ratio = ((div>>12) & 0x7);
 
-	hclk = get_HCLK();	
+	hclk = get_HCLK();
 
 	return hclk/(pclk_msys_ratio+1);
 }

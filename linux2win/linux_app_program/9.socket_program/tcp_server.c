@@ -25,17 +25,17 @@ int main(void)
 	//serverAddr.sin_len = xxx;
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port	= htons(SERVER_PORT);
-	//serverAddr.sin_addr.s_addr = htonl(INADDR_ANY); 
+	//serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serverAddr.sin_addr.s_addr = inet_addr(SERVER_ADDR);
 	
 // -- create socket
-	listen_fd = socket(AF_INET, SOCK_STREAM, 0);	// domain：selects protocol family which will be used for communication -- AF_INET
+	listen_fd = socket(AF_INET, SOCK_STREAM, 0);	// domain: selects protocol family which will be used for communication -- AF_INET
 	if (listen_fd < 0)
 	{
 		perror("socket");	// already has ':' && '\n'
 		_exit(-1);
 	}
-	perror("socket");
+	perror("socket");		// 不多余, 两个都需要
 	printf("listen_fd = %d\n", listen_fd);
 	
 // -- bind local addr
@@ -58,7 +58,7 @@ int main(void)
 	}
 	perror("listen");
 	
-	//while(1); // connect OK, multiple connect OK -- 2018-5-2 20:27:19
+	//while(1); // 再while(1)中仍: connect OK, multiple connect OK -- 2018-5-2 20:27:19
 	
 // -- accept
 	connect_fd = accept(listen_fd, &clientAddr, &clientAddrLen);	// extracts(抽取) the first connection request
@@ -108,7 +108,7 @@ int main(void)
 			printf("receive infor = %s\n", tcp_buff);
 			
 			//ret = send(connect_fd, tcp_buff, TCP_BUFF_SIZE, 0);		// send num always: 128
-			ret = send(connect_fd, tcp_buff, strlen(tcp_buff), 0);	// len is actual size
+			ret = send(connect_fd, tcp_buff, strlen(tcp_buff), 0);		// len is actual size
 			if (ret < 0)
 			{
 				perror("send");
@@ -135,7 +135,7 @@ int main(void)
  * close  : 发送FIN段 
  * read   : 返回0, 代表收到FIN段 
  */
- 
+
 /*
  *	accept调试记录
  */
@@ -161,7 +161,7 @@ int main(void)
 // connect_fd = 16
 // clientAddr = 192.168.0.129, clientPort = 9526	// client ip is same, client port is random
 // connect_fd = 17
-// clientAddr = 192.168.0.129, clientPort = 11062
+// clientAddr = 192.168.0.129, clientPort = 11062	// accept()将connect_fd与clientAddr相互绑定, clientAddr覆盖问题
 // connect_fd = 18
 // clientAddr = 192.168.0.129, clientPort = 18742
 

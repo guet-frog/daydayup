@@ -1153,7 +1153,7 @@ static int __def_mmc_init(bd_t *bis)
 }
 
 int cpu_mmc_init(bd_t *bis) __attribute__((weak, alias("__def_mmc_init")));
-int board_mmc_init(bd_t *bis) __attribute__((weak, alias("__def_mmc_init")));
+int board_mmc_init(bd_t *bis) __attribute__((weak, alias("__def_mmc_init")));   // __def_mmc_init函数起一个别名board_mmc_init
 
 void print_mmc_devices(char separator)
 {
@@ -1179,7 +1179,7 @@ int mmc_initialize(bd_t *bis)
 	struct mmc *mmc;
 	int err;
 
-	INIT_LIST_HEAD(&mmc_devices);
+	INIT_LIST_HEAD(&mmc_devices);   // mmc链表
 	cur_dev_num = 0;
 
 	if (board_mmc_init(bis) < 0)
@@ -1203,6 +1203,6 @@ int mmc_initialize(bd_t *bis)
 			return err;
 		}
 	}
-	printf("%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));
+	printf("%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));      // (1<<9) 512 先*512可能会溢出
 	return 0;
 }

@@ -3,7 +3,7 @@
 // uboot配置目的, 指定需要用到的源文件路径, 配置uboot version
 // 学习uboot类似复杂项目, 首先确定该项目是如何管理(整体代码架构, 管理方式), 代码细节是另一个层次
 
-// 1, 执行make_xx_config 传入ARCH, CPU, BOARD, SOC参数
+// 1, 执行make_xx_config 传入ARCH, CPU, BOARD, SOC参数    --> 生成config.mk
 // 2, mkconfig根据参数在include文件夹: 1.创建symbolic link; 2.生成config.h
 // 3, 执行make分别调用各子目录的Makefile生成.obj文件和.a文件
 // 4, 链接目标文件, 生成镜像

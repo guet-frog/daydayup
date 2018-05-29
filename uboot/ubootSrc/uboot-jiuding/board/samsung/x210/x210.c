@@ -103,11 +103,11 @@ int dram_init(void)
 {
 	DECLARE_GLOBAL_DATA_PTR;
 
-	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
-	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;
+	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;        // 0x3000_0000
+	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;    // 0x1000_0000 --256MB
 
 #if defined(PHYS_SDRAM_2)
-	gd->bd->bi_dram[1].start = PHYS_SDRAM_2;
+	gd->bd->bi_dram[1].start = PHYS_SDRAM_2;        // 0x4000_0000
 	gd->bd->bi_dram[1].size = PHYS_SDRAM_2_SIZE;
 #endif
 

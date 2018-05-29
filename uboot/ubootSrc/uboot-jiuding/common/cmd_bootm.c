@@ -226,7 +226,7 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 
 	/* get kernel image header, start address and length */
 	os_hdr = boot_get_kernel (cmdtp, flag, argc, argv,
-			&images, &os_data, &os_len);
+			&images, &os_data, &os_len);                        // important
 	if (os_len == 0) {
 		puts ("ERROR: can't get kernel image!\n");
 		return 1;

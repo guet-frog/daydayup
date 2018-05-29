@@ -27,13 +27,13 @@
 		   |
 	       | -- xTimeToWake = xConstTickCount + xTicksToWait
 		      |
-			  | -- if   {vListInsert(pxOverflowDelayedTaskList, &(pxCurrentTCB->xStateListItem))} 
+			  | -- if   {vListInsert(pxOverflowDelayedTaskList, &(pxCurrentTCB->xStateListItem))}
 	          |
 			  | -- else {vListInsert(pxDelayedTaskList, &())}  // Insert
 				 |
 				 | -- xNextTaskUnblockTime = xTimeToWake  // overflow 不需要设置 xNextTaskUnblockTime
 	 |
-     | --	 
+     | --
   |
   | --  if (xAlreadyYielded == pdFALSE)
 	 |
@@ -48,8 +48,8 @@
  -- xGenericListItem.pvContainer在xDelayedTaskList1情况
   |
   | -- vTaskDelay
-     |  
-     | -- pxCurrentTCB->xGenericListItem.pvContainer 
+     |
+     | -- pxCurrentTCB->xGenericListItem.pvContainer
         |
         | -- step①: List_t pxReadyTaskLists[configMAX_PRIORITIES]  remove from [ready list]
         | -- step②: List_t xDelayedTaskList1                       insert into [blocked(delay) list]

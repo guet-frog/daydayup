@@ -113,7 +113,7 @@ reset:
 
 	/*
 	 * Initialize $gp, force pointer sized alignment of bal instruction to
-	 * forbid the compiler to put nop's between bal and _gp. This is
+	 * forbid the compiler to put nop’s between bal and _gp. This is
 	 * required to keep _gp and ra aligned to 8 byte.
 	 */
 	.align 2	
@@ -210,7 +210,7 @@ relocate_code:
 	jalr	t9
 	 move	a0, s2			# a0 <-- destination address
 
-	/* Jump to where we've relocated ourselves */
+	/* Jump to where we have relocated ourselves */
 	addi	t0, s2, in_ram - _start
 	jr	t0
 	 nop

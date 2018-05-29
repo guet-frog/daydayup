@@ -136,7 +136,7 @@
 /*
  * Size of malloc() pool
  */
-#define CFG_MALLOC_LEN		(CFG_ENV_SIZE + 896*1024)
+#define CFG_MALLOC_LEN		(CFG_ENV_SIZE + 896*1024)   // 0x4000 -- 16KB
 #define CFG_GBL_DATA_SIZE	128	/* size in bytes reserved for initial data */
 
 #define CFG_STACK_SIZE		512*1024
@@ -497,11 +497,11 @@
 #endif
 
 #define CONFIG_NR_DRAM_BANKS    2          /* we have 2 bank of DRAM */
-#define SDRAM_BANK_SIZE         0x10000000    /* 512 MB lqm*/
+#define SDRAM_BANK_SIZE         0x10000000    /* 256 MB lqm*/
 //#define SDRAM_BANK_SIZE         0x20000000    /* 1GB lqm*/
-#define PHYS_SDRAM_1            MEMORY_BASE_ADDRESS /* SDRAM Bank #1 */
+#define PHYS_SDRAM_1            MEMORY_BASE_ADDRESS /* SDRAM Bank #1  -- 0x3000_0000*/ 
 #define PHYS_SDRAM_1_SIZE       SDRAM_BANK_SIZE
-#define PHYS_SDRAM_2            MEMORY_BASE_ADDRESS2 /* SDRAM Bank #2 */
+#define PHYS_SDRAM_2            MEMORY_BASE_ADDRESS2 /* SDRAM Bank #2 -- 0x4000_0000*/
 #define PHYS_SDRAM_2_SIZE       SDRAM_BANK_SIZE
 
 #define CFG_FLASH_BASE		0x80000000

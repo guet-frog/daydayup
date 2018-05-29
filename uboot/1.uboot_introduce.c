@@ -1,20 +1,19 @@
 
 2.1.1.为什么要有uboot
     2.2.1.1、计算机系统的主要部件
-        (1)计算机系统就是用CPU来做核心进行运行的系统	// warning: PC System
-        (2)PC System: CPU + 内部存储器(DDR/SDRAM/SRAM) + 外部存储器(Flash/硬盘)
+        (2)PC System: CPU + 内部存储器(DDR/SDRAM/SRAM) + 外部存储器(Flash/硬盘)	// warning: PC System
 
 	2.2.1.2、PC机的启动过程
 		(1)典型的/*PC机的部署*/: BIOS在PC机主板上, OS在硬盘上, 内存在掉电时无作用, CPU在掉电时不工作
 		(2)启动过程: PC上电后先执行BIOS程序(in NorFlash)
-			// BIOS init DDR && disk, copy OS(in disk) to DDR, then jump to DDR to exe OS
+			// BIOS init DDR && disk, copy OS from disk to DDR, then jump to DDR to exe OS
 
 	2.2.1.3、典型嵌入式linux系统启动过程
-		(1)embedded system deployment && boot is refer to PC	// warning: system deployment
+		(1)embedded system (deployment && boot) is refer to PC	// warning: system deployment(部署)
 		(2)嵌入式系统的部署: uboot程序部署在flash/*能作为启动设备的Flash*/, OS在FLash, 内存CPU在掉电时不工作
-		(3)启动过程: 嵌入式系统上电后先执行uboot, 然后uboot负责init ddr && flash, 
+		(3)启动过程: 嵌入式系统上电后先执行uboot, 然后uboot负责init ddr && flash
 						然后将OS从Flash中读取到DDR中, 然后启动OS(OS启动后uboot就无用了)
-	//embedded system boot && pc system boot (BIOS->uboot, HardDisk->Flash)
+	//embedded system boot && pc system boot(BIOS->uboot, HardDisk->Flash)
 
 	2.2.1.4、android系统启动过程
 		(1)android系统的启动和linux系统几乎一样, 只是在内核启动后加载根文件系统后不同了
@@ -27,14 +26,13 @@
 	2.1.2.2、uboot的发展历程
 		(1)uboot: universal bootLoader
 		(2)事实上的业内bootloader标准, 大部分的嵌入式设备都会默认使用uboot来做为bootloader
-		(3)早期uboot版本号: /*uboot1.3.4*/
-		   后来uboot版本号: /*uboot-2010.06*/
+		(3)早期uboot版本号: /*uboot1.3.4*/, 后来uboot版本号: /*uboot-2010.06*/
 		(4)//uboot的核心部分几乎没怎么变化, 越新的版本支持的开发板越多而已
 
 2.1.3.uboot必须解决哪些问题
 	2.1.3.1、自身可开机直接启动
 		(1)一般的SoC都支持多种启动方式, 譬如SD卡启动, NorFlash启动, NandFlash启动, usb启动等
-			uboot要能够开机启动, 必须根据具体的SoC的启动设计来设计uboot
+			/*uboot要能够开机启动*/, 必须根据具体的SoC的启动设计来设计uboot
 		(2)//uboot必须进行和硬件相对应的代码级别的更改和移植, 才能够保证可以从相应的启动介质启动 \
 			 uboot中第一阶段的start.S文件中具体处理了这一块
 
@@ -72,7 +70,7 @@
 			但是也有一部分环境变量是自己添加的, 自己添加的系统就不认识但是我们自己认识
 			系统或者我们自己的程序在运行时可以通过读取环境变量来指导程序的运行
 			这样设计的好处就是灵活，譬如我们要让一个程序更改运行方法，
-			不用去重新修改程序代码再重新编译运行，而只要修改相应的环境变量就可以了。
+			不用去重新修改程序代码再重新编译运行，而只要修改相应的环境变量就可以了
 		(5)环境变量就是运行时的配置属性
 			uboot的环境变量和操作系统的环境变量工作原理和方式几乎完全相同
 
@@ -82,8 +80,6 @@
 
 	2.1.5.2、有些命令有简化的别名
 		(1)譬如printenv命令可以简化为print, 譬如setenv可以简化为set
-
-	2.1.5.3、有些命令会带参数（注意格式是固定的）
 
 	2.1.5.4、命令中的特殊符号
 		(1)/*单引号*/将这个很长且中间有空格隔开的参数引起来
@@ -95,22 +91,19 @@
 		(1)print(无参数): 打印出系统中所有的环境变量
 		(2)环境变量 ≈ 全局变量
 			//环境变量被存储在flash的另一块专门区域(flash上环境变量分区)
-			
+
 2.1.6.uboot的常用命令2
-	2.1.6.1 设置(添加/更改)环境变量：
+	2.1.6.1 设置(添加/更改)环境变量
 		(1)/*设置/添加*/环境变量: set name value	// setenv/set
 		(2)/*保存*/环境变量: saveenv/save			// 块设备属性所决定, CR600可能考虑到传输参数的开销
 
-	2.1.7.2、开发板运行linux下和虚拟机ubuntu的ping通
+	2.1.7.2、开发板（uboot、Linux）ping通windows主机与虚拟机
 		(1)虚拟机网卡设置: 常用的就是NAT和桥接(bridged)
 		(2)虚拟机要和开发板进行网络通信，只能通过桥接方式连接
 		(3)设置: "虚拟网络编辑器"注意网卡设置 //win10需要权限
 		//查看Ubuntu虚拟机网卡信息: ifconfig
 		//设置Ubuntu虚拟机网卡信息: /etc/network/interfaces		//重启网卡: sudo ifdown eth0
-
-	2.1.7.3、开发板运行uboot下和主机Windows的ping通
-	2.1.7.4、开发板运行uboot下和虚拟机ubuntu的ping通
-		(1)uboot和虚拟机ubuntu互相ping通(前提是虚拟机ubuntu网络适配器设置为桥接(桥接到有线网卡))
+		(4)uboot和虚拟机ubuntu互相ping通(前提是虚拟机ubuntu网络适配器设置为桥接(桥接到有线网卡))
 			结论: 开发板中运行的uboot有点小bug, ping windows就不通, ping虚拟机ubuntu就通
 
 2.1.8.uboot常用命令3
@@ -156,8 +149,7 @@
     2.1.9.3、内存操作指令：mm、mw、md
         (1)*/DDR中没有分区(对硬盘、Flash进行分区)
             uboot裸机程序, 并不对内存进行管理
-			操作系统会所有内存, 系统负责分配和管理, 系统会保证内存不会随便越界
-            所以如果程序员（使用uboot的人）自己不注意就可能出现自己把自己的数据给覆盖了
+			操作系统会所有内存, 系统负责分配和管理, 系统会保证内存不会随便越界	// 裸机注意内存地址使用
             //思考: dnw(usb刷机时)uboot放在0x23E0_0000地址处
             uboot中实际链接地址在0x30000000中(可能使uboot中开启了虚拟地址映射)
             1. uboot中源码对内存地址的处理方式 2. 虚拟地址映射表, 如何建立页表映射
@@ -169,7 +161,7 @@
     2.1.9.4、启动内核指令：bootm、go
         (1)uboot的革命理想: 启动内核, 启动内核在uboot中表现为一个指令(never get back)
         (2)差别: bootm启动内核同时给内核传参, 而go命令启动内核不传参
-                 go命令内部其实就是一个函数指针指向一个内存地址然后直接调用那个函数
+                 go命令内部其实就是一个函数指针指向一个内存地址然后直接调用那个函数	// CR600 bootloader jump
                  go命令的实质就是PC直接跳转到一个内存地址去运行
                  调试裸机程序的一种方法: 事先启动uboot, 然后在uboot中去下载裸机程序, 用go命令去执行裸机程序
 
@@ -229,12 +221,12 @@
 			剩下的就是自由分区, 一般kernel启动后将自由分区挂载到rootfs下使用
 
 		总结: 
-		(1)各分区彼此相连
-		(3)uboot必须在Flash开头/*soc决定*/, 其他分区相对位置是可变 //SOC bootROM决定
-		(5)分区在系统移植前确定好, 在uboot中和kernel中使用同一个分区表
-			将来在/*系统部署时和系统代码*/中的分区方法也必须一样
+			(1)各分区彼此相连
+			(3)uboot必须在Flash开头/*soc决定*/, 其他分区相对位置是可变 //SOC bootROM决定
+			(5)分区在系统移植前确定好, 在uboot中和kernel中使用同一个分区表
+				将来在/*系统部署时和系统代码*/中的分区方法也必须一样
 
-		//fastboot通过系统分区表来部署系统(或者通过手动设置内存地址)
+			//fastboot通过系统分区表来部署系统(或者通过手动设置内存地址)
 
 2.1.12.2、uboot阶段DDR的分区
 	(3)内存分区关键就在于内存中哪一块用来干什么必须分配好

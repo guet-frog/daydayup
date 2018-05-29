@@ -466,7 +466,7 @@ void start_armboot (void)
 #ifdef CONFIG_USE_IRQ
 	gd_base -= (CONFIG_STACKSIZE_IRQ+CONFIG_STACKSIZE_FIQ);
 #endif
-	gd = (gd_t*)gd_base;
+	gd = (gd_t*)gd_base;    // 引用实例化
 #else
 	gd = (gd_t*)(_armboot_start - CFG_MALLOC_LEN - sizeof(gd_t));
 #endif
@@ -600,7 +600,7 @@ void start_armboot (void)
 
 	#if defined(CONFIG_GENERIC_MMC)
 		puts ("SD/MMC:  ");
-		mmc_exist = mmc_initialize(gd->bd);
+		mmc_exist = mmc_initialize(gd->bd); // all board interface
 		if (mmc_exist != 0)
 		{
 			puts ("0 MB\n");

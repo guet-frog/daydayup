@@ -26,7 +26,7 @@
  */
 
 #include <config.h>					// start.S的源码路径      " " or < >
-#include <version.h>
+#include <version.h>				// export INCDIR=./include
 #if defined(CONFIG_ENABLE_MMU)
 #include <asm/proc/domain.h>
 #endif
@@ -55,7 +55,7 @@
 
 .globl _start
 _start: b	reset									// 编译器会根据start.s中vector定义, 将中断向量表link到相应位置
-	ldr	pc, _undefined_instruction					// 此时PC指向reset, 其他异常向量表位置应该为空, 此时在程序运行时手动填充中断向量表
+	ldr	pc, _undefined_instruction
 	ldr	pc, _software_interrupt						// 这里是不执行的...
 	ldr	pc, _prefetch_abort
 	ldr	pc, _data_abort
@@ -82,7 +82,7 @@ _pad:
 .global _end_vect
 _end_vect:
 
-	.balignl 16,0xdeadbeef				// 内存对齐--16字节 伪指令
+	.balignl 16,0xdeadbeef							// 内存对齐--16字节 伪指令
 /*
  *************************************************************************
  *
@@ -96,8 +96,8 @@ _end_vect:
  *************************************************************************
  */
 
-_TEXT_BASE:								// 符号 -> 地址		// 汇编里的符号, 应理解为 &变量名
-	.word	TEXT_BASE					// .word类型 存入TEXT_BASE(外部已导出)	ldr r0 _TEXT_BASE		// memory -> reg
+_TEXT_BASE:								// 符号 -> 地址		// 汇编里的符号, 应理解为 &变量名, 不能理解为C语言中的变量名
+	.word	TEXT_BASE					// .word类型, 存入TEXT_BASE(外部已导出)	ldr r0 _TEXT_BASE		// memory -> reg
 
 /*
  * Below variable is very important because we use MMU in U-Boot.
@@ -256,7 +256,7 @@ lp2:
 	moveq	r3, #BOOT_ONENAND
 
 	/* SD/MMC BOOT */
-	cmp     r2, #0xc				// judge boot mode
+	cmp     r2, #0xc												// judge boot mode
 	moveq   r3, #BOOT_MMCSD	
 
 	/* NOR BOOT */
@@ -275,13 +275,13 @@ lp2:
 	moveq   r3, #BOOT_SEC_DEV
 	
 	ldr	r0, =INF_REG_BASE
-	str	r3, [r0, #INF_REG3_OFFSET]		// store r3 in memory 0xe010_f00c
+	str	r3, [r0, #INF_REG3_OFFSET]									// store r3(boot mode) in memory 0xe010_f00c
 
 	/*
 	 * Go setup Memory and board specific bits prior to relocation.
 	 */
 
-	ldr	sp, =0xd0036000 /* end of sram dedicated to u-boot */		// stack in sram  	dedicated: 专用的, 把...用于
+	ldr	sp, =0xd0036000 /* end of sram dedicated to u-boot */		// stack_in sram  	dedicated: 专用的, 把...用于
 	sub	sp, sp, #12	/* set stack */									// for function call, for store lr
 	mov	fp, #0
 	
@@ -294,7 +294,7 @@ lp2:
 	str	r1, [r0]
 
 	/* get ready to call C functions */
-	ldr	sp, _TEXT_PHY_BASE	/* setup temp stack pointer */			// stack in ddr 代码段物理基地址	0xc3e0_0000
+	ldr	sp, _TEXT_PHY_BASE	/* setup temp stack pointer */			// stack_in ddr 代码段链接地址: C3E0_0000
 	sub	sp, sp, #12													// uboot stack in low addr for uboot txt
 	mov	fp, #0				/* no previous frame, so fp=0 */
 
@@ -318,7 +318,7 @@ lp2:
 	beq     mmcsd_boot
 #endif
 
-	ldr	r0, =INF_REG_BASE				// 读取 boot mode
+	ldr	r0, =INF_REG_BASE						// 读取 boot mode
 	ldr	r1, [r0, #INF_REG3_OFFSET]
 	cmp	r1, #BOOT_NAND		/* 0x0 => boot device is nand */
 	beq	nand_boot
@@ -341,12 +341,12 @@ onenand_boot:
 	b	after_copy
 
 mmcsd_boot:
-#if DELETE						// #if 0
+#if DELETE										// #if 0
 	ldr     sp, _TEXT_PHY_BASE      
 	sub     sp, sp, #12
 	mov     fp, #0
 #endif
-	bl      movi_bl2_copy
+	bl      movi_bl2_copy						// SD代码重定位到DDR
 	b       after_copy
 
 nor_boot:
@@ -382,7 +382,7 @@ mmu_on:
 #endif
 
 skip_hw_init:
-	/* Set up the stack						    */
+	/* Set up the stack */
 stack_setup:
 #if defined(CONFIG_MEMORY_UPPER_CODE)
 	ldr	sp, =(CFG_UBOOT_BASE + CFG_UBOOT_SIZE - 0x1000)
@@ -408,7 +408,7 @@ clbss_l:
 	cmp	r0, r1
 	ble	clbss_l
 	
-	ldr	pc, _start_armboot
+	ldr	pc, _start_armboot					// _start_armboot指针使用在定义之前 not line111 _armboot_start
 
 _start_armboot:
 	.word start_armboot

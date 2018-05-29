@@ -28,7 +28,7 @@
                 默认只有/bin, /sbin, /usr/bin，/usr/sbin等在PATH路径中                         \
                 current directory通常不在PATH路径, 所以写成test.sh是找不到命令                 
                 ./test.sh       */OS就在当前目录找该二进制程序
-                // 在PATH中加入符号链接则可以运行
+                // 在PATH中加入符号链接, test.sh即可运行
 
 	//shell下用sed命令解决\r\n -- sed 命令具有替换功能
     2.2.2.2、helloworld程序和解释
@@ -108,7 +108,7 @@
         (1)project中大量文件需要管理, Makefile来做project管理, 方便编译链接过程
         (2)uboot和linux kernel本质上都是C语言的项目, 大量project file需要Makefile来管理
 
-    2.2.7.2、目标、依赖、命令  // target、prerequisite、command
+    2.2.7.2、目标、依赖、命令  // target, prerequisite, command
         //make xxx: 使用命令将依赖加工成目标的过程
 
     2.2.7.3 通配符%和Makefile自动推导(规则)
