@@ -26,13 +26,13 @@
 	2.1.2.2、uboot的发展历程
 		(1)uboot: universal bootLoader
 		(2)事实上的业内bootloader标准, 大部分的嵌入式设备都会默认使用uboot来做为bootloader
-		(3)早期uboot版本号: /*uboot1.3.4*/, 后来uboot版本号: /*uboot-2010.06*/
-		(4)//uboot的核心部分几乎没怎么变化, 越新的版本支持的开发板越多而已
+		(3)uboot版本号两种书写方式
+		(4)uboot的核心部分几乎没怎么变化, 越新的版本支持的开发板越多而已
 
 2.1.3.uboot必须解决哪些问题
 	2.1.3.1、自身可开机直接启动
 		(1)一般的SoC都支持多种启动方式, 譬如SD卡启动, NorFlash启动, NandFlash启动, usb启动等
-			/*uboot要能够开机启动*/, 必须根据具体的SoC的启动设计来设计uboot
+			/*uboot要能够开机启动*/, 必须根据具体SoC的启动设计来设计uboot
 		(2)//uboot必须进行和硬件相对应的代码级别的更改和移植, 才能够保证可以从相应的启动介质启动 \
 			 uboot中第一阶段的start.S文件中具体处理了这一块
 
@@ -43,7 +43,7 @@
 			内核启动后会到这个特定位置去取uboot传给他的参数
 			然后在内核中解析这些参数, 这些参数将被用来指导linux内核的启动过程
 
-	2.1.2.3、能提供系统部署功能
+	2.1.2.3、能提供/*系统部署*/
 		(1)uboot完成整个系统(包括uboot、kernel、rootfs等镜像)在flash上的烧录下载工作
 		(2)刷机利用uboot中的fastboot功能将各种镜像烧录到iNand中, 然后从iNand启动
 
@@ -56,10 +56,7 @@
 
 2.1.4.uboot的工作方式
 	2.1.4.2、uboot的命令式shell界面
-		(2)有些程序需要进行交互, 程序中就需要实现了一个shell, uboot就实现了一个shell
-			注意: 	shell并不是操作系统, 和操作系统一点关系都没有
-					linux中打开一个终端后就得到了一个shell, 可以输入命令回车执行
-					// uboot command no "ls"
+		(2)有些程序需要进行交互, 程序需要实现shell // uboot's shell command no "ls"
 
 	2.1.4.3、掌握uboot使用的2个关键点：命令和环境变量
 		(1)uboot下的shell: uboot部署系统, 设置环境变量, 启动内核
@@ -82,7 +79,7 @@
 		(1)譬如printenv命令可以简化为print, 譬如setenv可以简化为set
 
 	2.1.5.4、命令中的特殊符号
-		(1)/*单引号*/将这个很长且中间有空格隔开的参数引起来
+		(1)/*单引号*/将很长且中间有空格隔开的参数引起来
 
 	2.1.5.5、有些命令是一个命令族（譬如movi）
 		(1)同一个命令关键字, 参数不同, 功能和作用不同, 譬如movi都和moviNand(EMMC, iNand)操作有关
@@ -134,9 +131,9 @@
         (3)movi的指令都是movi read和movi write一组的, movi read用来读取iNand到DDR上
             movi write用来将DDR中的内容写入iNand中. 理解这些指令时一定要注意涉及到的2个硬件：iNand和DDR内存
         (4)movi read  {u-boot | kernel} {addr}   
-            命令使用通用型的描述方法: movi和read外面没有任何标记说明每一次使用这个指令都是必选的；
+            命令通用型的描述方法: movi和read外面没有任何标记说明每一次使用这个指令都是必选的；
             一对大括号{}括起来的部分必选1个, 大括号中的竖线表是多选一
-            中括号[]表示可选参数(可以有也可以没有)
+            中括号[]表示可选参数
         (5)指令有多种用法，譬如 movi read u-boot 0x30000000  // inand 中 u-boot分区 (起始地址 + 终止地址)
             把iNand中的u-boot分区读出到DDR的0x30000000起始的位置处
             uboot代码中将iNand分成了很多个分区, 每个分区有地址范围和分区名	// uboot进行系统部署

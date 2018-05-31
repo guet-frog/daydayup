@@ -28,7 +28,7 @@
                 默认只有/bin, /sbin, /usr/bin，/usr/sbin等在PATH路径中                         \
                 current directory通常不在PATH路径, 所以写成test.sh是找不到命令                 
                 ./test.sh       */OS就在当前目录找该二进制程序
-                // 在PATH中加入符号链接, test.sh即可运行
+                // 在PATH中创建符号链接, test.sh即可运行
 
 	//shell下用sed命令解决\r\n -- sed 命令具有替换功能
     2.2.2.2、helloworld程序和解释
@@ -96,7 +96,7 @@
 
             C语言: ./a.out aa bb cc 		argc = 4, 	argv[0] = ./a.out, argv[1]是第一个有效参数···
             shell: source a.sh aa bb cc  	$# = 3, 	$0是执行这个shell程序的解析程序的名字
-														$1是第一个有效参数的值，$2是第2个有效参数的值···
+														$1是第1个有效参数的值，$2是第2个有效参数的值···
 
     2.2.6.3、while循环和case语言和传参结合
         (1)shell中break只用于循环跳出 //当while中内嵌case语句时, case中的break是跳出外层的while循环的, 不是用来跳出case语句的
@@ -130,7 +130,7 @@
 
 2.2.8.Mafile补充学习1
 	2.2.8.3、Makefile中几种变量赋值运算符
-		(1)=	*/ $(var) var的值取决于最后一次赋值, 引用前or引用后
+		(1) =	*/ $(var) var的值取决于最后一次赋值, 引用前or引用后
 		(2):=	*/ $(var) var的值取决于引用前, 直接解析
 		(3)?=	如果变量前面并没有赋值过则执行这条赋值，如果前面已经赋值过了则本行被忽略
 				(所谓的没有赋值过其实就是这个变量没有被定义过)
