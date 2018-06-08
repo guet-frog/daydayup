@@ -1,6 +1,6 @@
 	
 2.2.1.shell介绍
-	shell是一个用C语言编写的程序;
+	shell是一个用C语言编写的程序;	// -- 应该说shell脚本解释器是C语言编写的程序
 
 	shell是用户使用OS的桥梁: Unix shell, Windows explorer图形界面shell;
 
@@ -31,6 +31,7 @@
                 // 在PATH中创建符号链接, test.sh即可运行
 
 	//shell下用sed命令解决\r\n -- sed 命令具有替换功能
+	
     2.2.2.2、helloworld程序和解释
         (1)shell程序的第一行一般都是： #!/bin/sh   // 指定shell程序执行时被哪个解释器解释执行
             可以将第一行写为：#!/bin/bash来指定使用bash执行该脚本
@@ -48,7 +49,7 @@
         (4)双引号中: $加变量名可以取变量的值
                      反引号仍表示命令替换
                      \$  \` \"  \\
-        除以上情况之外, 在其它字符前面的\无特殊含义，只表示字面值
+        除以上情况之外, 在其它字符前面的\无特殊含义, 只表示字面值
 
 2.2.4.shell编程学习2
     2.2.4.1、shell中调用linux命令
@@ -65,7 +66,7 @@
             fi          // shell 下没有大括号
 
         (3)if的典型应用
-            判断文件是否存在    (-f) */注意[]里面前后都有空格, 不能省略。
+            判断文件是否存在    (-f) */注意[]里面前后都有空格, 不能省略
             判断目录是否存在    (-d)
             判断字符串是否相等  ("str1" = "str2") */注意用一个等号而不是两个
             判断数字是否相等    (-eq) (-gt) (-lt) (-ge) (-le)	//gt:greater, than lt:less than, ge:greater or equal, le:less or equal
@@ -172,13 +173,14 @@
 			$@		规则的目标文件名
 			$<		规则的依赖文件名
 			$^		依赖的文件集合
-			
+
 	# 指定 error prerequisite   can not find xxx.o
-	
+
 	gcc xxx.c 		//是不是shell命令, 不是shell命令, 这条命令是如何执行的
-	
+					//shell实现Linux控制台? Linux控制台除了执行shell命令, 还可以执行其他可执行程序
+
 	arm-linux-gcc 	//是不是shell命令
-    
+
     // test shell script return 1
 
     2.2.4.1、shell中调用linux命令

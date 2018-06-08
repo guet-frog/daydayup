@@ -98,7 +98,7 @@ _end_vect:
 
 _TEXT_BASE:								// 符号 -> 地址		// 汇编里的符号, 应理解为 &变量名, 不能理解为C语言中的变量名
 	.word	TEXT_BASE					// .word类型, 存入TEXT_BASE(外部已导出)	ldr r0 _TEXT_BASE		// memory -> reg
-
+										// 这里类似于C语言的变量定义, 这里肯定不执行
 /*
  * Below variable is very important because we use MMU in U-Boot.
  * Without it, we cannot run code correctly before MMU is ON.

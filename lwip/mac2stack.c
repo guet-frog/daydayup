@@ -15,7 +15,7 @@
 		|
 	   -- else
 		|
-		| -- ETHPLC_FreeRxBuf(data)
+		| -- ETHPLC_FreeRxBuf(data)		// queue send error && free buff
 		|
 		| -- LINK_STATS_INC(link.drop)
 		| -- LINK_STATS_INC(link.err)
@@ -29,7 +29,7 @@
 	 |
 	 | -- switch (layer)
 		|
-		| -- case PBUF_TRANSPORT：// unrecognized token	表征, 记号
+		| -- case PBUF_TRANSPORT：//中文字符 unrecognized token	表征, 记号
 		| -- case PBUF_IP:
 		| -- case PBUF_LINK:
 		| -- case PBUF_RAW:

@@ -1,12 +1,10 @@
 
 2.3.2.2、配置
 	(1)uboot和linux kernel等复杂项目, 都不能直接编译, 需要先配置才能编译
-	(2)uboot配置方法: make x210_sd_config	// -- ./configmk shell脚本
+	(2)uboot配置方法: make x210_sd_config	// -- 执行./configmk脚本
 
 2.3.2.3、编译得到uboot.bin
-	(1)检查当前编译环境中有没有安装合适的arm-linux-gcc	//arm-2009q3 三星官方 cross_compile_toolchain
-	(2)检查当前目录下(uboot根目录)的Makefile中编译器的设置是否正确
-		// 在工程的主makefile中会设置交叉编译工具链的路径和名字
+	(1)检查当前编译环境或者主Makefile中编译工具链设置	// make "CROSS_COMPILE=xxx"有更高优先级
 		// make or make -j4
 
 2.3.3.2、各文件介绍
@@ -44,7 +42,7 @@
 					但是linux是操作系统而uboot只是个裸机程序, 因此这种移植会有不同
 					//uboot中的驱动其实是linux中的驱动的一部分
 	(9)examples
-	(10)fs			from linux src, 用来管理flash等资源
+	(10)fs			file system from linux src, 用来管理flash等资源
 	(11)include		uboot和linux kernel在管理头文件时, 把所有的头文件全部集中存放在include目录下
 	(12)lib_*		典型的lib_arm(arm架构)和lib_generic架构(其他架构通用)
 	(13)libfdt		设备树相关, linux kernel 3.4 更改了启动时传参的机制, 改用设备树来进行启动传参, 进行硬件信息的描述
@@ -65,7 +63,7 @@
         4. 头文件路径       include/config.h                    // 配置生成
 		5. 工具链配置相关	./config.mk							// 源码
 		6. uboot配置相关 	./mkconfig							// 源码
-        
+
     */源文件
         1. ./config.mk
         2. ./mkconfig

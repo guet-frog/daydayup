@@ -98,8 +98,8 @@ TOPDIR		:= $(SRCTREE)
 LNDIR		:= $(OBJTREE)
 export	TOPDIR SRCTREE OBJTREE
 
-MKCONFIG	:= $(SRCTREE)/mkconfig      # 源码根目录下面的mkconfig, 对uboot进行配置的脚本, 仅执行"make x210_sd_config"时, MKCONFIG已经生效
-export MKCONFIG                         # config script
+MKCONFIG	:= $(SRCTREE)/mkconfig      # 源码根目录下面的mkconfig, 对uboot进行配置的shell脚本
+export MKCONFIG                         # 仅执行"make x210_sd_config"时, MKCONFIG已经生效 -- 每次执行Makefile, 首先加载Makefile中变量定义, 然后在执行命令
 
 ifneq ($(OBJTREE),$(SRCTREE))
 REMOTE_BUILD	:= 1                    # 远程编译flag

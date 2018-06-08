@@ -59,7 +59,7 @@
 		(2)有些程序需要进行交互, 程序需要实现shell // uboot's shell command no "ls"
 
 	2.1.4.3、掌握uboot使用的2个关键点：命令和环境变量
-		(1)uboot下的shell: uboot部署系统, 设置环境变量, 启动内核
+		(1)uboot下的shell: uboot部署系统/*fastboot实现*/, 设置环境变量, 启动内核
 		(3)uboot shell -> linux shell, environment variable -> environment variable, driver management
 		(4)环境变量可以被认为是/*system global variable*/
 			环境变量名都是系统内置的
@@ -76,7 +76,7 @@
 		(2)linux终端设计有3种缓冲机制：无缓冲、行缓冲、全缓冲  //回车键(换行, 行缓冲)
 
 	2.1.5.2、有些命令有简化的别名
-		(1)譬如printenv命令可以简化为print, 譬如setenv可以简化为set
+		(1)printenv命令可以简化为print, setenv可以简化为set
 
 	2.1.5.4、命令中的特殊符号
 		(1)/*单引号*/将很长且中间有空格隔开的参数引起来
@@ -109,42 +109,45 @@
 			/*uboot为了部署内核就需要将内核镜像从主机中下载过来然后烧录到本地flash*/
 			uboot/*从主机*/(windows或者虚拟机ubuntu)下载镜像到开发板上:
 				1. fastboot: 通过USB线进行数据传输
-				2. tftp	   : 通过有线网络			//典型的方式是通过网络, fastboot is new skill
-		(2)tftp方式下载时uboot作为tftp客户端, 主机windows或虚拟机ubuntu中有一个作为tftp服务器
-			将要下载的镜像文件放在服务器的下载目录中, 设备uboot的tftp命令去下载即可
-		(3)windows中搭建TFTP服务器(如: tftpd32)
-		(4)linux  中搭建TFTP服务器参考文档, (tftp下载目录是/tftpboot, 将要被下载的镜像复制到这个目录下)
+				2. tftp	   : 通过有线网络			//典型的方式是通过net, fastboot is new skill
+
+		(2)tftp方式: uboot作为tftp客户端, 主机windows或虚拟机ubuntu中有一个作为tftp服务器
+					 将要下载的镜像文件放在服务器的下载目录中, 设备uboot的tftp命令去下载即可
+
+		(3)windows中搭建tftp服务器(如: tftpd32), linux中搭建tftp服务器参考文档, (tftp下载目录是/tftpboot)
+
 		(5)检查开发板uboot的环境变量serverip(serverip:主机tftp服务器的ip地址)
+
 		(6)操作: 在开发板的uboot下先ping通虚拟机ubuntu, 然后再尝试下载: tftp 0x30000000 zImage-qt
 			//将服务器上名为zImage-qt的文件下载到开发板内存的0x30000000地址处
-		(7)/*镜像下载到开发板的DDR中*/后, uboot就可以用movi指令进行镜像的烧写	// ram -> rom
 
-		//serverip meaning of tftp ip
+		(7)/*镜像下载到开发板的DDR中*/后, uboot通过movi指令进行镜像的烧写	// ram -> rom
 
 	2.1.8.2、nfs启动内核命令：nfs
 		(1)uboot支持nfs命令
 
 2.1.9.uboot的常用命令4
     2.1.9.1 SD卡/iNand操作指令movi
-        (1)开发板如果用SD卡/EMMC/iNand等作为Flash, 则在uboot中操作flash的指令为movi(或mmc)
-            movei init S3C_HSMMC-0
-        (3)movi的指令都是movi read和movi write一组的, movi read用来读取iNand到DDR上
-            movi write用来将DDR中的内容写入iNand中. 理解这些指令时一定要注意涉及到的2个硬件：iNand和DDR内存
-        (4)movi read  {u-boot | kernel} {addr}   
-            命令通用型的描述方法: movi和read外面没有任何标记说明每一次使用这个指令都是必选的；
+        (1)开发板如果用SD卡/EMMC/iNand等作为Flash, 则在uboot中操作flash的指令为movi(或mmc)	//movei init S3C_HSMMC-0
+
+        (3)movi read : flash -> ddr;
+		   movi write: ddr -> flash		// hardware: flash or ddr
+
+		(4)movi read  {u-boot | kernel} {addr}   
             一对大括号{}括起来的部分必选1个, 大括号中的竖线表是多选一
             中括号[]表示可选参数
-        (5)指令有多种用法，譬如 movi read u-boot 0x30000000  // inand 中 u-boot分区 (起始地址 + 终止地址)
+
+        (5)指令有多种用法, 譬如 movi read u-boot 0x30000000  // inand 中 u-boot分区 (起始地址 + 终止地址)
             把iNand中的u-boot分区读出到DDR的0x30000000起始的位置处
             uboot代码中将iNand分成了很多个分区, 每个分区有地址范围和分区名	// uboot进行系统部署
             uboot程序操作中可以使用直接地址来操作iNand分区, 也可以使用分区名来操作分区
             //uboot shell下默认是十六进制
-    
+
     2.1.9.2、NandFlash操作指令nand
-        (1)理解方法和操作方法完全类似于movi指令
+        (1)理解方法和操作方法完全类似于movi指令  // -- mmc卡操作指令mmc ?
 
     2.1.9.3、内存操作指令：mm、mw、md
-        (1)*/DDR中没有分区(对硬盘、Flash进行分区)
+        (1)*/DDR中没有分区(只对硬盘、Flash进行分区)
             uboot裸机程序, 并不对内存进行管理
 			操作系统会所有内存, 系统负责分配和管理, 系统会保证内存不会随便越界	// 裸机注意内存地址使用
             //思考: dnw(usb刷机时)uboot放在0x23E0_0000地址处
@@ -155,9 +158,10 @@
         (3)mw: memory write     将内容写到内存中
         (4)mm: memory modify    修改内存中(批量 逐个单元 修改内存)
 
-    2.1.9.4、启动内核指令：bootm、go
+    2.1.9.4、启动内核指令：bootm、go	// -- command: bootm
         (1)uboot的革命理想: 启动内核, 启动内核在uboot中表现为一个指令(never get back)
-        (2)差别: bootm启动内核同时给内核传参, 而go命令启动内核不传参
+        
+		(2)差别: bootm启动内核同时给内核传参, 而go命令启动内核不传参
                  go命令内部其实就是一个函数指针指向一个内存地址然后直接调用那个函数	// CR600 bootloader jump
                  go命令的实质就是PC直接跳转到一个内存地址去运行
                  调试裸机程序的一种方法: 事先启动uboot, 然后在uboot中去下载裸机程序, 用go命令去执行裸机程序
@@ -187,12 +191,15 @@
     2.1.11.2、uboot给kernel传参：bootargs
         (1)kernel启动时可以接收uboot传递的启动参数(约定好格式内容)
            kernel在这些启动参数的指导下完成启动过程(内核可以在不重新编译的情况下采用不同的方式启动)
+
         (2)uboot的环境变量中/*设置bootargs*/ 然后bootm命令启动kernel时会/*自动将bootargs传给kernel*/
-        (3)'bootargs=console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3'
+
+        (3) 'bootargs=console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3'
             'console=ttySAC2,115200'	控制台使用串口2, 波特率115200
             'root=/dev/mmcblk0p2 rw'	rootfs在SD卡端口0设备(iNand)第2分区, 根文件系统是可读可写
             'init=/linuxrc'			    linux的进程1(init进程)的路径
             'rootfstype=ext3'			根文件系统的类型是ext3
+
         (4)内核传参很重要(不传参或传参错误导致内核启动失败)
 
     2.1.11.3、新建、更改、删除一个环境变量的方法
@@ -204,11 +211,14 @@
 
 2.1.12.uboot中对Flash和DDR的管理
 	2.1.12.1、uboot阶段Flash的分区
-		(1)分区: Flash进行分块管理 // uboot var kernel rootfs
+		(1)分区: flash进行分块管理 // uboot var kernel rootfs
+
 		(2)PC整个硬盘由OS统一管理, OS使用文件系统管理硬盘空间
-		(3)uboot运行时需要手动管理flash分区, 对Flash的管理必须事先使用/*分区界定*/
+
+		(3)uboot运行时需要手动管理flash分区, 对flash的管理必须事先使用/*分区界定*/
 			/*实际上在uboot中和kernel中都有个分区表*/(分区表: 系统移植时对Flash的整体管理分配方法)
 			在部署系统时按照/*分区表*/中分区界定方法来部署
+
 		(4)分区方法不是固定的, 可以变动的, 一般在设计系统移植时就会定好:
 			// sd卡启动时：烧录脚本中seek=1
 			uboot分区的大小必须保证uboot肯定能放下, 一般设计为512KB或者1MB
@@ -217,9 +227,9 @@
 			rootfs：······
 			剩下的就是自由分区, 一般kernel启动后将自由分区挂载到rootfs下使用
 
-		总结: 
+		总结:
 			(1)各分区彼此相连
-			(3)uboot必须在Flash开头/*soc决定*/, 其他分区相对位置是可变 //SOC bootROM决定
+			(3)uboot必须在flash开头/*soc决定*/, 其他分区相对位置是可变 //SOC bootROM决定
 			(5)分区在系统移植前确定好, 在uboot中和kernel中使用同一个分区表
 				将来在/*系统部署时和系统代码*/中的分区方法也必须一样
 

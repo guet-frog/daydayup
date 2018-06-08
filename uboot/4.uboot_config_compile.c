@@ -54,7 +54,7 @@
 	2.4.3.3 include $(obj)include/config.mk // line133
 		(1)include/config.mk要在配置过程生成(make x210_sd_config)
 		(3)自动配置思想: 编译前配置"make x210_sd_config" 自动生成config.mk文件, 从而可以导出以上环境变量
-		(4)//line2589 -- @$(MKCONFIG) $(@:_config=) arm s5pc11x x210 samsung s5pc110 
+		(4)//line2589 -- @$(MKCONFIG) $(@:_config=) arm s5pc11x x210 samsung s5pc110
            //generated file: include/config.mk
 
 	2.4.3.4 ARCH CROSS_COMPILE
@@ -65,7 +65,7 @@
 			//可以在Makefile中去更改设置CROSS_COMPILE的值 -- 修改导出的环境变量CROSS_COMPILE
 			//编译时用"make CROSS_COMPILE=xxxx", 而且编译时传参可以覆盖Makefile内部设置, 优先级较高
 
-//makefile文件下编译, 与cmdline下编译, 本质是相同的
+			//makefile文件下编译, 与cmdline下编译, 本质是相同的
 
 2.4.4.uboot主Makefile分析4
 	2.4.4.1、$(TOPDIR)/config.mk	// line 185
@@ -146,7 +146,7 @@
     // mkconfig主要做了三件事:
         创建相应软链接
         生成./include/config.mk
-        生成./include/config.h
+        生成./include/config.h		// #include <configs/x210_sd.h>
 
 
 
