@@ -188,7 +188,9 @@
 (4)CONFIG_MTDPARTITION£¬´«²ÎÄÚÈÝÊÇiNand/SD¿¨µÄ·ÖÇø±í¡£
 (5)ÆðÊ¼tagÊÇATAG_CORE¡¢½áÊøtagÊÇATAG_NONE£¬ÆäËûµÄATAG_XXX¶¼ÊÇÓÐÐ§ÐÅÏ¢tag¡£
 Ë¼¿¼£ºÄÚºËÈçºÎÄÃµ½ÕâÐ©tag£¿
-uboot×îÖÕÊÇµ÷ÓÃtheKernelº¯ÊýÀ´Ö´ÐÐlinuxÄÚºËµÄ£¬ubootµ÷ÓÃÕâ¸öº¯Êý£¨ÆäÊµ¾ÍÊÇlinuxÄÚºË£©Ê±´«µÝÁË3¸ö²ÎÊý¡£Õâ3¸ö²ÎÊý¾ÍÊÇubootÖ±½Ó´«µÝ¸ølinuxÄÚºËµÄ3¸ö²ÎÊý£¬Í¨¹ý¼Ä´æÆ÷À´ÊµÏÖ´«²ÎµÄ¡££¨µÚ1¸ö²ÎÊý¾Í·ÅÔÚr0ÖÐ£¬µÚ¶þ¸ö²ÎÊý·ÅÔÚr1ÖÐ£¬µÚ3¸ö²ÎÊý·ÅÔÚr2ÖÐ£©µÚ1¸ö²ÎÊý¹Ì¶¨Îª0£¬µÚ2¸ö²ÎÊýÊÇ»úÆ÷Âë£¬µÚ3¸ö²ÎÊý´«µÝµÄ¾ÍÊÇ´óÆ¬´«²ÎtagµÄÊ×µØÖ·¡£
+	uboot×îÖÕÊÇµ÷ÓÃtheKernelº¯ÊýÀ´Ö´ÐÐlinuxÄÚºËµÄ£¬ubootµ÷ÓÃÕâ¸öº¯Êý£¨ÆäÊµ¾ÍÊÇlinuxÄÚºË£©Ê±´«µÝÁË3¸ö²ÎÊý¡£
+	Õâ3¸ö²ÎÊý¾ÍÊÇubootÖ±½Ó´«µÝ¸ølinuxÄÚºËµÄ3¸ö²ÎÊý£¬Í¨¹ý¼Ä´æÆ÷À´ÊµÏÖ´«²ÎµÄ¡£
+	£¨µÚ1¸ö²ÎÊý¾Í·ÅÔÚr0ÖÐ£¬µÚ¶þ¸ö²ÎÊý·ÅÔÚr1ÖÐ£¬µÚ3¸ö²ÎÊý·ÅÔÚr2ÖÐ£©µÚ1¸ö²ÎÊý¹Ì¶¨Îª0£¬µÚ2¸ö²ÎÊýÊÇ»úÆ÷Âë£¬µÚ3¸ö²ÎÊý´«µÝµÄ¾ÍÊÇ´óÆ¬´«²ÎtagµÄÊ×µØÖ·¡£
 
 2.7.7.3¡¢ÒÆÖ²Ê±×¢ÒâÊÂÏî
 (1)ubootÒÆÖ²Ê±Ò»°ãÖ»ÐèÒªÅäÖÃÏàÓ¦µÄºê¼´¿É
@@ -196,14 +198,25 @@ uboot×îÖÕÊÇµ÷ÓÃtheKernelº¯ÊýÀ´Ö´ÐÐlinuxÄÚºËµÄ£¬ubootµ÷ÓÃÕâ¸öº¯Êý£¨ÆäÊµ¾ÍÊÇlinuxÄ
 
 
 2.7.8.ubootÆô¶¯ÄÚºËµÄ×Ü½á
-2.7.8.1¡¢Æô¶¯4²½Öè
-µÚÒ»²½£º½«ÄÚºË°áÒÆµ½DDRÖÐ
-µÚ¶þ²½£ºÐ£ÑéÄÚºË¸ñÊ½¡¢CRCµÈ
+2.7.8.1¡¢Æô¶¯4²½Öè	
+µÚÒ»²½£º½«ÄÚºË°áÒÆµ½DDRÖÐ		// flash(local or remote) -> ddr(Á´½ÓµØÖ·´¦)
+µÚ¶þ²½£ºÐ£ÑéÄÚºË¸ñÊ½¡¢CRCµÈ		// Ð£ÑéddrÖÐÄÚºË¾µÏñ¸ñÊ½
 µÚÈý²½£º×¼±¸´«²Î
-µÚËÄ²½£ºÌø×ªÖ´ÐÐÄÚºË
-2.7.8.2¡¢Éæ¼°µ½µÄÖ÷Òªº¯ÊýÊÇ£ºdo_boomºÍdo_bootm_linux
-2.7.8.3¡¢ubootÄÜÆô¶¯µÄÄÚºË¸ñÊ½£ºzImage uImage fdt·½Ê½
+µÚËÄ²½£ºÌø×ªÖ´ÐÐÄÚºË			// r0 r1 r2´«²Î£º0¡¢»úÆ÷Âë¡¢tag(0x20003000)
+2.7.8.2¡¢Éæ¼°µ½µÄÖ÷Òªº¯ÊýÊÇ£ºdo_bootm(ÄÚºË°áÒÆ, Í·¼ìÑé, CRCÐ£Ñé)ºÍdo_bootm_linux(´«²ÎµÄ×¼±¸¹¤×÷, Ìø×ªÖ´ÐÐ)
+2.7.8.3¡¢ubootÄÜÆô¶¯µÄÄÚºË¸ñÊ½: zImage(ºÜ¶àubootÄ¬ÈÏ²»Ö§³ÖzImageÆô¶¯) uImage fdt·½Ê½
 2.7.8.4¡¢Ìø×ªÓëº¯ÊýÖ¸ÕëµÄ·½Ê½ÔËÐÐÄÚºË
+
+
+// CÓïÑÔ×Ö·û´®½âÎö
+// ATÃüÁîÊ¹ÓÃargcÀ´È·¶¨´«²Î¸öÊýÅÐ¶¨ -- ½âÎöÃüÁî²»Í¬ Ö´ÐÐÃüÁîÊ±µÄ´«²Î²»Í¬
+// default envÓëcurrent envµÄÇø±ð
+// envµÄÅÅ²¼·½·¨
+// set xxxÓÃÀ´
+
+// Ã»ÓÐÏÂ»®Ïß×Ô¼ºÓÃ£¬Ò»¸öÏÂ»®ÏßÏµÍ³Ê¹ÓÃ£¬Á½¸öÏÂ»®ÏßÏµÍ³ÄÚ²¿×Ô¼ºÊ¹ÓÃ
+
+
 
 
 
