@@ -20,7 +20,7 @@
 					-- tcp udp的socket返回值代表的含义不同
 		(6)send和write
 		(7)recv和read	// flag = 0
-		
+
 	3.9.4.4、辅助性函数
 		(1)inet_addr, inet_aton, inet_ntoa			// inet_addr
 		(2)inet_ntop、inet_pton						// net to point   warning: return const char *
