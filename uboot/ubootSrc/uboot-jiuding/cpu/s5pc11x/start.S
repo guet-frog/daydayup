@@ -30,7 +30,7 @@
 #if defined(CONFIG_ENABLE_MMU)
 #include <asm/proc/domain.h>
 #endif
-#include <regs.h>
+#include <regs.h>					// regs.h -> s5pc110.h
 
 #ifndef CONFIG_ENABLE_MMU
 #ifndef CFG_PHY_UBOOT_BASE
@@ -209,7 +209,7 @@ lp2:
 	mov	r0, #0                  @ set up for MCR
 	mcr	p15, 0, r0, c8, c7, 0   @ invalidate TLBs
 	mcr	p15, 0, r0, c7, c5, 0   @ invalidate icache
-
+	
    /*
 	* disable MMU stuff and caches
 	*/
@@ -219,13 +219,13 @@ lp2:
 	orr	r0, r0, #0x00000002     @ set bit 1 (--A-) Align
 	orr	r0, r0, #0x00000800     @ set bit 12 (Z---) BTB
 	mcr 	p15, 0, r0, c1, c0, 0
-
-
+	
+	
 	/* Read booting information */
 	ldr	r0, =PRO_ID_BASE				// defined in reg.h -> ./include/s5pc110.h
 	ldr	r1, [r0,#OMR_OFFSET]
 	bic	r2, r1, #0xffffffc1				// 1100-0001	r2 for boot mode
-
+	
 #ifdef CONFIG_VOGUES	// -- not defined
 	/* PS_HOLD(GPH0_0) set to output high */
 	ldr	r0, =ELFIN_GPIO_BASE
@@ -256,8 +256,8 @@ lp2:
 	moveq	r3, #BOOT_ONENAND
 
 	/* SD/MMC BOOT */
-	cmp     r2, #0xc												// judge boot mode
-	moveq   r3, #BOOT_MMCSD	
+	cmp     r2, #0xc						// judge boot mode
+	moveq   r3, #BOOT_MMCSD
 
 	/* NOR BOOT */
 	cmp     r2, #0x14
@@ -275,7 +275,7 @@ lp2:
 	moveq   r3, #BOOT_SEC_DEV
 	
 	ldr	r0, =INF_REG_BASE
-	str	r3, [r0, #INF_REG3_OFFSET]									// store r3(boot mode) in memory 0xe010_f00c
+	str	r3, [r0, #INF_REG3_OFFSET]		/// store r3(boot mode) in memory 0xE010_F00C
 
 	/*
 	 * Go setup Memory and board specific bits prior to relocation.

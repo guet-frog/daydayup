@@ -93,15 +93,33 @@
     2.2.6.2、调用shell程序的传参
         (1)C语言中可以通过main函数的argc和argv给程序传参
         (2)shell程序在调用时可以传参
-            $#: 传参的个数(only param); $0、$1: param[0] param[1]
-
-            C语言: ./a.out aa bb cc 		argc = 4, 	argv[0] = ./a.out, argv[1]是第一个有效参数···
-            shell: source a.sh aa bb cc  	$# = 3, 	$0是执行这个shell程序的解析程序的名字
-														$1是第1个有效参数的值，$2是第2个有效参数的值···
+			#!/bin/sh
+			if [ $# -eq 3 ]; then
+					echo "\$# = $#\n\$0 = $0\n\$1 = $1\n\$2 = $2\n\$3 = $3"
+			else
+					echo "param num error"
+			fi
+			
+			// ./shell1.sh aa bb cc
+			// $# = 3
+			// $0 = ./shell1.sh
+			// $1 = aa
+			// $2 = bb
+			// $3 = cc
+			
+			// source shell1.sh aa bb cc
+			// $# = 3\n$0 = /bin/bash\n$1 = aa\n$2 = bb\n$3 = cc
+			
+            C语言: ./a.out aa bb cc
+				*/argc = 4   
+				argv[0] = ./a.out
+				argv[1] = aa
+				argv[2] = bb
+				argv[3] = cc
 
     2.2.6.3、while循环和case语言和传参结合
         (1)shell中break只用于循环跳出 //当while中内嵌case语句时, case中的break是跳出外层的while循环的, 不是用来跳出case语句的
-        (2)shell中的$# $1等内置变量的值是可以被shift指令改变
+        (2)*/shell中的$# $1等内置变量的值是可以被shift指令改变
             shift指令有点像左移运算符, 把shell程序的传参左移了一个移出去, 原来的$2变成了新的$1, 原来的$#减1
 
 2.2.7.Makefile基础回顾 
