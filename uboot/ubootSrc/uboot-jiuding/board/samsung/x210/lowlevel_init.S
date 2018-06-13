@@ -35,7 +35,7 @@
 #include <s5pc110.h>
 #include "smdkc110_val.h"
 							// -- 没有用.global声明应该类似于静态全局变量
-_TEXT_BASE:					// 以文件为单位编译, 这里的 _TEXT_BASE 与 start.s(line99) 在链接的时候会不会冲突
+_TEXT_BASE:					// 以文件为单位编译, 这里的_TEXT_BASE与start.s(line99)在链接的时候会不会冲突
 	.word	TEXT_BASE
 
 	.globl lowlevel_init
@@ -100,7 +100,7 @@ lowlevel_init:
 	/* PS_HOLD pin(GPH0_0) set to high */
 	ldr	r0, =(ELFIN_CLOCK_POWER_BASE + PS_HOLD_CONTROL_OFFSET)	// 0xE010_E81C
 	ldr	r1, [r0]
-	orr	r1, r1, #0x300											# 供电锁存 "读, 改, 写"
+	orr	r1, r1, #0x300											// 供电锁存 "读, 改, 写"
 	orr	r1, r1, #0x1
 	str	r1, [r0]
 
@@ -108,11 +108,11 @@ lowlevel_init:
 	 * and actually, memory controller must be configured before U-Boot
 	 * is running in ram.
 	 */
-	ldr	r0, =0xff000fff												# 判断运行地址在 sram or ddr
+	ldr	r0, =0xff000fff												// 判断运行地址在 sram or ddr
 	bic	r1, pc, r0			/* r0 <- current base addr of code */	// pc=0xD002_0010 -> r1=0x0002_0000
 	ldr	r2, _TEXT_BASE		/* r1 <- original base addr in ram */	// r2=0xC3E0_0000
 	bic	r2, r2, r0			/* r0 <- current base addr of code */	// r2=0x00E0_0000
-	cmp     r1, r2      	/* compare r0, r1                  */
+	cmp     r1, r2      	/* compare r0, r1				   */
 	beq     1f				/* r0 == r1 then skip sdram init   */	// forward back
 
 	/* init system clock */
@@ -137,7 +137,6 @@ lowlevel_init:
 #endif
 
 	/* check reset status  */
-	
 	ldr	r0, =(ELFIN_CLOCK_POWER_BASE+RST_STAT_OFFSET)
 	ldr	r1, [r0]
 	bic	r1, r1, #0xfffeffff
@@ -428,7 +427,7 @@ uart_asm_init:
 	str	r1, [r0, #UDIVSLOT_OFFSET]
 
 	ldr	r1, =0x4f4f4f4f
-	str	r1, [r0, #UTXH_OFFSET]		@'O'	// 发送完成中断
+	str	r1, [r0, #UTXH_OFFSET]		@'O'	// test 发送完成中断
 
 	mov	pc, lr
 
