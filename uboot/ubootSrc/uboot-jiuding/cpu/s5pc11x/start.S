@@ -105,7 +105,7 @@ _TEXT_BASE:								// 符号 -> 地址		// 汇编里的符号, 应理解为 &变
  * by scsuh.
  */
 _TEXT_PHY_BASE:
-	.word	CFG_PHY_UBOOT_BASE			// for virtual addr, clean bss && relocation
+	.word	CFG_PHY_UBOOT_BASE			// 0x33E0_0000 for virtual addr, clean bss && relocation
 
 .globl _armboot_start
 _armboot_start:
@@ -295,8 +295,8 @@ lp2:
 
 	/* get ready to call C functions */
 	ldr	sp, _TEXT_PHY_BASE	/* setup temp stack pointer */			// stack_in ddr 代码段链接地址: C3E0_0000
-	sub	sp, sp, #12													// uboot stack in low addr for uboot txt
-	mov	fp, #0				/* no previous frame, so fp=0 */
+	sub	sp, sp, #12													// uboot's stack in low  addr
+	mov	fp, #0				/* no previous frame, so fp=0 */		// uboot's text  in high addr
 
 	/* when we already run in ram, we do not need to relocate U-Boot.
 	 * and actually, memory controller must be configured before U-Boot
@@ -314,7 +314,7 @@ lp2:
 	ldr	r0, =0xD0037488
 	ldr	r1, [r0]
 	ldr	r2, =0xEB200000
-	cmp	r1, r2
+	cmp	r1, r2					/// is r2 not [r2]
 	beq     mmcsd_boot
 #endif
 

@@ -107,7 +107,7 @@ find_lock_val:
 	mov	r2, r1, LSL #18
 	orr	r2, r2, #0x100000
 	orr	r2 ,r2, #0x1000	
-		
+
 	orr	r1, r2, #0x3				@Force Value locking
 	str	r1, [r0, #DMC_PHYCONTROL0]
 
