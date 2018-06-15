@@ -265,7 +265,7 @@ typedef enum {
 #define BLK_PWR_STAT_REG		__REG(ELFIN_CLOCK_POWER_BASE+BLK_PWR_STAT_OFFSET)
 
 #define PRO_ID_BASE			0xE0000000
-#define PRO_ID_OFFSET			0x00
+#define PRO_ID_OFFSET       0x00
 #define OMR_OFFSET			0x04
 
 #define INF_REG_BASE			0xE010F000
@@ -985,7 +985,7 @@ typedef enum {
  */
 #define ELFIN_SROM_BASE			0xE8000000
 
-#define SROM_BW_REG			__REG(ELFIN_SROM_BASE+0x0)
+#define SROM_BW_REG			    __REG(ELFIN_SROM_BASE+0x0)
 #define SROM_BC0_REG			__REG(ELFIN_SROM_BASE+0x4)
 #define SROM_BC1_REG			__REG(ELFIN_SROM_BASE+0x8)
 #define SROM_BC2_REG			__REG(ELFIN_SROM_BASE+0xC)

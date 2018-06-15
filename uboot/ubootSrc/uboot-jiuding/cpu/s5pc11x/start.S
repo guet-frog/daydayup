@@ -274,7 +274,7 @@ lp2:
 	cmp     r2, #(0x1<<4)
 	moveq   r3, #BOOT_SEC_DEV
 	
-	ldr	r0, =INF_REG_BASE
+	ldr	r0, =INF_REG_BASE				/// 软件自定义的boot mode序号
 	str	r3, [r0, #INF_REG3_OFFSET]		/// store r3(boot mode) in memory 0xE010_F00C
 
 	/*
@@ -298,16 +298,15 @@ lp2:
 	sub	sp, sp, #12													// uboot's stack in low  addr
 	mov	fp, #0				/* no previous frame, so fp=0 */		// uboot's text  in high addr
 
-	/* when we already run in ram, we do not need to relocate U-Boot.
-	 * and actually, memory controller must be configured before U-Boot
-	 * is running in ram.
-	 */
+	/* 0xD002_0000 - 0xD002_4000 */
+	/* 0x3000_0000 */
+	/* 0x00FF_F000 */
 	ldr	r0, =0xff000fff
-	bic	r1, pc, r0			/* r0 <- current base addr of code */	// 第一次判断运行地址: lowlevel_init	-- 是否执行clock ddr init
-	ldr	r2, _TEXT_BASE		/* r1 <- original base addr in ram */	// 第二次判断运行地址: here				-- 是否进行relocate
-	bic	r2, r2, r0			/* r0 <- current base addr of code */
-	cmp     r1, r2      	/* compare r0, r1                  */
-	beq     after_copy		/* r0 == r1 then skip flash copy   */
+	bic	r1, pc, r0			/* r1 = 0x0002_x000 */	// 第一次判断运行地址: lowlevel_init	-- 是否执行clock ddr init
+	ldr	r2, _TEXT_BASE		/* r2 = 0x3000_0000 */	// 第二次判断运行地址: here				-- 是否进行relocate
+	bic	r2, r2, r0			/* r2 = 0x0000_0000 */	// 0x33E0_0000
+	cmp     r1, r2
+	beq     after_copy
 
 #if defined(CONFIG_EVT1)
 	/* If BL1 was copied from SD/MMC CH2 */		// line260 已经判断过 boot mode
@@ -341,12 +340,12 @@ onenand_boot:
 	b	after_copy
 
 mmcsd_boot:
-#if DELETE										// #if 0
+#if DELETE						// #if 0
 	ldr     sp, _TEXT_PHY_BASE      
 	sub     sp, sp, #12
 	mov     fp, #0
 #endif
-	bl      movi_bl2_copy						// SD代码重定位到DDR
+	bl      movi_bl2_copy		// SD代码重定位到DDR
 	b       after_copy
 
 nor_boot:
@@ -400,7 +399,7 @@ stack_setup:
 clear_bss:
 	ldr	r0, _bss_start		/* find start of bss segment        */
 	ldr	r1, _bss_end		/* stop here                        */
-	mov 	r2, #0x00000000		/* clear                            */
+	mov r2, #0x00000000		/* clear                            */
 
 clbss_l:
 	str	r2, [r0]		/* clear loop...                    */
@@ -408,7 +407,7 @@ clbss_l:
 	cmp	r0, r1
 	ble	clbss_l
 	
-	ldr	pc, _start_armboot					// _start_armboot指针使用在定义之前 not line111 _armboot_start
+	ldr	pc, _start_armboot	// start_armboot符号为链接地址, 所以肯定不会运行到sram中的start_armboot
 
 _start_armboot:
 	.word start_armboot
@@ -436,7 +435,7 @@ copy_from_nand:
 
 #if defined(CONFIG_EVT1)
 	ldr	r0, =0xd0020000
-#else	
+#else
 	ldr	r0, =0xd0030000
 #endif
 	ldr	r1, _TEXT_PHY_BASE	/* 0x23e00000 */

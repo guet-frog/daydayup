@@ -46,7 +46,7 @@ lowlevel_init:
 	
 	ldr	r0, =(ELFIN_CLOCK_POWER_BASE+RST_STAT_OFFSET)	// 0xE010_A000
 	ldr	r1, [r0]
-	bic	r1, r1, #0xfff6ffff			// 0110使用bic指令校验1001
+	bic	r1, r1, #0xfff6ffff			// r1 &= ~(0xFFF_0110_FFFF); r1 &= (0x000_1001_0000)
 	cmp	r1, #0x10000				// reset by sleep mode wake-up
 	beq	wakeup_reset_pre
 	cmp	r1, #0x80000				// arm reset from deep-idle
@@ -112,7 +112,7 @@ lowlevel_init:
 	bic	r1, pc, r0			/* r0 <- current base addr of code */	// pc=0xD002_0010 -> r1=0x0002_0000
 	ldr	r2, _TEXT_BASE		/* r1 <- original base addr in ram */	// r2=0xC3E0_0000
 	bic	r2, r2, r0			/* r0 <- current base addr of code */	// r2=0x00E0_0000
-	cmp     r1, r2      	/* compare r0, r1				   */
+	cmp     r1, r2
 	beq     1f				/* r0 == r1 then skip sdram init   */	// forward back
 
 	/* init system clock */
@@ -120,7 +120,7 @@ lowlevel_init:
 
 	/* Memory initialize */
 	bl mem_ctrl_asm_init			/// clock init ok then ddr
-	
+
 1:
 	/* for UART */
 	bl uart_asm_init

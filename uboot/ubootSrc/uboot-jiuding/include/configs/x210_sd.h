@@ -37,17 +37,17 @@
  * High Level Configuration Options
  * (easy to change)
  */
-#define CONFIG_MPAD		1		//lxg added
+#define CONFIG_MPAD		    1		//lxg added
 #define CONFIG_S5PC110		1		/* in a SAMSUNG S3C6410 SoC */
 #define CONFIG_S5PC11X		1		/* in a SAMSUNG S3C64XX Family  */
-#define CONFIG_X210		1
+#define CONFIG_X210		    1
 
 #define CONFIG_MCP_SINGLE	1
-#define CONFIG_EVT1		1		/* EVT1 */
+#define CONFIG_EVT1		    1		/* EVT1 */
 //#define CONFIG_SMDKV210_REV02	1	/* Rev 0.2 and PMIC Type is MAX8998 */
 
-#define CONFIG_FASTBOOT		1
-//#define CONFIG_FUSED		1		/* Fused chip */
+#define CONFIG_FASTBOOT		    1
+//#define CONFIG_FUSED		    1		/* Fused chip */
 //#define CONFIG_SECURE_BOOT	1		/* secure booting */
 
 #define CONFIG_SW_WORKAROUND	1		/* Software around */
@@ -64,15 +64,15 @@
 #endif
 
 #define BOOT_ONENAND		0x1
-#define BOOT_NAND		0x2
-#define BOOT_MMCSD		0x3
-#define BOOT_NOR		0x4
+#define BOOT_NAND		    0x2
+#define BOOT_MMCSD		    0x3
+#define BOOT_NOR		    0x4
 #define BOOT_SEC_DEV		0x5
 
-#define AT070TN92		1
-#define VGA_800X600		2
-#define VGA_1024X768	3
-#define TRULY043		4
+#define AT070TN92		    1
+#define VGA_800X600		    2
+#define VGA_1024X768	    3
+#define TRULY043		    4
 #define VGA_1440X900		5
 #define VGA_1280X1024		6
 
@@ -86,12 +86,12 @@
 /* skip to load BL2 */
 //#define FAST_BOOT		1
 
-#define MEMORY_BASE_ADDRESS	0x30000000
+#define MEMORY_BASE_ADDRESS	    0x30000000
 //#define MEMORY_BASE_ADDRESS	0x20000000
 #define MEMORY_BASE_ADDRESS2	0x40000000
 
 /* input clock of PLL */
-#define CONFIG_SYS_CLK_FREQ	24000000	/* the SMDK6400 has 24MHz input clock */
+#define CONFIG_SYS_CLK_FREQ	    24000000	/* the SMDK6400 has 24MHz input clock */
 
 #define CONFIG_ENABLE_MMU
 
@@ -553,7 +553,7 @@
 //#define CFG_UBOOT_BASE		0x23e00000  /*yan*/
 #endif
 
-#define CFG_PHY_UBOOT_BASE	MEMORY_BASE_ADDRESS + 0x3e00000		// 0x3000_0000
+#define CFG_PHY_UBOOT_BASE	MEMORY_BASE_ADDRESS + 0x3e00000		// 0x33E0_0000
 #define CFG_PHY_KERNEL_BASE	MEMORY_BASE_ADDRESS + 0x8000
 
 #define CFG_ENV_OFFSET		0x0007C000
@@ -584,7 +584,7 @@
 
 /* SD/MMC configuration */
 #define CONFIG_MMC
-#define CONFIG_GENERIC_MMC
+#define CONFIG_GENERIC_MMC      /// generic: 一般的, 通用的
 #define CONFIG_S3C_HSMMC
 #undef DEBUG_S3C_HSMMC
 

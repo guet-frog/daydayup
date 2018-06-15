@@ -29,7 +29,7 @@
 #define UART_NR	S5PC11X_UART1
 
 #elif defined(CONFIG_SERIAL3)
-#define UART_NR	S5PC11X_UART2
+#define UART_NR	S5PC11X_UART2       /// 2
 
 #elif defined(CONFIG_SERIAL4)
 #define UART_NR S5PC11X_UART3

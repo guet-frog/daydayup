@@ -103,7 +103,7 @@ pxList->pxIndex = (xListItem *)&( pxList->xListEnd );  // list init
   | -- if (NULL != pxCreatedTask) // pxCreatedTask = &taskHandler
      |
      | -- *pxCreatedTask = (TaskHandle_t)pxNewTCB //TaskHandle = &pxCurrentTCB; stackTopPoint = *pxCurrentTCB
-  |
+  |												  //taskHandle = pxCurrentTCB
   | -- tackENTER_CRITICAL()
      |
      | -- uxCurrentNumberOfTasks++

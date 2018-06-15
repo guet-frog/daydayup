@@ -23,7 +23,7 @@
 #define BL2_BASE                0x27e00000
 #else
 # error TCM_BASE or BL2_BASE is not defined
-#endif
+#endif /* defined(CONFIG_S3C6400) || defined(CONFIG_S3C6410) || defined(CONFIG_S3C6430) */
 
 /* TCM function for bl2 load */
 #if defined(CONFIG_S3C6400)
@@ -35,7 +35,7 @@
 #define CopyMovitoMem(a,b,c,d,e)	(((int(*)(int, uint, ushort, uint *, int))(*((uint *)(S5P6440_DEVCPY_BASE + 0x8))))(a,b,c,d,e))
 #elif defined(CONFIG_S3C2450) || defined(CONFIG_S3C2416)
 #define CopyMovitoMem(a,b,c,d)		(((int(*)(uint, ushort, uint *, int))(*((uint *)(TCM_BASE + 0x8))))(a,b,c,d))
-#endif
+#endif /* CONFIG_S3C6400 */
 
 /* size information */
 #if defined(CONFIG_S3C6400)
@@ -169,18 +169,18 @@ extern struct movi_offset_t ofsinfo;
 #define MOVI_FWBL1_BLKCNT	(FWBL1_SIZE / MOVI_BLKSIZE)	/* 4KB */
 #endif
 
-#define MOVI_BL1_BLKCNT		(SS_SIZE / MOVI_BLKSIZE)	/* 8KB */
-#define MOVI_ENV_BLKCNT		(CFG_ENV_SIZE / MOVI_BLKSIZE)	/* 16KB */
+#define MOVI_BL1_BLKCNT		(SS_SIZE / MOVI_BLKSIZE)	    /* 8KB */       /// 8KB  / 512B
+#define MOVI_ENV_BLKCNT		(CFG_ENV_SIZE / MOVI_BLKSIZE)	/* 16KB */      /// 16KB / 512B
 #define MOVI_BL2_BLKCNT		(PART_SIZE_BL / MOVI_BLKSIZE)	/* 512KB */
 #define MOVI_ZIMAGE_BLKCNT	(PART_SIZE_KERNEL / MOVI_BLKSIZE)	/* 4MB */
 
 /* Change writing block position at fused chip */
 #if defined(CONFIG_EVT1)
-	#if defined(CONFIG_SECURE) || defined(CONFIG_FUSED)
-#define MOVI_BL2_POS		((eFUSE_SIZE / MOVI_BLKSIZE) + (FWBL1_SIZE / MOVI_BLKSIZE) + MOVI_BL1_BLKCNT + MOVI_ENV_BLKCNT)
-	#else
-#define MOVI_BL2_POS		((eFUSE_SIZE / MOVI_BLKSIZE) + MOVI_BL1_BLKCNT + MOVI_ENV_BLKCNT)
-	#endif
+#if defined(CONFIG_SECURE) || defined(CONFIG_FUSED)
+    #define MOVI_BL2_POS		((eFUSE_SIZE / MOVI_BLKSIZE) + (FWBL1_SIZE / MOVI_BLKSIZE) + MOVI_BL1_BLKCNT + MOVI_ENV_BLKCNT)
+#else
+    #define MOVI_BL2_POS		((eFUSE_SIZE / MOVI_BLKSIZE) + MOVI_BL1_BLKCNT + MOVI_ENV_BLKCNT)
+#endif
 #else
 #define MOVI_BL2_POS		(MOVI_LAST_BLKPOS - MOVI_BL1_BLKCNT - MOVI_BL2_BLKCNT - MOVI_ENV_BLKCNT)
 #endif

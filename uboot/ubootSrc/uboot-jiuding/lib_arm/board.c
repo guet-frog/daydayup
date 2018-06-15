@@ -114,8 +114,7 @@ static void mem_malloc_init (ulong dest_addr)
 	mem_malloc_end = dest_addr + CFG_MALLOC_LEN;
 	mem_malloc_brk = mem_malloc_start;
 
-	memset ((void *) mem_malloc_start, 0,
-			mem_malloc_end - mem_malloc_start);
+	memset ((void *) mem_malloc_start, 0, mem_malloc_end - mem_malloc_start);
 }
 
 void *sbrk (ptrdiff_t increment)
@@ -461,7 +460,6 @@ void start_armboot (void)
 	/* Pointer is writable since we allocated a register for it */
 #ifdef CONFIG_MEMORY_UPPER_CODE /* by scsuh */
 	ulong gd_base;
-
 	gd_base = CFG_UBOOT_BASE + CFG_UBOOT_SIZE - CFG_MALLOC_LEN - CFG_STACK_SIZE - sizeof(gd_t);
 #ifdef CONFIG_USE_IRQ
 	gd_base -= (CONFIG_STACKSIZE_IRQ+CONFIG_STACKSIZE_FIQ);
@@ -480,8 +478,10 @@ void start_armboot (void)
 
 	monitor_flash_len = _bss_start - _armboot_start;
 
-	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
-		if ((*init_fnc_ptr)() != 0) {
+	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr)
+    {
+		if ((*init_fnc_ptr)() != 0)
+        {
 			hang ();
 		}
 	}
@@ -493,9 +493,9 @@ void start_armboot (void)
 #endif /* CFG_NO_FLASH */
 
 #ifdef CONFIG_VFD
-#	ifndef PAGE_SIZE
-#	  define PAGE_SIZE 4096
-#	endif
+#ifndef PAGE_SIZE
+#define PAGE_SIZE 4096
+#endif
 	/*
 	 * reserve memory for VFD display (always full pages)
 	 */
@@ -521,7 +521,7 @@ void start_armboot (void)
 	}
 #endif /* CONFIG_LCD */
 
-	/* armboot_start is defined in the board-specific linker script */
+/* armboot_start is defined in the board-specific linker script */
 #ifdef CONFIG_MEMORY_UPPER_CODE /* by scsuh */
 	mem_malloc_init (CFG_UBOOT_BASE + CFG_UBOOT_SIZE - CFG_MALLOC_LEN - CFG_STACK_SIZE);
 #else
@@ -574,7 +574,6 @@ void start_armboot (void)
 #endif	/* CONFIG_SMDK6410 */
 
 #if defined(CONFIG_SMDKC100)
-
 	#if defined(CONFIG_GENERIC_MMC)
 		puts ("SD/MMC:  ");
 		mmc_exist = mmc_initialize(gd->bd);
@@ -597,37 +596,36 @@ void start_armboot (void)
 #endif /* CONFIG_SMDKC100 */
 
 #if defined(CONFIG_X210)
-
-	#if defined(CONFIG_GENERIC_MMC)
-		puts ("SD/MMC:  ");
-		mmc_exist = mmc_initialize(gd->bd); // all board interface
-		if (mmc_exist != 0)
-		{
-			puts ("0 MB\n");
+#if defined(CONFIG_GENERIC_MMC)
+	puts ("SD/MMC:  ");
+	mmc_exist = mmc_initialize(gd->bd); // all board interface
+	if (mmc_exist != 0)
+	{
+		puts ("0 MB\n");
 #ifdef CONFIG_CHECK_X210CV3
-			check_flash_flag=0;//check inand error!
+		check_flash_flag=0;//check inand error!
 #endif
-		}
+	}
 #ifdef CONFIG_CHECK_X210CV3
-		else
-		{
-			check_flash_flag=1;//check inand ok! 
-		}
+	else
+	{
+		check_flash_flag=1;//check inand ok! 
+	}
 #endif
-	#endif
+#endif /* CONFIG_GENERIC_MMC */
+ 
+#if defined(CONFIG_MTD_ONENAND)
+	puts("OneNAND: ");
+	onenand_init();
+	/*setenv("bootcmd", "onenand read c0008000 80000 380000;bootm c0008000");*/
+#else
+	//puts("OneNAND: (FSR layer enabled)\n");
+#endif
 
-	#if defined(CONFIG_MTD_ONENAND)
-		puts("OneNAND: ");
-		onenand_init();
-		/*setenv("bootcmd", "onenand read c0008000 80000 380000;bootm c0008000");*/
-	#else
-		//puts("OneNAND: (FSR layer enabled)\n");
-	#endif
-
-	#if defined(CONFIG_CMD_NAND)
-		puts("NAND:    ");
-		nand_init();
-	#endif
+#if defined(CONFIG_CMD_NAND)
+	puts("NAND:    ");
+	nand_init();
+#endif
 
 #endif /* CONFIG_X210 */
 

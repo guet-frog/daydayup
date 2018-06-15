@@ -124,20 +124,14 @@
 		// -- copy_sd_mmc_to_mem copy_bl2 = (copy_sd_mmc_to_mem) (*(u32 *) (0xD003E008));
 		// -- copy_bl2(2, MOVI_BL2_POS, MOVI_BL2_BLKCNT, CFG_PHY_UBOOT_BASE, 0)
 
-		MOVI_BL2_POS: bl2(整个uboot.bin)的起始扇区	// 注意应和烧录时bl2起始扇区相同
-		①: MOVI_BL2_POS = MOVI_LAST_BLKPOS - MOVI_BL1_BLKCNT - MOVI_BL2_BLKCNT - MOVI_ENV_BLKCNT
-				MOVI_LAST_BLKPOS = MOVI_TOTAL_BLKCNT - (eFUSE_SIZE / 512)
-				MOVI_BL1_BLKCNT  = SS_SIZE / 512
-				MOVI_BL2_BLKCNT  = PART_SIZE_BL / 512
-				MOVI_ENV_BLKCNT  = CFG_ENV_SIZE / 512
-					MOVI_TOTAL_BLKCNT = *(0xd002_0230)
-					eFUSE_SIZE		  = (1   * 1024)
-					SS_SIZE			  = (8   * 1024)
-					PART_SIZE_BL	  = (512 * 1024)
-					CFG_ENV_SIZE      = 0x4000 		// 16K
-		②: MOVI_BL2_BLKCNT
-		③: CFG_PHY_UBOOT_BASE	// physical address
+		MOVI_BL2_POS: bl2(整个uboot.bin)的起始扇区	// 注意应和烧录sd卡时, bl2起始扇区相同
 
+		MOVI_BL2_POS = (eFUSE_SIZE / MOVI_BLKSIZE) + MOVI_BL1_BLKCNT + MOVI_ENV_BLKCNT = 1 + 16 + 32 = 49
+			eFUSE_SIZE		= 512
+			MOVI_BLKSIZE	= 512
+			MOVI_BL1_BLKCNT	= SS_SIZE / MOVI_BLKSIZE		// 8KB	/ 512
+			MOVI_ENV_BLKCNT = CFG_ENV_SIZE / MOVI_BLKSIZE	// 16KB	/ 512
+		
 2.5.10.start.S解析8
     2.5.10.1、什么是虚拟地址、物理地址
         (3)虚拟地址在软件操作和硬件被操作之间增加一个层次: 虚拟地址映射层
@@ -225,9 +219,9 @@
 			 实现: uboot_step1(in sram) jump to uboot_step2(in ddr)
 
 // 链接时将start.s放在前8K
-// ddr中uboot的第一阶段永远不会执行 -- ? 
+// ddr中uboot的第一阶段永远不会执行 -- 在ddr中运行, 肯定是从start_armboot开始 -- test adr加载时, pc指针的值
 	-- 应该不会执行, reset的地址是一定的.
-	-- 但是还是不能确定在SD卡中是否有两份BL1
+	-- 但是还是不能确定在SD卡中是否有两份BL1 -- sd卡中两份bl1
 
 2.5.13.4、总结：uboot的第一阶段做了哪些工作
 	(1)构建异常向量表          // like mcu start.s
