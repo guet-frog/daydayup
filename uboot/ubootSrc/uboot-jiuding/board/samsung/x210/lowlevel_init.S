@@ -40,7 +40,7 @@ _TEXT_BASE:					// 以文件为单位编译, 这里的_TEXT_BASE与start.s(line9
 
 	.globl lowlevel_init
 lowlevel_init:
-	push	{lr}
+	push	{lr}			// has already set sp
 
 	/* check reset status  */
 	

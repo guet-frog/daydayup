@@ -83,7 +83,7 @@
                 // 建立板相关的头文件./include/config.h
                 // 建立指向其他文件的软链接
 
-        2. board/samsung/x210/config.mk     // 变量定义: TEXT_BASE = 0xc3e0_0000
+        2. board/samsung/x210/config.mk     // 变量定义: TEXT_BASE = 0xC3E0_0000
             // other special config.mk already in src code
             // ./arm_config.mk
             // ./cpu/s5pc11x/config.mk

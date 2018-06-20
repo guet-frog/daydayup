@@ -47,8 +47,8 @@
  */
 
 #if defined(CONFIG_EVT1) && !defined(CONFIG_FUSED)
-	.word 0x2000									// .word GNU汇编伪指令 相当于int类型变量  -- effect?
-	.word 0x0										// 这里定义, 代表在start.o文件的开头 ?
+	.word 0x2000									// .word, GNU汇编伪指令(类似于int)
+	.word 0x0										// bin文件首部信息(16字节)占位
 	.word 0x0
 	.word 0x0
 #endif
@@ -56,9 +56,9 @@
 .globl _start
 _start: b	reset									// 编译器会根据start.s中vector定义, 将中断向量表link到相应位置
 	ldr	pc, _undefined_instruction
-	ldr	pc, _software_interrupt						// 这里是不执行的...
+	ldr	pc, _software_interrupt						// 固定指令格式, 可以将这些 函数名 放入到 硬件异常向量表?
 	ldr	pc, _prefetch_abort
-	ldr	pc, _data_abort
+	ldr	pc, _data_abort								// reset hardfault 都link在bin文件的起始位置?
 	ldr	pc, _not_used
 	ldr	pc, _irq
 	ldr	pc, _fiq
@@ -95,10 +95,10 @@ _end_vect:
  *
  *************************************************************************
  */
+										// 符号 -> 地址 	
+_TEXT_BASE:								// 汇编里的符号, 应理解为 &变量名, 不能理解为C语言中的变量名
+	.word	TEXT_BASE					// 汇编变量定义(类型)+赋值			//	ldr r0 _TEXT_BASE	 memory -> reg
 
-_TEXT_BASE:								// 符号 -> 地址		// 汇编里的符号, 应理解为 &变量名, 不能理解为C语言中的变量名
-	.word	TEXT_BASE					// .word类型, 存入TEXT_BASE(外部已导出)	ldr r0 _TEXT_BASE		// memory -> reg
-										// 这里类似于C语言的变量定义, 这里肯定不执行
 /*
  * Below variable is very important because we use MMU in U-Boot.
  * Without it, we cannot run code correctly before MMU is ON.
@@ -276,11 +276,11 @@ lp2:
 	
 	ldr	r0, =INF_REG_BASE				/// 软件自定义的boot mode序号
 	str	r3, [r0, #INF_REG3_OFFSET]		/// store r3(boot mode) in memory 0xE010_F00C
-
+	
 	/*
 	 * Go setup Memory and board specific bits prior to relocation.
 	 */
-
+	
 	ldr	sp, =0xd0036000 /* end of sram dedicated to u-boot */		// stack_in sram  	dedicated: 专用的, 把...用于
 	sub	sp, sp, #12	/* set stack */									// for function call, for store lr
 	mov	fp, #0
@@ -292,22 +292,22 @@ lp2:
 	ldr	r0, =0xE010E81C  /* PS_HOLD_CONTROL register */				// 软开关相关
 	ldr	r1, =0x00005301	 /* PS_HOLD output high	*/					// 一般为"读 改 写" -- reflect
 	str	r1, [r0]
-
+	
 	/* get ready to call C functions */
 	ldr	sp, _TEXT_PHY_BASE	/* setup temp stack pointer */			// stack_in ddr 代码段链接地址: C3E0_0000
 	sub	sp, sp, #12													// uboot's stack in low  addr
 	mov	fp, #0				/* no previous frame, so fp=0 */		// uboot's text  in high addr
-
+	
 	/* 0xD002_0000 - 0xD002_4000 */
 	/* 0x3000_0000 */
 	/* 0x00FF_F000 */
 	ldr	r0, =0xff000fff
-	bic	r1, pc, r0			/* r1 = 0x0002_x000 */	// 第一次判断运行地址: lowlevel_init	-- 是否执行clock ddr init
-	ldr	r2, _TEXT_BASE		/* r2 = 0x3000_0000 */	// 第二次判断运行地址: here				-- 是否进行relocate
+	bic	r1, pc, r0			/* r1 = 0x0002_x000 */	// 第一次判断运行地址: lowlevel_init				-- 是否执行clock ddr init
+	ldr	r2, _TEXT_BASE		/* r2 = 0x3000_0000 */	// 第二次判断运行地址: here						-- 是否进行relocate
 	bic	r2, r2, r0			/* r2 = 0x0000_0000 */	// 0x33E0_0000
 	cmp     r1, r2
 	beq     after_copy
-
+	
 #if defined(CONFIG_EVT1)
 	/* If BL1 was copied from SD/MMC CH2 */		// line260 已经判断过 boot mode
 	ldr	r0, =0xD0037488
@@ -316,7 +316,7 @@ lp2:
 	cmp	r1, r2					/// is r2 not [r2]
 	beq     mmcsd_boot
 #endif
-
+	
 	ldr	r0, =INF_REG_BASE						// 读取 boot mode
 	ldr	r1, [r0, #INF_REG3_OFFSET]
 	cmp	r1, #BOOT_NAND		/* 0x0 => boot device is nand */
