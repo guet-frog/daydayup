@@ -467,7 +467,7 @@ void start_armboot (void)
 	gd = (gd_t*)gd_base;    // 引用实例化
 #else
 	gd = (gd_t*)(_armboot_start - CFG_MALLOC_LEN - sizeof(gd_t));
-#endif
+#endif /* CONFIG_MEMORY_UPPER_CODE */
 
 	/* compiler optimization barrier needed for GCC >= 3.4 */
 	__asm__ __volatile__("": : :"memory");
@@ -613,7 +613,7 @@ void start_armboot (void)
 	}
 #endif
 #endif /* CONFIG_GENERIC_MMC */
- 
+
 #if defined(CONFIG_MTD_ONENAND)
 	puts("OneNAND: ");
 	onenand_init();

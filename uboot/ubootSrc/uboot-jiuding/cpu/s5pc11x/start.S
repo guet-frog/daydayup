@@ -95,7 +95,7 @@ _end_vect:
  *
  *************************************************************************
  */
-										// 符号 -> 地址 	
+										// 符号 -> 地址
 _TEXT_BASE:								// 汇编里的符号, 应理解为 &变量名, 不能理解为C语言中的变量名
 	.word	TEXT_BASE					// 汇编变量定义(类型)+赋值			//	ldr r0 _TEXT_BASE	 memory -> reg
 
@@ -198,9 +198,9 @@ lp2:
 #endif /*CONFIG_EVT1*/
 	
 	bl	disable_l2cache
-
+ 	
 	bl	set_l2cache_auxctrl_cycle
-
+	
 	bl	enable_l2cache
 	
    /*
@@ -308,20 +308,20 @@ lp2:
 	cmp     r1, r2
 	beq     after_copy
 	
-#if defined(CONFIG_EVT1)
+#if defined(CONFIG_EVT1) // 九鼎添加
 	/* If BL1 was copied from SD/MMC CH2 */		// line260 已经判断过 boot mode
 	ldr	r0, =0xD0037488
 	ldr	r1, [r0]
 	ldr	r2, =0xEB200000
-	cmp	r1, r2					/// is r2 not [r2]
+	cmp	r1, r2
 	beq     mmcsd_boot
 #endif
 	
-	ldr	r0, =INF_REG_BASE						// 读取 boot mode
+	ldr	r0, =INF_REG_BASE			/// boot mode save in line277
 	ldr	r1, [r0, #INF_REG3_OFFSET]
-	cmp	r1, #BOOT_NAND		/* 0x0 => boot device is nand */
+	cmp	r1, #BOOT_NAND
 	beq	nand_boot
-	cmp	r1, #BOOT_ONENAND	/* 0x1 => boot device is onenand */
+	cmp	r1, #BOOT_ONENAND
 	beq	onenand_boot
 	cmp     r1, #BOOT_MMCSD
 	beq     mmcsd_boot
@@ -329,16 +329,16 @@ lp2:
 	beq     nor_boot
 	cmp     r1, #BOOT_SEC_DEV
 	beq     mmcsd_boot
-
+	
 nand_boot:
 	mov	r0, #0x1000
 	bl	copy_from_nand
 	b	after_copy
-
+	
 onenand_boot:
 	bl	onenand_bl2_copy
 	b	after_copy
-
+	
 mmcsd_boot:
 #if DELETE						// #if 0
 	ldr     sp, _TEXT_PHY_BASE      
@@ -386,23 +386,22 @@ stack_setup:
 #if defined(CONFIG_MEMORY_UPPER_CODE)
 	ldr	sp, =(CFG_UBOOT_BASE + CFG_UBOOT_SIZE - 0x1000)
 #else
-	ldr	r0, _TEXT_BASE		/* upper 128 KiB: relocated uboot   */
-	sub	r0, r0, #CFG_MALLOC_LEN	/* malloc area                      */
-	sub	r0, r0, #CFG_GBL_DATA_SIZE /* bdinfo                        */
+	ldr	r0, _TEXT_BASE					/* upper 128 KiB: relocated uboot */
+	sub	r0, r0, #CFG_MALLOC_LEN			/* malloc area */
+	sub	r0, r0, #CFG_GBL_DATA_SIZE 		/* bdinfo */
 #if defined(CONFIG_USE_IRQ)
 	sub	r0, r0, #(CONFIG_STACKSIZE_IRQ+CONFIG_STACKSIZE_FIQ)
 #endif
-	sub	sp, r0, #12		/* leave 3 words for abort-stack    */
-
-#endif
+	sub	sp, r0, #12		/* leave 3 words for abort-stack */
+#endif /*CONFIG_MEMORY_UPPER_CODE*/
 
 clear_bss:
-	ldr	r0, _bss_start		/* find start of bss segment        */
-	ldr	r1, _bss_end		/* stop here                        */
-	mov r2, #0x00000000		/* clear                            */
+	ldr	r0, _bss_start		/* find start of bss segment */
+	ldr	r1, _bss_end		/* stop here */
+	mov r2, #0x00000000		/* clear */
 
-clbss_l:
-	str	r2, [r0]		/* clear loop...                    */
+clbss_l:					/* data段直接重定位就OK */
+	str	r2, [r0]
 	add	r0, r0, #4
 	cmp	r0, r1
 	ble	clbss_l

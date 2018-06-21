@@ -104,6 +104,7 @@
 		./board/samsung/x210/lowlevel_init.S
 		./board/samsung/x210/u-boot.lds
 		./cpu/s5pc11x/s5pc110/cpu_init.S
+		./lib_arm/board.c
 	
         
         
