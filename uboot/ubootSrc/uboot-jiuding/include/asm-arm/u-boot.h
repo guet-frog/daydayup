@@ -36,18 +36,20 @@
 #ifndef _U_BOOT_H_
 #define _U_BOOT_H_	1
 
-typedef struct bd_info {
-    int			bi_baudrate;	            /* serial console baudrate */
-    unsigned long	bi_ip_addr;	            /* IP Address */
-    unsigned char	bi_enetaddr[6];         /* Ethernet adress */
-    struct environment_s	       *bi_env;
-    ulong	        bi_arch_number;	        /* unique id for this board */
-    ulong	        bi_boot_params;	        /* where this board expects params */
-    struct				                    /* RAM configuration */
+typedef struct bd_info
+{
+    int			            bi_baudrate;	        /* serial console baudrate */
+    unsigned long	        bi_ip_addr;	            /* IP Address */
+    unsigned char	        bi_enetaddr[6];         /* Ethernet adress */
+    struct environment_s    *bi_env;
+    ulong	                bi_arch_number;	        /* unique id for this board */
+    ulong	                bi_boot_params;	        /* where this board expects params */
+    struct				                            /* RAM configuration */
     {
-	ulong start;
-	ulong size;
-    }			bi_dram[CONFIG_NR_DRAM_BANKS];
+	    ulong start;
+	    ulong size;
+    }bi_dram[CONFIG_NR_DRAM_BANKS];
+
 #ifdef CONFIG_HAS_ETH1
     /* second onboard ethernet port */
     unsigned char   bi_enet1addr[6];

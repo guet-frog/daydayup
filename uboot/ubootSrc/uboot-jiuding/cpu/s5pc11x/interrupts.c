@@ -200,7 +200,6 @@ int interrupt_init(void)
 	timers->TCON = (timers->TCON & ~0x00700000) | TCON_4_AUTO | COUNT_4_ON;
 	timestamp = 0;
 
-
 	return (0);
 }
 

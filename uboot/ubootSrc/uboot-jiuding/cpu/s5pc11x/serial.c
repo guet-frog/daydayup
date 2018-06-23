@@ -145,7 +145,8 @@ int serial_tstc(void)
 
 void serial_puts(const char *s)
 {
-	while (*s) {
+	while (*s)
+    {
 		serial_putc(*s++);
 	}
 }

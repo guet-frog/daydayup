@@ -208,7 +208,9 @@ void puts (const char *s)
 	if (gd->flags & GD_FLG_DEVINIT) {
 		/* Send to the standard output */
 		fputs (stdout, s);
-	} else {
+	}
+    else
+    {
 		/* Send directly to the handler */
 		serial_puts (s);
 	}

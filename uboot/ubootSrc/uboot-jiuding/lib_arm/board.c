@@ -178,7 +178,8 @@ static int init_baudrate (void)
 {
 	char tmp[64];	/* long enough for environment variables */
 	int i = getenv_r ("baudrate", tmp, sizeof (tmp));
-	gd->bd->bi_baudrate = gd->baudrate = (i > 0)
+	
+    gd->bd->bi_baudrate = gd->baudrate = (i > 0)
 			? (int) simple_strtoul (tmp, NULL, 10)
 			: CONFIG_BAUDRATE;
 
@@ -412,16 +413,17 @@ typedef int (init_fnc_t) (void);
 
 int print_cpuinfo (void); /* test-only */
 
-init_fnc_t *init_sequence[] = {
+init_fnc_t *init_sequence[] =
+{
 	cpu_init,		/* basic cpu dependent setup */
 #if defined(CONFIG_SKIP_RELOCATE_UBOOT)
 	reloc_init,		/* Set the relocation done flag, must
 				   do this AFTER cpu_init(), but as soon
 				   as possible */
 #endif
-	board_init,		/* basic board dependent setup */
+	board_init,		    /* basic board dependent setup */
 	interrupt_init,		/* set up exceptions */
-	env_init,		/* initialize environment */
+	env_init,		    /* initialize environment */
 	init_baudrate,		/* initialze baudrate settings */
 	serial_init,		/* serial communications setup */
 	console_init_f,		/* stage 1 init of console */
@@ -430,12 +432,12 @@ init_fnc_t *init_sequence[] = {
 	print_cpuinfo,		/* display cpu info (and speed) */
 #endif
 #if defined(CONFIG_DISPLAY_BOARDINFO)
-	checkboard,		/* display board info */
+	checkboard,		    /* display board info */
 #endif
 #if defined(CONFIG_HARD_I2C) || defined(CONFIG_SOFT_I2C)
 	init_func_i2c,
 #endif
-	dram_init,		/* configure available RAM banks */
+	dram_init,		    /* configure available RAM banks */
 	display_dram_config,
 	NULL,
 };
@@ -473,12 +475,12 @@ void start_armboot (void)
 	__asm__ __volatile__("": : :"memory");
 
 	memset ((void*)gd, 0, sizeof (gd_t));
-	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t));
+	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t));     /// bd_t *bd, 需要给bd_t分配空间, 清零
 	memset (gd->bd, 0, sizeof (bd_t));
 
 	monitor_flash_len = _bss_start - _armboot_start;
 
-	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr)
+	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr)   //函数指针类型 ++init_fnc_ptr == ((uint8_t *)(init_fnc_ptr)+4)
     {
 		if ((*init_fnc_ptr)() != 0)
         {
