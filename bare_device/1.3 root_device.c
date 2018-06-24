@@ -4,7 +4,7 @@
 
 1.3.4.0、破坏iNand中的bootloader以从SD2启动
 	step1: busybox dd if=/dev/zero of=/dev/block/mmcblk0 bs=512 seek=1 count=1 conv=sync
-	step2: sync	
+	step2: sync
 	// 使用linux dd 命令读写磁盘
 	// if: input file 	/dev/zero				// 特殊设备 对应全0    --  将0写入到inand中
 	// of: output file  /dev/block/mmcblk0 		// 输出设备对应inand
@@ -36,8 +36,10 @@
 	uboot的参数设置: set bootcmd 'movi read kernel 30008000; bootm 30008000'  // default param
 	刷linux+QT镜像后, uboot的参数不用修改(刷的是linux+QT定制的uboot, 默认参数应该相应修改)
 
+	// fastboot flash到inand中, 没有下载到SD卡中
+
 1.3.9.3、x210的dnw刷机
-	step1: 刷x210_usb.bin, 地址0xd0020010;
+	step1: 刷x210_usb.bin, 地址0xd0020010
 	step2: 刷uboot.bin,    地址0x23e00000
 	uboot启动起来后, ①fdisk -c 0 重新分区, ②fastboot		// fdisk -c 0
 
@@ -49,7 +51,7 @@
 
 1.3.10.3、使用SD卡启动
 	先确定开发板是从SD卡启动的
-	然后确定板子内的iNand中的uboot是被破坏的，不能启动的。
+	然后确定板子内的iNand中的uboot是被破坏的，不能启动的
 	SD卡插入SD2通道，启动即可。启动后(看有没必要fdisk -c 0来分区)使用fastboot继续刷机
 
 ======================================================================================
