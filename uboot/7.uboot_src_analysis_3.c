@@ -1,16 +1,15 @@
 
-第二部分、章节介绍
 2.7.1.uboot和内核到底是什么
 	本节先从宏观上讲述uboot和内核的实质，他们的静态部署和运行时的加载运行过程等，目的是从不同角度让大家理解OS启动过程。
 2.7.2.启动内核第一步：加载内核到DDR中
 	本节讲述系统部署细节参数和启动介质中的分区，这些是内核启动的第一阶段，目的是将内核镜像从启动介质中搬移到ddr中适当位置处。
 2.7.3.zImage和uImage的区别联系
 	本节开始介绍bootm命令，该命令实现从DDR内存中的内核镜像处启动。
-2.7.4.zImage启动细节	
+2.7.4.zImage启动细节
 	本节详细结束zImage镜像启动时do_bootm函数中对镜像头的校验
 2.7.5.uImage启动
 	本节讲解uImage启动和FDT方式启动，主要在于uImage启动时打印信息的流程讲解，通过分析让大家了解函数运行轨迹。
-2.7.6.do_bootm_linux函数	
+2.7.6.do_bootm_linux函数
 	本节开始讲解uboot启动内核第三阶段，即do_bootm_linux函数。
 2.7.7.传参详解
 	本节详细介绍do_bootm_linux函数中的传参设计，目的是让大家进一步了解uboot向内核传递启动参数的技术细节。
@@ -90,8 +89,8 @@
 // ubuntu 用grob来启动
 
 2.7.3.3、编译内核得到uImage去启动
-	(1)如果直接在kernel底下去make uImage会提供mkimage command not found。
-		解决方案是去uboot/tools下cp mkimage /usr/local/bin/，(一般为用户自己添加的程序文件, 直接copy过去)复制mkimage工具到系统目录下。
+	(1)如果直接在kernel底下去make uImage会提供mkimage command not found
+		解决方案是去uboot/tools下cp mkimage /usr/local/bin/(一般为用户自己添加的程序文件, 直接copy过去)复制mkimage工具到系统目录下。
 		再去make uImage即可。
 
 

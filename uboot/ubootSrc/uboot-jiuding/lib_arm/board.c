@@ -415,11 +415,9 @@ int print_cpuinfo (void); /* test-only */
 
 init_fnc_t *init_sequence[] =
 {
-	cpu_init,		/* basic cpu dependent setup */
+	cpu_init,		    /* basic cpu dependent setup */
 #if defined(CONFIG_SKIP_RELOCATE_UBOOT)
-	reloc_init,		/* Set the relocation done flag, must
-				   do this AFTER cpu_init(), but as soon
-				   as possible */
+	reloc_init,
 #endif
 	board_init,		    /* basic board dependent setup */
 	interrupt_init,		/* set up exceptions */
@@ -450,36 +448,40 @@ void start_armboot (void)
 #if !defined(CFG_NO_FLASH) || defined (CONFIG_VFD) || defined(CONFIG_LCD)
 	ulong size;
 #endif
-
+    
 #if defined(CONFIG_VFD) || defined(CONFIG_LCD)
 	unsigned long addr;
 #endif
-
+    
 #if defined(CONFIG_BOOT_MOVINAND)
 	uint *magic = (uint *) (PHYS_SDRAM_1);
 #endif
-
+    
 	/* Pointer is writable since we allocated a register for it */
 #ifdef CONFIG_MEMORY_UPPER_CODE /* by scsuh */
+    
 	ulong gd_base;
 	gd_base = CFG_UBOOT_BASE + CFG_UBOOT_SIZE - CFG_MALLOC_LEN - CFG_STACK_SIZE - sizeof(gd_t);
+    
 #ifdef CONFIG_USE_IRQ
 	gd_base -= (CONFIG_STACKSIZE_IRQ+CONFIG_STACKSIZE_FIQ);
 #endif
+    
 	gd = (gd_t*)gd_base;    // 引用实例化
+    
 #else
 	gd = (gd_t*)(_armboot_start - CFG_MALLOC_LEN - sizeof(gd_t));
 #endif /* CONFIG_MEMORY_UPPER_CODE */
-
+    
 	/* compiler optimization barrier needed for GCC >= 3.4 */
 	__asm__ __volatile__("": : :"memory");
-
+    
 	memset ((void*)gd, 0, sizeof (gd_t));
 	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t));     /// bd_t *bd, 需要给bd_t分配空间, 清零
 	memset (gd->bd, 0, sizeof (bd_t));
-
+    
 	monitor_flash_len = _bss_start - _armboot_start;
-
+    
 	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr)   //函数指针类型 ++init_fnc_ptr == ((uint8_t *)(init_fnc_ptr)+4)
     {
 		if ((*init_fnc_ptr)() != 0)
@@ -487,7 +489,7 @@ void start_armboot (void)
 			hang ();
 		}
 	}
-
+    
 #ifndef CFG_NO_FLASH
 	/* configure available FLASH banks */
 	size = flash_init ();

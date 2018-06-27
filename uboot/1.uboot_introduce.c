@@ -10,9 +10,9 @@
 
 	2.2.1.3、典型嵌入式linux系统启动过程
 		(1)embedded system (deployment && boot) is refer to PC	// warning: system deployment(部署)
-		(2)嵌入式系统的部署: uboot程序部署在flash/*能作为启动设备的Flash*/, OS在FLash, 内存CPU在掉电时不工作
+		(2)嵌入式系统的部署: uboot程序部署在flash/*能作为启动设备的flash*/, OS在fLash, 内存cpu在掉电时不工作
 		(3)启动过程: 嵌入式系统上电后先执行uboot, 然后uboot负责init ddr && flash
-						然后将OS从Flash中读取到DDR中, 然后启动OS(OS启动后uboot就无用了)
+						然后将OS从flash中读取到ddr中, 然后启动OS(OS启动后uboot就无用了)
 	//embedded system boot && pc system boot(BIOS->uboot, HardDisk->Flash)
 
 	2.2.1.4、android系统启动过程
@@ -39,7 +39,7 @@
 	2.1.3.2、能够 /*引导操作系统内核启动*/并/*给内核传参*/
 		(1)uboot的终极目标就是/*启动内核*/
 		(2)linux内核在设计的时候, 设计为可以被传参
-			uboot中事先给linux内核准备一些启动参数/*放在内存中特定位置*/然后传给内核 // ShareMemory
+			uboot中事先给linux内核准备一些启动参数/*放在内存中特定位置*/然后传给内核 // sharememory
 			内核启动后会到这个特定位置去取uboot传给他的参数
 			然后在内核中解析这些参数, 这些参数将被用来指导linux内核的启动过程
 

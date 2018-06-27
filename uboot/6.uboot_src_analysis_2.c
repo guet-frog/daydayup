@@ -2,7 +2,7 @@
 
 2.6.1.start_armboot		// 整个函数构成了uboot启动的第二阶段
 2.6.1.3、宏观分析：uboot第二阶段应该做什么
-	(1)uboot step1: 主要初始化了SoC内部的一些部件(看门狗、时钟), 然后初始化DDR并且完成重定位
+	(1)uboot step1: 主要初始化了SoC内部的一些部件(看门狗、时钟), 然后初始化ddr并且完成重定位
 	(2)uboot step2: init SoC板级硬件(iNand、网卡芯片等), uboot本身的一些东西(uboot的命令、环境变量等)
 					最终初始化完成后进入uboot的命令行准备接受命令
 
@@ -155,7 +155,7 @@
 // uboot是裸机程序使用物理地址, Linux使用虚拟地址, 理论上uboot不能使用Linux中的驱动
 // uboot驱动需要对Linux内核驱动架构有所了解
 // uboot驱动形式很复杂, 因为尽量多的利用Linux内核中驱动, 因为Linux内核中有很多架构都是确定的
-// drivers/mmc 通用mmc控制器驱动 mmc.h是核心文件 Linux mmc mtd驱动架构
+// drivers/mmc 通用mmc控制器驱动 mmc.h是核心文件linux mmc mtd驱动架构
 
 2.6.13.1、env_relocate		// env is embeded in text segment  -- warning: text segment will copy to ddr
 	(1)env_relocate: 环境变量重定位 //将环境变量从SD卡读取到DDR中
@@ -197,8 +197,7 @@
 	(2)通过分析发现跳转表只是被赋值从未被引用，因此跳转表在uboot中根本就没使用。
 	
 	// C语言是非面向对象的，但是C语言编写的Linux内核是面向对象的
-
-
+	
 2.6.15.start_armboot解析13
 2.6.15.1、console_init_r
 (1)console_init_f是控制台的第一阶段初始化，console_init_r是第二阶段初始化。

@@ -19,7 +19,7 @@ void movi_bl2_copy(void)
 {
 	ulong ch;
 
-#if defined(CONFIG_EVT1)    // defined
+#if defined(CONFIG_EVT1)
 	
     ch = *(volatile u32 *)(0xD0037488);     /// store boot channel, 前提是sd/mmc设备启动
     copy_sd_mmc_to_mem copy_bl2 = (copy_sd_mmc_to_mem) (*(u32 *) (0xD0037F98));  /// 定义并初始化函数指针

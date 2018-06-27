@@ -32,14 +32,10 @@
 			printf("func@getenv_r() exe error\n");
 		}
 	}
-	
-// #ifdef 
-// #elif
-// #else
-// #error "not configure xxx ..."
-// #endif
 
 // can not find func simple_strtoul()
+
+// uboot在复位后首先在sram中运行bl1, 然后跳转到ddr中从bl2开始运行
 
 
 

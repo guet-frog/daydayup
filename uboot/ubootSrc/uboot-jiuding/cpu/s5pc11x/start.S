@@ -148,7 +148,6 @@ reset:
 	@;msr	cpsr,r0
 	msr	cpsr_c, #0xd3		@ I & F disable, Mode: 0x13 - SVC		// cpsr 程序状态寄存器  cpsr_c程序状态寄存器的c位(模式位)
 
-
 /*
  *************************************************************************
  *
@@ -220,7 +219,6 @@ lp2:
 	orr	r0, r0, #0x00000800     @ set bit 12 (Z---) BTB
 	mcr 	p15, 0, r0, c1, c0, 0
 	
-	
 	/* Read booting information */
 	ldr	r0, =PRO_ID_BASE				// defined in reg.h -> ./include/s5pc110.h
 	ldr	r1, [r0,#OMR_OFFSET]
@@ -269,7 +267,7 @@ lp2:
 	cmp     r2, #0x8
 	moveq   r3, #BOOT_SEC_DEV
 #endif
-
+	
 	/* Uart BOOTONG failed */
 	cmp     r2, #(0x1<<4)
 	moveq   r3, #BOOT_SEC_DEV
@@ -401,7 +399,7 @@ clear_bss:
 	mov r2, #0x00000000		/* clear */
 
 clbss_l:					/* data段直接重定位就OK */
-	str	r2, [r0]
+	str	r2, [r0]			/* data段会影响到bin大小 */
 	add	r0, r0, #4
 	cmp	r0, r1
 	ble	clbss_l
