@@ -206,16 +206,22 @@ DRAM控制器对应的引脚设置为驱动强度2X（我也不知道为什么是2X，什么时候设置成3X 4X?
 这段代码对应27步中的第2到第4步。
 
 1.5.13.汇编初始化SDRAM详解2
+
+// CONCONTROL控制器时序相关
+
+// memory burst length 一次读几个字节
+
 1.5.13.1、DMC0_MEMCONTROL
 	burst length=4，1chip，······  对应值是0x00202400
 1.5.13.2、DMC0_MEMCONFIG_0
-	DRAM0通道中memory chip0的参数设置寄存器
+	DRAM0通道中memory chip0的参数设置寄存器		//	chip_mask决定address range
 1.5.13.3、DMC0_MEMCONFIG_1
 	DRAM0通道中memory chip1的参数设置寄存器
 总结：我猜测（推论）：三星设置DRAM0通道，允许我们接2片256MB的内存，分别叫memory chip0和memory chip1，分别用这两个寄存器来设置它的参数。
 按照三星的设计，chip0的地址应该是0x20000000到0x2FFFFFFF，然后chip1的地址应该是0x30000000~0x3FFFFFFF.各自256MB。
 但是我们X210开发板实际在DRAM0端口只接了256MB的内存，所以只用了chip0，没有使用chip1.
-（我们虽然是2片芯片，然后这两片是并联形成32位内存的，逻辑上只能算1片）。按照这个推论，DMC0_MEMCONFIG_0有用，而DMC0_MEMCONFIG_1无用，所以我直接给他了默认值。
+（我们虽然是2片芯片，然后这两片是并联形成32位内存的，逻辑上只能算1片）。
+按照这个推论，DMC0_MEMCONFIG_0有用，而DMC0_MEMCONFIG_1无用，所以我直接给他了默认值。
 1.5.13.4、DMC_DIRECTCMD
 这个寄存器是个命令寄存器，我们210通过向这个寄存器写值来向DDR芯片发送命令（通过命令总线），这些命令应该都是用来配置DDR芯片工作参数。
 
