@@ -211,12 +211,15 @@ DRAM控制器对应的引脚设置为驱动强度2X（我也不知道为什么是2X，什么时候设置成3X 4X?
 
 // memory burst length 一次读几个字节
 
+// 由片选信号(3根bank片选) -- ddr是8bank
+
 1.5.13.1、DMC0_MEMCONTROL
 	burst length=4，1chip，······  对应值是0x00202400
 1.5.13.2、DMC0_MEMCONFIG_0
 	DRAM0通道中memory chip0的参数设置寄存器		//	chip_mask决定address range
 1.5.13.3、DMC0_MEMCONFIG_1
-	DRAM0通道中memory chip1的参数设置寄存器
+	DRAM0通道中memory chip1的参数设置寄存器		// 这里理解应该error
+	
 总结：我猜测（推论）：三星设置DRAM0通道，允许我们接2片256MB的内存，分别叫memory chip0和memory chip1，分别用这两个寄存器来设置它的参数。
 按照三星的设计，chip0的地址应该是0x20000000到0x2FFFFFFF，然后chip1的地址应该是0x30000000~0x3FFFFFFF.各自256MB。
 但是我们X210开发板实际在DRAM0端口只接了256MB的内存，所以只用了chip0，没有使用chip1.
