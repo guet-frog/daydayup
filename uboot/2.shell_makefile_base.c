@@ -31,7 +31,7 @@
                 // 在PATH中创建符号链接, test.sh即可运行
 
 	//shell下用sed命令解决\r\n -- sed 命令具有替换功能
-	
+
     2.2.2.2、helloworld程序和解释
         (1)shell程序的第一行一般都是： #!/bin/sh   // 指定shell程序执行时被哪个解释器解释执行
             可以将第一行写为：#!/bin/bash来指定使用bash执行该脚本
@@ -99,19 +99,18 @@
 			else
 					echo "param num error"
 			fi
-			
-			// ./shell1.sh aa bb cc
-			// $# = 3
-			// $0 = ./shell1.sh
-			// $1 = aa
-			// $2 = bb
-			// $3 = cc
-			
 			// source shell1.sh aa bb cc
-			// $# = 3\n$0 = /bin/bash\n$1 = aa\n$2 = bb\n$3 = cc
-			
+			// $# = 3\n$0 = /bin/bash\n$1 = aa\n$2 = bb\n$3 = cc			
+
+			shell: ./shell1.sh aa bb cc
+				$# = 3
+				$0 = ./shell1.sh
+				$1 = aa
+				$2 = bb
+				$3 = cc
+
             C语言: ./a.out aa bb cc
-				*/argc = 4   
+				*/argc = 4
 				argv[0] = ./a.out
 				argv[1] = aa
 				argv[2] = bb

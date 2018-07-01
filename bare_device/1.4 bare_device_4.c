@@ -30,59 +30,22 @@
 	./arm-none-linux-gnueabi-gcc -v		// 当前软件版本号	-- gcc version 4.4.1 
 
 4.3.1、环境变量的意义
-	环境变量就是操作系统的全局变量。每一个环境变量对操作系统来说都是唯一的，名字和所代表的意义都是唯一的。linux系统可以有很多个环境变量。其中有一部分是linux系统自带的，还有一些是我们自己来扩充的。我们这里涉及到的一个环境变量是
-	PATH。PATH这个环境变量是系统自带的，它的含义就是系统在查找可执行程序时会搜索的路径范围。
-【./表示当前目录】
-【/usr/local/arm/arm-2009q3/bin/arm-linux-gcc a.c   这样即使不加环境变量也可以编译，已经给了完整路径】
-【bash是啥意思？】
-【echo $PATH】	
-4.3.2、将工具链导出到环境变量
-	export PATH=/usr/local/arm/arm-2009q3/bin:$PATH 【export 命令修改PATH路径】
-	在一个终端中执行以上命令后，该终端中就可以直接使用arm-linux-gcc了，但是只要关掉这个终端再另外打开一个就不行了。原因是我们本次终端中执行时的操作只是针对本终端，以后再打开的终端并未被执行过这个命令所以没导出。
-解决方案：
-~/.bashrc中，添加export PATH=/usr/local/arm/arm-2009q3/bin:$PATH 即可。【root用户的宿主目录/root】 // which arm-linux-gcc
-注意：我们导出这个环境变量是在当前用户，如果你登录时在其他用户下是没用的。【cd ~】
-4.3.3、为工具链创建arm-linux-xxx符号链接
-	ln arm-none-linux-gnueabi-addr2line -s arm-linux-addr2line
-	【 arm-linux-gcc -> arm-none-linux-gnueabi-gcc】
-	【执行脚本一般使用 source命令】【cp 命令使用 后面有个 · 】
-	【arm-linux-gcc 与 自带gcc的区别？？？】
-	【./gcc a.c 	bash: ./gcc: No such file or directory 】./ 指定当前目录
-	【arm-none-linux-gnueabi-gcc a.c  路径找的不够大】
-	【echo $PATH】
-	【/usr/local/arm/arm-2009q3/bin:
-	  /usr/local/sbin:
-	  /usr/local/bin:
-	  /usr/sbin:
-	  /usr/bin:
-	  /sbin:/bin:
-	  /usr/games:
-	  /usr/local/games】
-	 【-$ aston ubuntu  -# root用户】
-	 【chmod a+x xxxx.xx】更改为可执行权限 change mode
-	
-4.5.Makefile大侠隆重登场
-4.5.1、为什么需要Makefile
-	Makefile是用来管理工程的。
-	在一个正式的软件项目中，由很多个.c和.h文件构成，此时如果直接在命令行编译，就会像这样：gcc a.c b.c c.c d.c e.c f.c g.c -o exe		每次编译都要输入一堆东西很麻烦，这个问题严重影响工作效率，怎么办？Makefile来解决【Makefile、MakeFile两种书写方法】
-示例1：
-all:
-		gcc a.c -o exe		【注意是tab 不是8个空格】
-		
-示例2：
-exe: a.c b.c
-		gcc a.c b.c -o exe	    【Makefile三个重组成部分：①冒号前面... ...】
-							
-clean:						【这个Makefile有两个目标，第二个目标没有依赖】	
-		rm exe				
-	
-执行Makefile:	root@ubuntu:/home/aston# make				【它会打印出执行命令】
+	(1) 环境变量就是操作系统的全局变量, 环境变量对操作系统来说命名和意义都是唯一的
+	(2) linux系统环境变量一部分linux系统自带的, 一部分是自己扩充的
+	(3) PATH(系统自带): 系统在查找可执行程序时搜索的路径范围
+		// ~/.bashrc	export PATH=/usr/local/arm/arm-2009q3/bin:$PATH
+
+	// bash是linux标准默认的shell (linux一般默认使用bash作为shell脚本解释器)
+	// 很多linux发行版里默认带的就是bash shell
+	// 一般情况下, 并不严格区分Bourne Shell和Bourne Again Shell, 所以也不区分#!/bin/sh或#!/bin/bash
+	// 一般情况下, 一个shell script可以在很多种shell中使用
+	// #!向系统指定, 该路径所指定的程序, 是解释, 此脚本文件的shell程序
+
 4.5.3、Makefile中的一些基本概念
-	目标：目标定格写，后面是冒号（冒号后面是依赖）【同一个目标下面的命令是一起的，同时执行或同时不执行】
-	依赖：依赖是用来产生目标的原材料。
-	命令：命令前面一定是Tab，不能是顶格，也不能说多个空格。命令就是要生成那个目标需要做的动作。【三个重要组成部分】【命令 是加工 依赖 生成 目标 的方法】
-【很多Makefile在Windows下编写移植到Linux中不能使用。很多时候Tab被解析成空格！！！】
-【Makefile根据文件被修改时间，判断是否需要去重新执行】
+	// 命令 是加工 依赖 生成 目标 的方法
+	// 注意Makefile在windows下编辑, 命令前的tab被解析成空格
+	// 第一个目标是默认目标
+
 4.5.4、Makefile的基本工作原理
 	其一，当我们执行 make xx 的时候，Makefile会自动执行xx这个目标下面的命令语句。
 	其二，当我们make xx的时候，是否执行命令是取决于依赖的。依赖如果成立就会执行命令，否则不执行。

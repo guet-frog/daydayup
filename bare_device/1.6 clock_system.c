@@ -2,45 +2,36 @@
 1.6.1.1、什么是时钟？SoC为什么需要时钟？
 	(1)时钟是同步工作系统的同步节拍
 
-1.6.1.2、时钟一般如何获得
-(1)SoC的时钟获得一般有:
-	(1)外部直接输入时钟信号, SoC有个引脚用来输入外部时钟信号
-	(2)外部晶振+内部时钟发生器产生时钟, 大部分低频单片机都是这么工作的
+1.6.1.2、SoC时钟一般如何获得
+	(1)外部直接输入时钟信号, SoC有个引脚用来输入外部时钟信号	// 方便同步
+	(2)外部晶振+内部时钟发生器产生时钟		// 低频单片机
 	(3)外部晶振+内部时钟发生器+内部PLL产生高频时钟+内部分频器分频得到各种频率的时钟	// s5pv210
 
 1.6.1.5、时钟和功耗控制的关系
-	//关闭外设时钟, 关闭外设从而降低功耗
-
-1.6.2.S5PV210的时钟系统简介
-1.6.2.1、时钟域：MSYS、DSYS、PSYS
-	S5PV210的时钟体系比较复杂, 内部外设模块多且模块间工作时钟差异大, 因此把整个内部的时钟划分为3大块	//3个域
-		(1)MSYS: CPU(Cortex-A8内核), DRAM控制器(DMC0和DMC1), IRAM&IROM···
-		(2)DSYS: 视频显示、编解码等有关的模块
-		(3)PSYS: 内部的各种外设时钟: 串口、SD接口、I2C、AC97、USB等
-
-	//时钟来源: 晶振+时钟发生器+PLL+分频电路
+	// 关闭外设时钟, 关闭外设从而降低功耗
+	// 外设工作时钟一般默认是关闭的, 使用外设之前注意使能时钟
 
 1.6.2.3、PLL：APLL、MPLL、EPLL、VPLL
 	APLL: 		Cortex-A8内核 MSYS域
 	MPLL&EPLL: 	DSYS PSYS
 	VPLL: 		Video视频相关模块
 
-1.6.3.S5PV210时钟域详解
-1.6.3.1、MSYS域：
-	ARMCLK：	给cpu内核工作的时钟，也就是所谓的主频。
-	HCLK_MSYS：	MSYS域的高频时钟，给DMC0和DMC1使用
-	
-	PCLK_MSYS：	MSYS域的低频时钟
-	HCLK_IMEM：给iROM和iRAM（合称iMEM）使用
+1.6.2.1、时钟域：MSYS、DSYS、PSYS	//s5pv210内部外设模块间工作时钟差异大, 因此把整个内部的时钟划分3个域
+	(1) MSYS域:
+		ARMCLK:		cpu内核(cortex-a8 core)工作时钟(主频)
+		HCLK_MSYS:	MSYS域的高频时钟, 给DMC0和DMC1使用
 
-1.6.3.2、DSYS域：
-	HCLK_DSYS：DSYS域的高频时钟
-	PCLK_DSYS：DSYS域的低频时钟
+		PCLK_MSYS:	MSYS域的低频时钟
+		HCLK_IMEM:	给iROM和iRAM（合称iMEM）使用
 
-1.6.3.3、PSYS域：
-	HCLK_PSYS：PSYS域的高频时钟
-	PCLK_PSYS：PSYS域的低频时钟
-	SCLK_ONENAND：
+	(2) DSYS域:	// 视频显示, 编解码模块等
+		HCLK_DSYS: DSYS域的高频时钟
+		PCLK_DSYS: DSYS域的低频时钟
+
+	(3) PSYS域:	// 内部的各种外设(串口、SD接口、I2C、AC97、USB等)
+		HCLK_PSYS: PSYS域的高频时钟
+		PCLK_PSYS: PSYS域的低频时钟
+		SCLK_ONENAND:
 	
 总结：210内部的各个外设都是接在（内部AMBA总线）总线上面的，AMBA总线有1条高频分支叫AHB，有一条低频分支叫APB。
 	上面的各个域都有各自对应的HCLK_XXX和PCLK_XXX，
