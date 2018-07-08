@@ -259,7 +259,7 @@ lp2:
 
 	/* NOR BOOT */
 	cmp     r2, #0x14
-	moveq   r3, #BOOT_NOR	
+	moveq   r3, #BOOT_NOR
 
 #if 0	/* Android C110 BSP uses OneNAND booting! */
 	/* For second device booting */

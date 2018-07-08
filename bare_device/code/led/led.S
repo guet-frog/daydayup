@@ -23,7 +23,7 @@ flash:
 delay:
 	ldr r2, =9000000
 	ldr r3, =0x0
-delay_loop:	
+delay_loop:
 	sub r2, r2, #1		// r2 = r2 - 1
 	cmp r2, r3			// cmp修改z标志位, 如果r2等于r3则z=1, 下一句中eq就会成立
 	bne delay_loop		// b no equal
