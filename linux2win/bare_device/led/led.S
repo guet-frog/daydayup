@@ -11,7 +11,13 @@ _start:
 	str r0, [r1]
 	
 flash:
-	ldr r0, =~(1<<3)
+	ldr r0, =~(0x7<<3)
+	ldr r1, =GPJ0DAT
+	str r0, [r1]
+	
+	bl delay
+	
+	ldr r0, =(0x7<<3)
 	ldr r1, =GPJ0DAT
 	str r0, [r1]
 	

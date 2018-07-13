@@ -13,7 +13,7 @@
 #define BUFSIZE                 (16*1024)
 #define IMG_SIZE                (16*1024)
 #define SPL_HEADER_SIZE         16
-//#define SPL_HEADER            "S5PC110 HEADER  "
+//#define SPL_HEADER              "S5PC110 HEADER  "
 #define SPL_HEADER              "****************"
 
 int main (int argc, char *argv[])
