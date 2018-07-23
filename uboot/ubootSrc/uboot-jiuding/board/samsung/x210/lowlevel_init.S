@@ -380,7 +380,7 @@ retryloop:
 	bic	r1, r1, #(0x7<<12)	@; ONENAND_RATIO: 0
 	str	r1, [r0, #CLK_DIV6_OFFSET]*/ //lxg mask
 
-#endif	
+#endif
 
 	mov	pc, lr
 
