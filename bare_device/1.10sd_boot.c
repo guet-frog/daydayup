@@ -133,7 +133,8 @@ SteppingStone（翻译为启动基石）技术就是在SoC内部内置4KB的SRAM，
 
 10.8.3、开发板供电置锁原理和分析
 (1)软开关在设计时有一个置锁电路，用EINT0（也就是GPH0_2）引脚来控制的。
-(2)EINT0这个引脚是有复用设计（两个完全不相干的功能挤在同一个引脚上，同时我们只能让这个引脚用于其中一种功能，这就叫复用）的，一个是GPIO（也就是GPH0_2引脚）、一个是PS_HOLD_CONTROL。（注意：EINT0功能算是GPIO下的一个子功能）
+(2)EINT0这个引脚是有复用设计的，
+	一个是GPIO（也就是GPH0_2引脚）、一个是PS_HOLD_CONTROL。（注意：EINT0功能算是GPIO下的一个子功能）
 (3)PS_HOLD在Section2.4 Power Management章节下的4.10.5.8节下。
 (4)PS_HOLD_CONTROL寄存器（0xE010E81C），共有3个位有用。
 	bit0, 0表示这个引脚为GPIO功能，1表示这个引脚为PS_HOLD功能
@@ -146,6 +147,7 @@ SteppingStone（翻译为启动基石）技术就是在SoC内部内置4KB的SRAM，
 (2)置锁代码的方法是：给PS_HOLD_CONTROL寄存器的bit0、8、9均写入1即可。
 (3)注意：此时开发板已经置锁，POWER按键已经失效，关机时需要按下复位按键。
 
+// power down mode ≠ power off mode 
 
 
 

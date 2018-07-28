@@ -4,7 +4,7 @@ led.bin: led.o
 	arm-linux-objdump -D led.elf > led_elf.dis
 	gcc mkv210_image.c -o mkx210
 	./mkx210 led.bin 210.bin
-	
+
 %.o : %.S
 	arm-linux-gcc -o $@ $< -c
 
@@ -13,6 +13,3 @@ led.bin: led.o
 
 clean:
 	rm *.o *.elf *.bin *.dis mkx210 -f
-
-	
-	

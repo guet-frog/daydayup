@@ -229,8 +229,8 @@ retryloop:
 	ldr	r1, =0x0
 	str	r1, [r0, #MPLL_CON_OFFSET]
 
-	ldr	r1, =0x0
-	str	r1, [r0, #MPLL_CON_OFFSET]
+	///ldr	r1, =0x0
+	///str	r1, [r0, #MPLL_CON_OFFSET]
 
 	ldr   	r1, [r0, #CLK_DIV0_OFFSET]
 	ldr	r2, =CLK_DIV0_MASK

@@ -104,7 +104,7 @@ uart.bin: $(objs)              //ÔÚMakefileÖĞ¶¨ÒåÒ»¸ö±äÁ¿£¬ÔÙÈ¥ÒıÓÃÕâ¸ö±äÁ¿¡¾$ Ò
 libc.a: $(objs)
 Ä¿±êÊÇlibc.a : .a±íÊ¾ÊÇÒ»¸ö¿â£¬Ïàµ±ÓÚWindowsÖĞµÄ¾²Ì¬Á´½Ó¿â.lib 
             .so LinuxÖĞ¶¯Ì¬Á´½Ó¿â£¬WindowsÖĞ½Ğ .dll
-			   			         
+
 7.10.uart stdioµÄÒÆÖ²2
 7.10.1¡¢ĞŞ¸ÄMakefile½øĞĞprintfÒÆÖ²
 7.10.2¡¢Makefile¼°gccµÄ¿âÎÄ¼ş½éÉÜ
