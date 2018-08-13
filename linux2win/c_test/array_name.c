@@ -30,7 +30,7 @@ int main(void)
 	
 	return 0;
 }
-
+/*
 a   = 0xbfa9e847
 a+1 = 0xbfa9e848
 &a  = 0xbfa9e847
@@ -50,7 +50,7 @@ b[0]+1   	= 0xbfa9e83e
 
 &b[0][0]   	= 0xbfa9e83d	// 普通类型
 &b[0][0]+1 	= 0xbfa9e83e
-
+*/
 
 
 

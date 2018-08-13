@@ -141,7 +141,7 @@
     (6)链接脚本中除了.text  .data .rodata .bss段等/*编译工具*/自带的段之外
         编译工具还允许自定义段, 譬如uboot总的.u_boot_cmd段就是自定义段    //自定义段很重要
 
-    
+
     // mkconfig主要做了三件事:
         创建相应软链接
         生成./include/config.mk

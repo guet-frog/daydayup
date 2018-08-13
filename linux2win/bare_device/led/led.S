@@ -23,7 +23,7 @@ flash:
 	
 	bl delay
 	
-	b flash		// beq flash ... 在一个函数内跳转?
+	b flash		// beq flash ... 在一个函数内跳转?  -- PC跳转后继续执行
 //  b .
 	
 delay:

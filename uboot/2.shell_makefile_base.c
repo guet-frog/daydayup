@@ -11,7 +11,7 @@
 
 	我们常说有多少种shell, 其实就是说的是shell脚本解释器	// 常见shell脚本解释器bash, sh, csh, ksh
 
-	编译型语言与解释型语言 
+	编译型语言与解释型语言
     // 解释器(interpreter)读取源代码(source code)并转换为目标代码(object code)每次执行程序都多了编译的过程, 因此效率有所下降  
 
 2.2.2.动手写第一个shell

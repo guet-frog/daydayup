@@ -70,7 +70,7 @@ du -lh --max-depth=1 : 查看当前目录下一级子文件和子目录占用的
 // (1) 专用的跳转指令(b, bl)
 // (2) 直接向程序计数器PC写入跳转地址值(mov lr, pc; mov pc, xxx)
 
-
+============================================================================2018-7-31 21:38:24
 // printf sprintf vsprintf vprintf
 
  -- int printf(const char *format, ...);
@@ -114,7 +114,27 @@ int printf(const char *fmt, ...)
 	vprintf(fmt, args);		// 格式化输出到stdout
 	va_end(args);
 }
+============================================================================2018-7-31 21:38:33
+// makefile
+	GNU链接器几个开关项的解释：-lm -lc -lgcc  
+	-lm 代表链接器将连接GCC的数学库libm.a  
+	-lc 代表链接器将连接GCC的标准C库libc.a  
+	-lgcc 代表链接器将连接GCC的支持库libgcc.a 
+	
+	-g 可执行程序包含调试信息
+	-o 指定输出文件名
+	-c 只编译不链接
+	
+#LIBPATH = -lgcc -L/usr/local/arm/arm-2009q3/lib/gcc/arm-none-linux-gnueabi/4.4.1
+LIBPATH	= /usr/local/arm/arm-2009q3/lib/gcc/arm-none-linux-gnueabi/4.4.1
 
+uart.bin: start.o led.o uart.o speed.o main.o $(LIBPATH)/libgcc.a	// 链接静态库(1)
+	#arm-linux-ld -Ttext 0x0 -o uart.elf $^ $(LIBPATH)	// 链接静态库(2)
+============================================================================2018-8-3 22:23:16
+// 编译bootloader、kernel、裸机  -nostdlib	// 此类程序不需要 启动文件、标准库文件
+============================================================================2018-8-8 23:44:17
+// #define DMC0_MEMCONFIG_0	0x20F01323s 	// 0x38000000内存地址可以被访问
+============================================================================
 	
 	
 	
