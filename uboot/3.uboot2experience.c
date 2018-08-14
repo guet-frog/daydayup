@@ -106,20 +106,11 @@
 		./cpu/s5pc11x/s5pc110/cpu_init.S
 		./lib_arm/board.c
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-     
-        
-        
-        
-        
+
+
+
+
+
+
+		
         

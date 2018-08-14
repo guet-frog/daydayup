@@ -207,9 +207,11 @@
         // echo自带\n  echo "\n" 两个换行
 
 
+x210_sd_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm s5pc11x x210 samsung s5pc110			 // $@
+	@echo "TEXT_BASE = 0xc3e00000" > $(obj)board/samsung/x210/config.mk  // shell中 > 表示创建文件
 
-
-
+# mkconfig x210_sd arm s5pc11x x210 samsung s5pc110
 
 
 
