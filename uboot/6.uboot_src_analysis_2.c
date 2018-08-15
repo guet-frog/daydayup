@@ -21,15 +21,25 @@
 	(1)#define DECLARE_GLOBAL_DATA_PTR     register volatile gd_t *gd asm ("r8")	//gd: global data
 
 2.6.3.2、内存排布
-	(1)uboot区	CFG_UBOOT_BASE - xxx 	// uboot.bin size
-	(2)堆区		CFG_MALLOC_LEN			// CFG_ENV_SIZE + 896*1024
-	(3)栈区		CFG_STACK_SIZE			// 512*1024
-	(4)gd		sizeof(gd_t)			// 36
-	(5)bd		sizeof(bd_t)			// 44
+	(1)uboot code	// | 0xC3E0_0000
+	(2)reserved		// |
+	(3)bd			// |
+	(4)gd			// |addr
+	(5)栈区			// |
+	(6)ENV			// |
+	(7)堆区			// ↓
+	
+	// CFG_UBOOT_BASE	0xC3E0_0000
+	// CFG_UBOOT_SIZE	2*1024*1024
 
-	//compile optimization barrier: 内存间隔, 为了防止高版本的gcc的优化造成错误
+	// CFG_MALLOC_LEN	CFG_ENV_SIZE + 896*1024
+	// CFG_ENV_SIZE		0x4000
+	// CFG_STACK_SIZE	512*1024
+	// sizeof(gd_t) = 36 sizeof(bd) = 44
 
 	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t))	// 结构体变量首地址在低地址, bd->bi_baudrate在低地址
+
+	//compile optimization barrier: 内存间隔, 为了防止高版本的gcc的优化造成错误
 
 2.6.4.1、执行init_sequence
 	(1)init_fnc_t *init_sequence[]	//函数指针数组 -- (init_fnc_t *)类型
@@ -102,7 +112,7 @@
 		第五步：./sd_fusing.sh /dev/sdb完成烧录(注意不是sd_fusing2.sh)
 
 	//代码实践, 去掉flash看会不会出错
-	
+
 	// bl1_position=1
 	// uboot_position=49	// video start_armboot解析7 15′
 
