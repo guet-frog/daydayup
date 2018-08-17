@@ -1,5 +1,4 @@
 
-
 2.6.1.start_armboot		// 整个函数构成了uboot启动的第二阶段
 2.6.1.3、宏观分析：uboot第二阶段应该做什么
 	(1)uboot step1: 主要初始化了SoC内部的一些部件(看门狗、时钟), 然后初始化ddr并且完成重定位
@@ -24,10 +23,12 @@
 	(1)uboot code	// | 0xC3E0_0000
 	(2)reserved		// |
 	(3)bd			// |
-	(4)gd			// |addr
-	(5)栈区			// |
-	(6)ENV			// |
-	(7)堆区			// ↓
+	(4)gd			// | addr
+	(5)ENV			// |
+	(6)堆区			// |
+	(7)栈区			// ↓
+
+	// (5) (6) (7) 调节顺序 -- board.c start_armboot() line530
 	
 	// CFG_UBOOT_BASE	0xC3E0_0000
 	// CFG_UBOOT_SIZE	2*1024*1024
@@ -42,11 +43,14 @@
 	//compile optimization barrier: 内存间隔, 为了防止高版本的gcc的优化造成错误
 
 2.6.4.1、执行init_sequence
-	(1)init_fnc_t *init_sequence[]	//函数指针数组 -- (init_fnc_t *)类型
-	(3)init_fnc_ptr二重函数指针, 可以指向init_sequence这个函数指针数组	// = array_name not &array_name
+	(1)init_fnc_t *init_sequence[]	//函数指针数组 -- init_fnc_t *
+	(3)init_fnc_t **init_fnc_ptr	//二重函数指针 -- init_fnc_t **		init_fnc_ptr 指向 init_sequence	
+
+	// array_name not &array_name
+	// init_fnc_ptr++ (+4) 		-- 二重指针类型自增
 
 2.6.4.2、board_init
-	(1)网卡初始化: 主要是网卡的GPIO和端口的配置(移植时驱动不需要修改)
+	(1)eth init: config controller's gpio, controller control regs
 	(2)gd->bd->bi_arch_number		// board机器码 -- 内核启动前检验uboot传参中的机器码, 判断是否启动
 	(3)gd->bd->bi_boot_params		// uboot给内核启动时的传参地址(字符串首地址0x3000_0100), bootargs
 
@@ -72,12 +76,12 @@
 2.6.6.2、env_init
 	(1)uboot支持各种不同的启动介质(norflash、nandflash、inand、sd卡...), 因此有多个env_init()
 	(2)这个函数只是对/*内存*/里维护的那一份uboot的env做了基本的初始化	// judge valid or not
-	   当前还没进行环境变量从SD卡到DDR中的relocate/*only relocate firmware*/, 因此当前环境变量是不能用的
-	(4)在start_armboot函数中(line776)调用env_relocate才进行环境变量从SD卡中到DDR中的重定位
-		重定位之后需要环境变量时才可以从DDR中去取, 重定位之前如果要使用环境变量只能从SD卡中去读取
+	   当前env没有从SD卡到DDR中的relocate/*only relocate firmware*/	    // -- current env invalid
+	(4)在start_armboot函数中(line776)调用env_relocate(), 进行env从SD卡中到DDR中的重定位
+		重定位之后需要环境变量时才可以从DDR中去取, 重定位之前如果要使用环境变量只能从SD卡中去读取 -- // ?
 
 2.6.7.1、init_baudrate
-	(2)getenv_r函数用来读取环境变量的值	// 读取到的为string类型而不是int类型 -- simple_strtoul()
+	(2)getenv_r函数用来读取环境变量的值	// 读取到的为string类型而不是int类型 -- simple_strtoul() -- // ?
 
 2.6.8.1、console_init_f
 	(1)console_init_f是console(控制台)的第一阶段初始化, _f表示是第一阶段初始化, _r表示第二阶段初始化
@@ -97,8 +101,6 @@
 // cpu被串口拖慢 添加缓冲机制
 
 2.6.8.3、print_cpuinfo	// cpu clock && usart message
-
-2.6.9.2、init_func_i2c
 
 2.6.9.3、uboot学习实践
 	(1)对uboot源代码进行完修改
@@ -254,41 +256,67 @@ uboot中有2种解决方案来处理这种情况：
 (3)命令补全
 
 
-2.6.17.uboot启动2阶段总结
-2.6.17.1、启动流程回顾、重点函数标出
 (1)第二阶段主要是对开发板级别的硬件、软件数据结构进行初始化。
-(2)
-init_sequence
-	cpu_init	空的
-	board_init	网卡、机器码、内存传参地址
-		dm9000_pre_init			网卡
-		gd->bd->bi_arch_number	机器码
-		gd->bd->bi_boot_params	内存传参地址
-	interrupt_init	定时器
-	env_init
-	init_baudrate	gd数据结构中波特率
-	serial_init		空的
-	console_init_f	空的
-	display_banner	打印启动信息
-	print_cpuinfo	打印CPU时钟设置信息
-	checkboard		检验开发板名字
-	dram_init		gd数据结构中DDR信息
-	display_dram_config	打印DDR配置信息表
-mem_malloc_init		初始化uboot自己维护的堆管理器的内存
-mmc_initialize		inand/SD卡的SoC控制器和卡的初始化
-env_relocate		环境变量重定位
-gd->bd->bi_ip_addr	gd数据结构赋值
-gd->bd->bi_enetaddr	gd数据结构赋值
-devices_init		空的
-jumptable_init		不用关注的
-console_init_r		真正的控制台初始化
-enable_interrupts	空的
-loadaddr、bootfile 	环境变量读出初始化全局变量
-board_late_init		空的
-eth_initialize		空的
-x210_preboot_init	LCD初始化和显示logo
-check_menu_update_from_sd	检查自动更新
-main_loop			主循环
+
+	init_sequence[]
+		|
+		| -- cpu_init()	// if necessary: 设置IRQ FIQ stack	-- msp or psp
+		|
+		| -- board_init()	// 网卡, 机器码, 内存传参地址
+		   |
+		   | -- dm9000_pre_init()	// SROM controller reg init
+		   | -- gd->bd->bi_arch_number
+		   | -- gd->bd->bi_boot_params	// memory_base + 0x100
+	    |
+		| -- interrupt_init()  // init timer4 -- auto_load, 10ms, no_interrupt, turn_on
+		|
+		| -- env_init()
+		   |
+		   | -- gd->env_addr = default_environment
+		   | -- gd->env_valid = 0
+		|
+		| -- init_baudrate()
+		   |
+		   | -- gd->bd->bi_baudrate = gd->baudrate = CONFIG_BAUDRATE
+		|
+		| -- serial_init()	// nothing
+		|
+		| -- console_init_f()
+		   |
+		   | -- gd->have_console = 1
+		|
+		| -- display_banner()
+		   |
+		   | -- printf("%s\n", version_string)		// _DATE_ _TIME_
+		|
+		| -- print_cpuinfo()	// speed.c
+		|
+		| -- checkboard() 	// printf x210
+		|
+		| -- dram_init()	// gd struct init -- ddr init in asm_code
+		   |
+		   | -- gd->bd->bi_dram[0].start = PHY_SDRAM_1			// 0x3000_0000
+		   | -- gd->bd->bi_dram[0].size  = PHYS_SDRAM_1_SIZE	// 0x1000_0000
+		   | -- gd->bd->bi_dram[1].start = PHYS_SDRAM_2			// 0x4000_0000
+		   | -- gd->bd->bi_dram[1].size  = PHYS_SDRAM_2_SIZE	// 0x1000_0000
+		|
+		| -- display_dram_config()	// printf ddr config_info
+		
+	mem_malloc_init		初始化uboot自己维护的堆管理器的内存
+	mmc_initialize		inand/SD卡的SoC控制器和卡的初始化
+	env_relocate		环境变量重定位
+	gd->bd->bi_ip_addr	gd数据结构赋值
+	gd->bd->bi_enetaddr	gd数据结构赋值
+	devices_init		空的
+	jumptable_init		不用关注的
+	console_init_r		真正的控制台初始化
+	enable_interrupts	空的
+	loadaddr、bootfile 	环境变量读出初始化全局变量
+	board_late_init		空的
+	eth_initialize		空的
+	x210_preboot_init	LCD初始化和显示logo
+	check_menu_update_from_sd	检查自动更新
+	main_loop			主循环
 
 2.6.17.2、启动过程特征总结
 (1)第一阶段为汇编阶段、第二阶段为C阶段

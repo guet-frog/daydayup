@@ -18,9 +18,10 @@ int main(void)
 	
 	//a = a + 1;	// error: incompatible types when assigning to type ‘unsigned char[2][5]’ from type ‘unsigned char (*)[5]
 	//b = a;		// warning: assignment from incompatible pointer type [enabled by default]
-	//unsigned char (*)[5] c = a;	// expected identifier or ‘(’ before ‘)’ token unsigned char (*)[5] c = a
 	
+	//unsigned char (*)[5] c = a;	// expected identifier or ‘(’ before ‘)’ token unsigned char (*)[5] c = a
 	//unsigned char (*c)[5] = a;	// it's ok
+	
 	array5_t c = a;
 	
 	printf("a     = %p\n", a);

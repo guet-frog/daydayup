@@ -482,7 +482,7 @@ void start_armboot (void)
     
 	monitor_flash_len = _bss_start - _armboot_start;
     
-	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr)   //函数指针类型 ++init_fnc_ptr == ((uint8_t *)(init_fnc_ptr)+4)
+	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr)   //函数指针类型 ++init_fnc_ptr == ((uint8_t *)(init_fnc_ptr)+4) -- 二重指针类型自增
     {
 		if ((*init_fnc_ptr)() != 0)
         {
