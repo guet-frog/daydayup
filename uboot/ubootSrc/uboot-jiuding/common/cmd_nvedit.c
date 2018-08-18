@@ -501,16 +501,20 @@ char *getenv (char *name)
 
 	WATCHDOG_RESET();
 
-	for (i=0; env_get_char(i) != '\0'; i=nxt+1) {
+	for (i=0; env_get_char(i) != '\0'; i=nxt+1)
+	{
 		int val;
-
-		for (nxt=i; env_get_char(nxt) != '\0'; ++nxt) {
-			if (nxt >= CFG_ENV_SIZE) {
+		
+		for (nxt=i; env_get_char(nxt) != '\0'; ++nxt)
+		{
+			if (nxt >= CFG_ENV_SIZE)
+			{
 				return (NULL);
 			}
 		}
 		if ((val=envmatch((uchar *)name, i)) < 0)
 			continue;
+		
 		return ((char *)env_get_addr(val));
 	}
 

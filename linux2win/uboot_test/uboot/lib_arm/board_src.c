@@ -114,7 +114,8 @@ static void mem_malloc_init (ulong dest_addr)
 	mem_malloc_end = dest_addr + CFG_MALLOC_LEN;
 	mem_malloc_brk = mem_malloc_start;
 
-	memset ((void *) mem_malloc_start, 0, mem_malloc_end - mem_malloc_start);
+	memset ((void *) mem_malloc_start, 0,
+			mem_malloc_end - mem_malloc_start);
 }
 
 void *sbrk (ptrdiff_t increment)
@@ -178,8 +179,7 @@ static int init_baudrate (void)
 {
 	char tmp[64];	/* long enough for environment variables */
 	int i = getenv_r ("baudrate", tmp, sizeof (tmp));
-	
-    gd->bd->bi_baudrate = gd->baudrate = (i > 0)
+	gd->bd->bi_baudrate = gd->baudrate = (i > 0)
 			? (int) simple_strtoul (tmp, NULL, 10)
 			: CONFIG_BAUDRATE;
 
@@ -413,15 +413,16 @@ typedef int (init_fnc_t) (void);
 
 int print_cpuinfo (void); /* test-only */
 
-init_fnc_t *init_sequence[] =
-{
-	cpu_init,		    /* basic cpu dependent setup */
+init_fnc_t *init_sequence[] = {
+	cpu_init,		/* basic cpu dependent setup */
 #if defined(CONFIG_SKIP_RELOCATE_UBOOT)
-	reloc_init,
+	reloc_init,		/* Set the relocation done flag, must
+				   do this AFTER cpu_init(), but as soon
+				   as possible */
 #endif
-	board_init,		    /* basic board dependent setup */
+	board_init,		/* basic board dependent setup */
 	interrupt_init,		/* set up exceptions */
-	env_init,		    /* initialize environment */
+	env_init,		/* initialize environment */
 	init_baudrate,		/* initialze baudrate settings */
 	serial_init,		/* serial communications setup */
 	console_init_f,		/* stage 1 init of console */
@@ -430,12 +431,12 @@ init_fnc_t *init_sequence[] =
 	print_cpuinfo,		/* display cpu info (and speed) */
 #endif
 #if defined(CONFIG_DISPLAY_BOARDINFO)
-	checkboard,		    /* display board info */
+	checkboard,		/* display board info */
 #endif
 #if defined(CONFIG_HARD_I2C) || defined(CONFIG_SOFT_I2C)
 	init_func_i2c,
 #endif
-	dram_init,		    /* configure available RAM banks */
+	dram_init,		/* configure available RAM banks */
 	display_dram_config,
 	NULL,
 };
@@ -448,64 +449,338 @@ void start_armboot (void)
 #if !defined(CFG_NO_FLASH) || defined (CONFIG_VFD) || defined(CONFIG_LCD)
 	ulong size;
 #endif
-    
+
 #if defined(CONFIG_VFD) || defined(CONFIG_LCD)
 	unsigned long addr;
 #endif
-    
+
 #if defined(CONFIG_BOOT_MOVINAND)
 	uint *magic = (uint *) (PHYS_SDRAM_1);
 #endif
-    
+
 	/* Pointer is writable since we allocated a register for it */
 #ifdef CONFIG_MEMORY_UPPER_CODE /* by scsuh */
 	ulong gd_base;
+
 	gd_base = CFG_UBOOT_BASE + CFG_UBOOT_SIZE - CFG_MALLOC_LEN - CFG_STACK_SIZE - sizeof(gd_t);
-    
-	gd = (gd_t*)gd_base;    // 引用实例化
-#endif /* CONFIG_MEMORY_UPPER_CODE */
-    
+#ifdef CONFIG_USE_IRQ
+	gd_base -= (CONFIG_STACKSIZE_IRQ+CONFIG_STACKSIZE_FIQ);
+#endif
+	gd = (gd_t*)gd_base;
+#else
+	gd = (gd_t*)(_armboot_start - CFG_MALLOC_LEN - sizeof(gd_t));
+#endif
+
 	/* compiler optimization barrier needed for GCC >= 3.4 */
 	__asm__ __volatile__("": : :"memory");
-    
+
 	memset ((void*)gd, 0, sizeof (gd_t));
-	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t));     /// bd_t *bd, 需要给bd_t分配空间, 清零
+	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t));
 	memset (gd->bd, 0, sizeof (bd_t));
-    
+
 	monitor_flash_len = _bss_start - _armboot_start;
-    
-	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr)   //函数指针类型 ++init_fnc_ptr == ((uint8_t *)(init_fnc_ptr)+4) -- 二重指针类型自增
-    {
-		if ((*init_fnc_ptr)() != 0)
-        {
+
+	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
+		if ((*init_fnc_ptr)() != 0) {
 			hang ();
 		}
 	}
-	
-	/* armboot_start is defined in the board-specific linker script */
-	mem_malloc_init (CFG_UBOOT_BASE + CFG_UBOOT_SIZE - CFG_MALLOC_LEN - CFG_STACK_SIZE);
 
-#if defined(CONFIG_X210)
-#if defined(CONFIG_GENERIC_MMC)
+#ifndef CFG_NO_FLASH
+	/* configure available FLASH banks */
+	size = flash_init ();
+	display_flash_config (size);
+#endif /* CFG_NO_FLASH */
+
+#ifdef CONFIG_VFD
+#	ifndef PAGE_SIZE
+#	  define PAGE_SIZE 4096
+#	endif
+	/*
+	 * reserve memory for VFD display (always full pages)
+	 */
+	/* bss_end is defined in the board-specific linker script */
+	addr = (_bss_end + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
+	size = vfd_setmem (addr);
+	gd->fb_base = addr;
+#endif /* CONFIG_VFD */
+
+#ifdef CONFIG_LCD
+	/* board init may have inited fb_base */
+	if (!gd->fb_base) {
+#		ifndef PAGE_SIZE
+#		  define PAGE_SIZE 4096
+#		endif
+		/*
+		 * reserve memory for LCD display (always full pages)
+		 */
+		/* bss_end is defined in the board-specific linker script */
+		addr = (_bss_end + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
+		size = lcd_setmem (addr);
+		gd->fb_base = addr;
+	}
+#endif /* CONFIG_LCD */
+
+	/* armboot_start is defined in the board-specific linker script */
+#ifdef CONFIG_MEMORY_UPPER_CODE /* by scsuh */
+	mem_malloc_init (CFG_UBOOT_BASE + CFG_UBOOT_SIZE - CFG_MALLOC_LEN - CFG_STACK_SIZE);
+#else
+	mem_malloc_init (_armboot_start - CFG_MALLOC_LEN);
+#endif
+
+//******************************//
+// Board Specific
+// #if defined(CONFIG_SMDKXXXX)
+//******************************//
+
+#if defined(CONFIG_SMDK6410)
+	#if defined(CONFIG_GENERIC_MMC)
 	puts ("SD/MMC:  ");
-	mmc_exist = mmc_initialize(gd->bd); // all board interface
+	mmc_exist = mmc_initialize(gd->bd);
 	if (mmc_exist != 0)
 	{
 		puts ("0 MB\n");
 	}
-#endif /* CONFIG_GENERIC_MMC */
+	#else
+	#if defined(CONFIG_MMC)
+	puts("SD/MMC:  ");
 
-#if defined(CONFIG_CMD_NAND)		// config_cmd_all.h not include
-	puts("NAND:    ");
-	nand_init();
+	if (INF_REG3_REG == 0)
+		movi_ch = 0;
+	else
+		movi_ch = 1;
+
+	movi_set_capacity();
+	movi_init();
+	movi_set_ofs(MOVI_TOTAL_BLKCNT);
+	#endif
+	#endif
+
+	if (INF_REG3_REG == BOOT_ONENAND) {
+	#if defined(CONFIG_CMD_ONENAND)
+		puts("OneNAND: ");
+		onenand_init();
+	#endif
+		/*setenv("bootcmd", "onenand read c0008000 80000 380000;bootm c0008000");*/
+	} else {
+		puts("NAND:    ");
+		nand_init();
+
+		if (INF_REG3_REG == 0 || INF_REG3_REG == 7)
+			setenv("bootcmd", "movi read kernel c0008000;movi read rootfs c0800000;bootm c0008000");
+		else
+			setenv("bootcmd", "nand read c0008000 80000 380000;bootm c0008000");
+	}
+#endif	/* CONFIG_SMDK6410 */
+
+#if defined(CONFIG_SMDKC100)
+
+	#if defined(CONFIG_GENERIC_MMC)
+		puts ("SD/MMC:  ");
+		mmc_exist = mmc_initialize(gd->bd);
+		if (mmc_exist != 0)
+		{
+			puts ("0 MB\n");
+		}
+	#endif
+
+	#if defined(CONFIG_CMD_ONENAND)
+		puts("OneNAND: ");
+		onenand_init();
+	#endif
+
+	#if defined(CONFIG_CMD_NAND)
+		puts("NAND:    ");
+		nand_init();
+	#endif
+
+#endif /* CONFIG_SMDKC100 */
+
+#if defined(CONFIG_X210)
+
+	#if defined(CONFIG_GENERIC_MMC)
+		puts ("SD/MMC:  ");
+		mmc_exist = mmc_initialize(gd->bd);
+		if (mmc_exist != 0)
+		{
+			puts ("0 MB\n");
+#ifdef CONFIG_CHECK_X210CV3
+			check_flash_flag=0;//check inand error!
 #endif
+		}
+#ifdef CONFIG_CHECK_X210CV3
+		else
+		{
+			check_flash_flag=1;//check inand ok! 
+		}
+#endif
+	#endif
+
+	#if defined(CONFIG_MTD_ONENAND)
+		puts("OneNAND: ");
+		onenand_init();
+		/*setenv("bootcmd", "onenand read c0008000 80000 380000;bootm c0008000");*/
+	#else
+		//puts("OneNAND: (FSR layer enabled)\n");
+	#endif
+
+	#if defined(CONFIG_CMD_NAND)
+		puts("NAND:    ");
+		nand_init();
+	#endif
 
 #endif /* CONFIG_X210 */
+
+#if defined(CONFIG_SMDK6440)
+	#if defined(CONFIG_GENERIC_MMC)
+	puts ("SD/MMC:  ");
+	mmc_exist = mmc_initialize(gd->bd);
+	if (mmc_exist != 0)
+	{
+		puts ("0 MB\n");
+	}
+	#else
+	#if defined(CONFIG_MMC)
+	if (INF_REG3_REG == 1) {	/* eMMC_4.3 */
+		puts("eMMC:    ");
+		movi_ch = 1;
+		movi_emmc = 1;
+
+		movi_init();
+		movi_set_ofs(0);
+	} else if (INF_REG3_REG == 7 || INF_REG3_REG == 0) {	/* SD/MMC */
+		if (INF_REG3_REG & 0x1)
+			movi_ch = 1;
+		else
+			movi_ch = 0;
+
+		puts("SD/MMC:  ");
+
+		movi_set_capacity();
+		movi_init();
+		movi_set_ofs(MOVI_TOTAL_BLKCNT);
+
+	} else {
+
+	}
+	#endif
+	#endif
+
+	if (INF_REG3_REG == 2) {
+			/* N/A */
+	} else {
+		puts("NAND:    ");
+		nand_init();
+		//setenv("bootcmd", "nand read c0008000 80000 380000;bootm c0008000");
+	}
+#endif /* CONFIG_SMDK6440 */
+
+#if defined(CONFIG_SMDK6430)
+	#if defined(CONFIG_GENERIC_MMC)
+	puts ("SD/MMC:  ");
+	mmc_exist = mmc_initialize(gd->bd);
+	if (mmc_exist != 0)
+	{
+		puts ("0 MB\n");
+	}
+	#else
+	#if defined(CONFIG_MMC)
+	puts("SD/MMC:  ");
+
+	if (INF_REG3_REG == 0)
+		movi_ch = 0;
+	else
+		movi_ch = 1;
+
+	movi_set_capacity();
+	movi_init();
+	movi_set_ofs(MOVI_TOTAL_BLKCNT);
+	#endif
+	#endif
+
+	if (INF_REG3_REG == BOOT_ONENAND) {
+	#if defined(CONFIG_CMD_ONENAND)
+		puts("OneNAND: ");
+		onenand_init();
+	#endif
+		/*setenv("bootcmd", "onenand read c0008000 80000 380000;bootm c0008000");*/
+	} else if (INF_REG3_REG == BOOT_NAND) {
+		puts("NAND:    ");
+		nand_init();
+	} else {
+	}
+
+	if (INF_REG3_REG == 0 || INF_REG3_REG == 7)
+		setenv("bootcmd", "movi read kernel c0008000;movi read rootfs c0800000;bootm c0008000");
+	else
+		setenv("bootcmd", "nand read c0008000 80000 380000;bootm c0008000");
+#endif	/* CONFIG_SMDK6430 */
+
+#if defined(CONFIG_SMDK6442)
+	#if defined(CONFIG_GENERIC_MMC)
+	puts ("SD/MMC:  ");
+	mmc_exist = mmc_initialize(gd->bd);
+	if (mmc_exist != 0)
+	{
+		puts ("0 MB\n");
+	}
+	#else
+	#if defined(CONFIG_MMC)
+	puts("SD/MMC:  ");
+
+	movi_set_capacity();
+	movi_init();
+	movi_set_ofs(MOVI_TOTAL_BLKCNT);
+
+	#endif
+	#endif
+
+	#if defined(CONFIG_CMD_ONENAND)
+	if (INF_REG3_REG == BOOT_ONENAND) {
+		puts("OneNAND: ");
+		onenand_init();
+		}
+	#endif
+
+#endif	/* CONFIG_SMDK6442 */
+
+#if defined(CONFIG_SMDK2416) || defined(CONFIG_SMDK2450)
+	#if defined(CONFIG_NAND)
+	puts("NAND:    ");
+	nand_init();
+	#endif
+
+	#if defined(CONFIG_ONENAND)
+	puts("OneNAND: ");
+	onenand_init();
+	#endif
+
+	#if defined(CONFIG_BOOT_MOVINAND)
+	puts("SD/MMC:  ");
+
+	if ((0x24564236 == magic[0]) && (0x20764316 == magic[1])) {
+		printf("Boot up for burning\n");
+	} else {
+			movi_init();
+			movi_set_ofs(MOVI_TOTAL_BLKCNT);
+	}
+	#endif
+#endif	/* CONFIG_SMDK2416 CONFIG_SMDK2450 */
+
+#ifdef CONFIG_HAS_DATAFLASH
+	AT91F_DataflashInit();
+	dataflash_print_info();
+#endif
 
 	/* initialize environment */
 	env_relocate ();
 
-#ifdef CONFIG_SERIAL_MULTI		// not defined
+#ifdef CONFIG_VFD
+	/* must do this after the framebuffer is allocated */
+	drv_vfd_init();
+#endif /* CONFIG_VFD */
+
+#ifdef CONFIG_SERIAL_MULTI
 	serial_initialize();
 #endif
 
@@ -527,28 +802,62 @@ void start_armboot (void)
 			if (s)
 				s = (*e) ? e + 1 : e;
 		}
+
+#ifdef CONFIG_HAS_ETH1
+		i = getenv_r ("eth1addr", tmp, sizeof (tmp));
+		s = (i > 0) ? tmp : NULL;
+
+		for (reg = 0; reg < 6; ++reg) {
+			gd->bd->bi_enet1addr[reg] = s ? simple_strtoul (s, &e, 16) : 0;
+			if (s)
+				s = (*e) ? e + 1 : e;
+		}
+#endif
 	}
 
 	devices_init ();	/* get the devices list going. */
 
-	jumptable_init ();
+#ifdef CONFIG_CMC_PU2
+	load_sernum_ethaddr ();
+#endif /* CONFIG_CMC_PU2 */
 
+	jumptable_init ();
 #if !defined(CONFIG_SMDK6442)
-	console_init_r ();	/* fully init console as a device */	// has exe
+	console_init_r ();	/* fully init console as a device */
+#endif
+
+#if defined(CONFIG_MISC_INIT_R)
+	/* miscellaneous platform dependent initialisations */
+	misc_init_r ();
 #endif
 
 	/* enable exceptions */
 	enable_interrupts ();
 
+	/* Perform network card initialisation if necessary */
+#ifdef CONFIG_DRIVER_TI_EMAC
+extern void dm644x_eth_set_mac_addr (const u_int8_t *addr);
+	if (getenv ("ethaddr")) {
+		dm644x_eth_set_mac_addr(gd->bd->bi_enetaddr);
+	}
+#endif
+
+#ifdef CONFIG_DRIVER_CS8900
+	cs8900_get_enetaddr (gd->bd->bi_enetaddr);
+#endif
+
+#if defined(CONFIG_DRIVER_SMC91111) || defined (CONFIG_DRIVER_LAN91C96)
+	if (getenv ("ethaddr")) {
+		smc_set_mac_addr(gd->bd->bi_enetaddr);
+	}
+#endif /* CONFIG_DRIVER_SMC91111 || CONFIG_DRIVER_LAN91C96 */
+
 	/* Initialize from environment */
-	if ((s = getenv ("loadaddr")) != NULL)
-	{
+	if ((s = getenv ("loadaddr")) != NULL) {
 		load_addr = simple_strtoul (s, NULL, 16);
 	}
-
-#if defined(CONFIG_CMD_NET)						// has include config_cmd_default.h
-	if ((s = getenv ("bootfile")) != NULL)
-	{
+#if defined(CONFIG_CMD_NET)
+	if ((s = getenv ("bootfile")) != NULL) {
 		copy_filename (BootFile, s, sizeof (BootFile));
 	}
 #endif
@@ -556,9 +865,20 @@ void start_armboot (void)
 #ifdef BOARD_LATE_INIT
 	board_late_init ();
 #endif
-
 #if defined(CONFIG_CMD_NET)
+#if defined(CONFIG_NET_MULTI)
+	puts ("Net:   ");
+#endif
 	eth_initialize(gd->bd);
+#if defined(CONFIG_RESET_PHY_R)
+	debug ("Reset Ethernet PHY\n");
+	reset_phy();
+#endif
+#endif
+
+#if defined(CONFIG_CMD_IDE)
+	puts("IDE:   ");
+	ide_init();
 #endif
 
 /****************lxg added**************/
@@ -577,13 +897,10 @@ void start_armboot (void)
 		update_all();
 	}
 	else
-	{
 		puts ("[LEFT UP] boot mode\n");
-	}		
 
 	/* main_loop() can return to retry autoboot, if so just run it again. */
-	for (;;)
-	{
+	for (;;) {
 		main_loop ();
 	}
 

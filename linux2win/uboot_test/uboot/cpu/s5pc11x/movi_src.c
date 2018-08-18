@@ -13,60 +13,53 @@
 
 extern raw_area_t raw_area_control;
 
-typedef u32(*copy_sd_mmc_to_mem)            (u32 channel, u32 start_block, u16 block_size, u32 *trg, u32 init);
+typedef u32(*copy_sd_mmc_to_mem)
+(u32 channel, u32 start_block, u16 block_size, u32 *trg, u32 init);
 
 void movi_bl2_copy(void)
 {
 	ulong ch;
-
 #if defined(CONFIG_EVT1)
-	
-    ch = *(volatile u32 *)(0xD0037488);     /// store boot channel, 前提是sd/mmc设备启动
-    copy_sd_mmc_to_mem copy_bl2 = (copy_sd_mmc_to_mem) (*(u32 *) (0xD0037F98));  /// 定义并初始化函数指针
+	ch = *(volatile u32 *)(0xD0037488);
+	copy_sd_mmc_to_mem copy_bl2 =
+	    (copy_sd_mmc_to_mem) (*(u32 *) (0xD0037F98));
 
-#if defined(CONFIG_SECURE_BOOT)
-    ulong rv;
-#endif
-
+	#if defined(CONFIG_SECURE_BOOT)
+	ulong rv;
+	#endif
 #else
-
 	ch = *(volatile u32 *)(0xD003A508);
-	copy_sd_mmc_to_mem copy_bl2 = (copy_sd_mmc_to_mem) (*(u32 *) (0xD003E008));
-
-#endif /* CONFIG_EVT1 */
-
+	copy_sd_mmc_to_mem copy_bl2 =
+	    (copy_sd_mmc_to_mem) (*(u32 *) (0xD003E008));
+#endif
 	u32 ret;
-	if (ch == 0xEB000000)
-    {
-		ret = copy_bl2(0, MOVI_BL2_POS, MOVI_BL2_BLKCNT, CFG_PHY_UBOOT_BASE, 0);
+	if (ch == 0xEB000000) {
+		ret = copy_bl2(0, MOVI_BL2_POS, MOVI_BL2_BLKCNT,
+			CFG_PHY_UBOOT_BASE, 0);
 
 #if defined(CONFIG_SECURE_BOOT)
 		/* do security check */
 		rv = Check_Signature( (SecureBoot_CTX *)SECURE_BOOT_CONTEXT_ADDR,
 				      (unsigned char *)CFG_PHY_UBOOT_BASE, (1024*512-128),
 			              (unsigned char *)(CFG_PHY_UBOOT_BASE+(1024*512-128)), 128 );
-		if (rv != 0)
-        {
-            while(1);
-        }
+		if (rv != 0){
+				while(1);
+			}
 #endif
-
 	}
-	else if (ch == 0xEB200000)
-    {
-		ret = copy_bl2(2, MOVI_BL2_POS, MOVI_BL2_BLKCNT, CFG_PHY_UBOOT_BASE, 0);
+	else if (ch == 0xEB200000) {
+		ret = copy_bl2(2, MOVI_BL2_POS, MOVI_BL2_BLKCNT,
+			CFG_PHY_UBOOT_BASE, 0);
 		
 #if defined(CONFIG_SECURE_BOOT)
 		/* do security check */
 		rv = Check_Signature( (SecureBoot_CTX *)SECURE_BOOT_CONTEXT_ADDR,
 				      (unsigned char *)CFG_PHY_UBOOT_BASE, (1024*512-128),
 			              (unsigned char *)(CFG_PHY_UBOOT_BASE+(1024*512-128)), 128 );
-		if (rv != 0)
-        {
+		if (rv != 0) {
 			while(1);
 		}
 #endif
-
 	}
 	else
 		return;
@@ -118,7 +111,7 @@ void movi_write_env(ulong addr)
 
 void movi_read_env(ulong addr)
 {
-	movi_read(raw_area_control.image[2].start_blk,          /*raw_area_control 原始信息分区表 获取env 起始扇区号                 fastboot用到*/
+	movi_read(raw_area_control.image[2].start_blk,
 		  raw_area_control.image[2].used_blk, addr);
 }
 

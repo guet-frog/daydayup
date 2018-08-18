@@ -69,7 +69,7 @@
         (3)if的典型应用
             判断文件是否存在    (-f) */注意[]里面前后都有空格, 不能省略
             判断目录是否存在    (-d)
-            判断字符串是否相等  ("str1" = "str2") */注意用一个等号而不是两个
+            判断字符串是否相等  ("str1" = "str2") */注意用一个等号而不是两个 -- warning: 空格(两处)
             判断数字是否相等    (-eq) (-gt) (-lt) (-ge) (-le)	//gt:greater, than lt:less than, ge:greater or equal, le:less or equal
             判断字符串是否为空  (-z)     //注意-z判断时如果变量没定义也是不成立(noDefineValue != null)
 

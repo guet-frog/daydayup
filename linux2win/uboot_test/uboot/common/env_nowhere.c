@@ -59,6 +59,8 @@ int  env_init(void)
 	gd->env_addr  = (ulong)&default_environment[0];
 	gd->env_valid = 0;
 
+	printf("env_init func in env_nowhere.c\n");
+
 	return (0);
 }
 
