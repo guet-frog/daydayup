@@ -544,6 +544,11 @@ void start_armboot (void)
 	if ((s = getenv ("loadaddr")) != NULL)
 	{
 		load_addr = simple_strtoul (s, NULL, 16);
+		printf("load_addr = %ld\n", load_addr);
+	}
+	else
+	{
+		printf("getenv(loadaddr) == NULL\n");
 	}
 
 #if defined(CONFIG_CMD_NET)						// has include config_cmd_default.h

@@ -80,8 +80,6 @@ int env_init(void)
 
 	printf("env_init func in env_movi.c\n");
 
-	abcd for test;
-
 	return (0);
 }
 

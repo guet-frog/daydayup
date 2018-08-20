@@ -1,6 +1,6 @@
 
 2.8.3.uboot如何处理命令集1
-	本节讲解 uboot的命令数据结构 和使用 链接段属性 的方式将命令集中存放并查找的技巧，
+	本节讲解 uboot的命令数据结构 和使用 链接段属性 的方式将命令集中存放并查找的技巧
 	这种技巧在linux内核中同样有广泛使用。
 2.8.4.uboot如何处理命令集2	
 	本节通过分析find_cmd函数和version命令的实现函数do_version来进一步分析uboot命令集
@@ -39,14 +39,13 @@
 		int		repeatable;
 		int		(*cmd)(struct cmd_tbl_s *, int, int, char *[]); /* Implementation function	*/
 		char		*usage;
-	#ifdef	CFG_LONGHELP
-		char		*help;
-	#endif
-	#ifdef CONFIG_AUTO_COMPLETE
-		int		(*complete)(int argc, char *argv[], char last_char, int maxv, char *cmdv[]);
-	#endif
+		#ifdef	CFG_LONGHELP
+			char		*help;
+		#endif
+		#ifdef CONFIG_AUTO_COMPLETE
+			int		(*complete)(int argc, char *argv[], char last_char, int maxv, char *cmdv[]);
+		#endif
 	};		// warnging: 两个地方的';' 
-typedef struct cmd_tbl_s	cmd_tbl_t;
 
 总结：uboot的命令体系在工作时，一个命令对应一个cmd_tbl_t结构体的一个实例，
 然后uboot支持多少个命令，就需要多少个结构体实例。
@@ -110,9 +109,8 @@ cmd_tbl_t __u_boot_cmd_version __attribute__ ((unused,section (".u_boot_cmd"))) 
 
 
 // 编译配置 -- kernel中常用技巧
-
-COBJS-y += main.o
-COBJS-$(CONFIG_CMD_BDI) += cmd_bdinfo.o
+	COBJS-y += main.o
+	COBJS-$(CONFIG_CMD_BDI) += cmd_bdinfo.o
 
 
 

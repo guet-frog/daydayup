@@ -437,7 +437,13 @@ void main_loop (void)
 	 * Main Loop for Monitor Command Processing
 	 */
 #ifdef CFG_HUSH_PARSER
+
+	printf("#####main.c CFG_HUSH_PARSER has defined\n");
+
 	parse_file_outer();
+
+	printf("#####main.c this point is never reached\n");
+	
 	/* This point is never reached */
 	for (;;);
 #else

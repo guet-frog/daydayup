@@ -139,6 +139,11 @@ int env_init(void)
 #else /* ENV_IS_EMBEDDED */
 	gd->env_addr  = (ulong)&default_environment[0];
 	gd->env_valid = 1;
+
+	printf("\n#####env_init in file env_auto.c\n");
+	printf("#####ENV_IS_EMBEDDED not defined\n");
+	printf("#####default_environment[] define in env_common.c\n");
+	
 #endif /* ENV_IS_EMBEDDED */
 
 	return (0);
@@ -540,6 +545,9 @@ void env_relocate_spec_onenand(void)
 void env_relocate_spec(void)
 {
 #if defined(CONFIG_SMDKC100) | defined(CONFIG_X210) | defined(CONFIG_S5P6442)
+
+	printf("#####INF_REG3_REG = %d\n", INF_REG3_REG);
+
 	if (INF_REG3_REG == 1)
 		env_relocate_spec_onenand();
 	else if (INF_REG3_REG == 2)

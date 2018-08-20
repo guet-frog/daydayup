@@ -81,7 +81,8 @@ uchar default_environment[] = {
 	"nfsboot="	CONFIG_NFSBOOTCOMMAND		"\0"
 #endif
 #if defined(CONFIG_BOOTDELAY) && (CONFIG_BOOTDELAY >= 0)
-	"bootdelay="	MK_STR(CONFIG_BOOTDELAY)	"\0"
+	//"bootdelay="	MK_STR(CONFIG_BOOTDELAY)	"\0"
+	"bootdelay="	MK_STR(12)	"\0"
 #endif
 #if defined(CONFIG_BAUDRATE) && (CONFIG_BAUDRATE >= 0)
 	"baudrate="	MK_STR(CONFIG_BAUDRATE)		"\0"
@@ -247,15 +248,18 @@ void env_relocate (void)
 	 */
 	env_ptr = (env_t *)((ulong)env_ptr + gd->reloc_off);
 	DEBUGF ("%s[%d] embedded ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
+	printf ("%s[%d] embedded ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
 #else
 	/*
 	 * We must allocate a buffer for the environment
 	 */
 	env_ptr = (env_t *)malloc (CFG_ENV_SIZE);
 	DEBUGF ("%s[%d] malloced ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
+	printf ("%s[%d] malloced ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
 #endif
 
-	if (gd->env_valid == 0) {
+	if (gd->env_valid == 0)
+	{
 #if defined(CONFIG_GTH)	|| defined(CFG_ENV_IS_NOWHERE)	/* Environment not changable */
 		puts ("Using default environment\n\n");
 #else
@@ -263,8 +267,11 @@ void env_relocate (void)
 		show_boot_progress (-60);
 #endif
 		set_default_env();
+		printf("#####gd->env_valid == 0\n");
 	}
-	else {
+	else
+	{
+		printf("#####gd->env_valid == 1\n");
 		env_relocate_spec ();
 	}
 	gd->env_addr = (ulong)&(env_ptr->data);
