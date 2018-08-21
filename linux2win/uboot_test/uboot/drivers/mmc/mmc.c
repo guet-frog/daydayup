@@ -1194,11 +1194,15 @@ int mmc_initialize(bd_t *bis)
 #else
 	mmc = find_mmc_device(0);
 #endif
-	if (mmc) {
+	if (mmc)
+    {
 		err = mmc_init(mmc);
 		if (err)
-			err = mmc_init(mmc);
-		if (err) {
+        {
+            err = mmc_init(mmc);
+        }
+		if (err)
+        {
 			printf("Card init fail!\n");
 			return err;
 		}

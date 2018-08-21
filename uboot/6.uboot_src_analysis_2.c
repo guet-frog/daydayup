@@ -61,7 +61,7 @@
 	// 控制台是基于串口, 控制台可以实现标准输入输出
 	// hang()/*挂起*/
 
-2.6.4.x、dram_init	//	ddr的配置
+2.6.4.3、dram_init	//	ddr的配置
 	(1)硬件初始化: ddr可以正常工作	// lowlevel_init
 
 	(2)软件初始化: 软件架构中一些ddr相关的属性配置, 地址设置
@@ -69,13 +69,13 @@
 		①: x210_sd.h中用宏定义指明, 然后uboot直接使用这些信息
 		②: 类似于PC的bios通过读取硬件信息来确定
 
-2.6.4.3、interrupt_init
+2.6.4.4、interrupt_init
 		(1)TIM4 init
 			read_reg -> r,m,p,s -> get_pllclk() -> get_hclk -> get_pclk() -> timer_load_val
 
 2.6.6.2、env_init
 	(1)uboot支持各种不同的启动介质(norflash、nandflash、inand、sd卡...), 因此有多个env_init()
-	(2)这个函数只是对/*内存*/里维护的那一份uboot的env做了基本的初始化	// judge valid or not
+	(2)这个函数只是对/*内存*/里维护的那一份uboot的env做了基本的初始化	// judge valid or not -- no
 	   当前env没有从SD卡到DDR中的relocate/*only relocate firmware*/	    // -- current env invalid
 	(4)在start_armboot函数中(line776)调用env_relocate(), 进行env从SD卡中到DDR中的重定位
 		重定位之后需要环境变量时才可以从DDR中去取, 重定位之前如果要使用环境变量只能从SD卡中去读取 -- // ?
@@ -160,7 +160,6 @@
 		// 210CPU内置sd卡控制器, 所以mmc_init就在CPU层面执行
 	(6)cpu_mmc_init在uboot/cpu/s5pc11x/cpu.c
 		这里面又间接的调用了drivers/mmc/s3c_mmcxxx.c中的驱动代码来初始化硬件MMC控制器
-		这里面分层很多，分层的思想一定要有，否则完全就糊涂了
 		// uboot/soc/s5pc11x/cpu.c
 
 // uboot本身没有单独实现驱动
@@ -180,6 +179,15 @@
 		然后被写入(可能是saveenv时写入, 也可能是第一次读取默认环境变量后就被写入到SD卡的ENV分区)
 		以后上电初始化时读取就OK
 	(3)真正的从SD卡到DDR中重定位ENV的代码是在env_relocate_spec内部的movi_read_env完成的
+	
+	-- env_relocate()
+	  |
+	  | -- env_ptr = (env_t *)malloc (CFG_ENV_SIZE)
+	  |
+	  | -- env_relocate_spec()
+	  |
+	  | -- gd->env_addr = (uint32_t)&(env_ptr->data)
+	
 
 	// set_default_env()	// default_environment in config_sd.h  -- 已经加载一次修改该文件没有效果
 	// env_movi.c
@@ -272,8 +280,8 @@ uboot中有2种解决方案来处理这种情况：
 		|
 		| -- env_init()
 		   |
-		   | -- gd->env_addr = default_environment
-		   | -- gd->env_valid = 0
+		   | -- gd->env_addr = (uint32_t)&default_environment[0]
+		   | -- gd->env_valid = 1
 		|
 		| -- init_baudrate()
 		   |
@@ -300,7 +308,7 @@ uboot中有2种解决方案来处理这种情况：
 		   | -- gd->bd->bi_dram[1].start = PHYS_SDRAM_2			// 0x4000_0000
 		   | -- gd->bd->bi_dram[1].size  = PHYS_SDRAM_2_SIZE	// 0x1000_0000
 		|
-		| -- display_dram_config()	// printf ddr config_info
+		| -- display_dram_config()	// printf ddr config_info(size)
 		
 	mem_malloc_init		初始化uboot自己维护的堆管理器的内存
 	mmc_initialize		inand/SD卡的SoC控制器和卡的初始化

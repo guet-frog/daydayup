@@ -286,59 +286,8 @@ void main_loop (void)
 	char *p;
 #endif
 
-#ifdef CONFIG_BOOTCOUNT_LIMIT
-	unsigned long bootcount = 0;
-	unsigned long bootlimit = 0;
-	char *bcs;
-	char bcs_set[16];
-#endif /* CONFIG_BOOTCOUNT_LIMIT */
-
-#if defined(CONFIG_VFD) && defined(VFD_TEST_LOGO)
-	ulong bmp = 0;		/* default bitmap */
-	extern int trab_vfd (ulong bitmap);
-
-	#ifdef CONFIG_MODEM_SUPPORT
-	if (do_mdm_init)
-		bmp = 1;	/* alternate bitmap */
-	#endif
-	trab_vfd (bmp);
-#endif	/* CONFIG_VFD && VFD_TEST_LOGO */
-
-#ifdef CONFIG_BOOTCOUNT_LIMIT
-	bootcount = bootcount_load();
-	bootcount++;
-	bootcount_store (bootcount);
-	sprintf (bcs_set, "%lu", bootcount);
-	setenv ("bootcount", bcs_set);
-	bcs = getenv ("bootlimit");
-	bootlimit = bcs ? simple_strtoul (bcs, NULL, 10) : 0;
-#endif /* CONFIG_BOOTCOUNT_LIMIT */
-
-#ifdef CONFIG_MODEM_SUPPORT
-	debug ("DEBUG: main_loop:   do_mdm_init=%d\n", do_mdm_init);
-	if (do_mdm_init) {
-		char *str = strdup(getenv("mdm_cmd"));
-		setenv ("preboot", str);  /* set or delete definition */
-		if (str != NULL)
-			free (str);
-		mdm_init(); /* wait for modem connection */
-	}
-#endif  /* CONFIG_MODEM_SUPPORT */
-
-#ifdef CONFIG_VERSION_VARIABLE
-	{
-		extern char version_string[];
-
-		setenv ("ver", version_string);  /* set version variable */
-	}
-#endif /* CONFIG_VERSION_VARIABLE */
-
 #ifdef CFG_HUSH_PARSER
 	u_boot_hush_start ();
-#endif
-
-#ifdef CONFIG_AUTO_COMPLETE
-	install_auto_complete();
 #endif
 
 #ifdef CONFIG_FASTBOOT
@@ -370,31 +319,15 @@ void main_loop (void)
 	bootdelay = s ? (int)simple_strtol(s, NULL, 10) : CONFIG_BOOTDELAY;
 
 	debug ("### main_loop entered: bootdelay=%d\n\n", bootdelay);
+    printf("### main_loop entered: bootdelay=%d\n\n", bootdelay);
 
-# ifdef CONFIG_BOOT_RETRY_TIME
-	init_cmd_timeout ();
-# endif	/* CONFIG_BOOT_RETRY_TIME */
-
-#ifdef CONFIG_POST
-	if (gd->flags & GD_FLG_POSTFAIL) {
-		s = getenv("failbootcmd");
-	}
-	else
-#endif /* CONFIG_POST */
-
-#ifdef CONFIG_BOOTCOUNT_LIMIT
-	if (bootlimit && (bootcount > bootlimit)) {
-		printf ("Warning: Bootlimit (%u) exceeded. Using altbootcmd.\n",
-		        (unsigned)bootlimit);
-		s = getenv ("altbootcmd");
-	}
-	else
-#endif /* CONFIG_BOOTCOUNT_LIMIT */
-		s = getenv ("bootcmd");
+    s = getenv ("bootcmd");
 
 	debug ("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
+    printf("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
 
-	if (bootdelay >= 0 && s && !abortboot (bootdelay)) {
+	if (bootdelay >= 0 && s && !abortboot (bootdelay))
+    {
 #ifdef CONFIG_AUTOBOOT_KEYED
 		int prev = disable_ctrlc(1);	/* disable Control C checking */
 #endif
@@ -402,14 +335,19 @@ void main_loop (void)
 #ifndef CFG_HUSH_PARSER
 		run_command (s, 0);
 #else
-		parse_string_outer(s, FLAG_PARSE_SEMICOLON |
-				    FLAG_EXIT_FROM_LOOP);
+        printf("#####func@main_loop() not push key\n");
+
+		parse_string_outer(s, FLAG_PARSE_SEMICOLON | FLAG_EXIT_FROM_LOOP);
+
+        printf("#####func@main_loop() push key\n");
+        while(1);   // for test
 #endif
 
 #ifdef CONFIG_AUTOBOOT_KEYED
 		disable_ctrlc(prev);	/* restore Control C checking */
 #endif
 	}
+
 
 #ifdef CONFIG_MENUKEY
 	if (menukey == CONFIG_MENUKEY) {
@@ -424,7 +362,9 @@ void main_loop (void)
 	    }
 	}
 #endif /* CONFIG_MENUKEY */
+
 #endif	/* CONFIG_BOOTDELAY */
+
 
 #ifdef CONFIG_AMIGAONEG3SE
 	{
@@ -437,15 +377,16 @@ void main_loop (void)
 	 * Main Loop for Monitor Command Processing
 	 */
 #ifdef CFG_HUSH_PARSER
-
+    
 	printf("#####main.c CFG_HUSH_PARSER has defined\n");
-
+    
 	parse_file_outer();
-
+    
 	printf("#####main.c this point is never reached\n");
 	
 	/* This point is never reached */
 	for (;;);
+
 #else
 	for (;;) {
 	#ifdef CONFIG_BOOT_RETRY_TIME

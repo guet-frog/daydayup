@@ -90,7 +90,7 @@
 # include <linux/types.h>
 #endif
 
-#ifdef CFG_REDUNDAND_ENVIRONMENT
+#ifdef CFG_REDUNDAND_ENVIRONMENT    // not defined
 # define ENV_HEADER_SIZE	(sizeof(uint32_t) + 1)
 #else
 # define ENV_HEADER_SIZE	(sizeof(uint32_t))

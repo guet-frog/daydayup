@@ -509,15 +509,20 @@ void env_relocate_spec_nor(void)
 void env_relocate_spec_movinand(void)
 {
 #if !defined(ENV_IS_EMBEDDED)
-#if defined(CONFIG_CMD_MOVINAND)
+#if defined(CONFIG_CMD_MOVINAND)    
 	uint *magic = (uint*)(PHYS_SDRAM_1);
-
-	if ((0x24564236 != magic[0]) || (0x20764316 != magic[1])) {
+    
+	if ((0x24564236 != magic[0]) || (0x20764316 != magic[1]))
+    {
 		movi_read_env(virt_to_phys((ulong)env_ptr));
 	}
 	
 	if (crc32(0, env_ptr->data, ENV_SIZE) != env_ptr->crc)
-		return use_default();
+    {
+        printf("#####func@env_relocate_spec_movinand() crc verify error && use default environment\n");
+        return use_default();
+    }
+    
 #endif /* CONFIG_CMD_MOVINAND */
 #endif /* ! ENV_IS_EMBEDDED */
 }
@@ -545,9 +550,6 @@ void env_relocate_spec_onenand(void)
 void env_relocate_spec(void)
 {
 #if defined(CONFIG_SMDKC100) | defined(CONFIG_X210) | defined(CONFIG_S5P6442)
-
-	printf("#####INF_REG3_REG = %d\n", INF_REG3_REG);
-
 	if (INF_REG3_REG == 1)
 		env_relocate_spec_onenand();
 	else if (INF_REG3_REG == 2)
@@ -586,12 +588,9 @@ static void use_default()
 	}
 
 	memset (env_ptr, 0, sizeof(env_t));
-	memcpy (env_ptr->data,
-			default_environment,
-			default_environment_size);
+	memcpy (env_ptr->data, default_environment, default_environment_size);
 	env_ptr->crc = crc32(0, env_ptr->data, ENV_SIZE);
 	gd->env_valid = 1;
-
 }
 #endif
 

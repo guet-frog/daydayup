@@ -470,7 +470,7 @@ void start_armboot (void)
     
 	memset ((void*)gd, 0, sizeof (gd_t));
 	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t));     /// bd_t *bd, 需要给bd_t分配空间, 清零
-	memset (gd->bd, 0, sizeof (bd_t));
+	memset (gd->bd, 0, sizeof(bd_t));
     
 	monitor_flash_len = _bss_start - _armboot_start;
     
@@ -518,25 +518,26 @@ void start_armboot (void)
 		ulong reg;
 		char *s, *e;
 		char tmp[64];
-
+        
 		i = getenv_r ("ethaddr", tmp, sizeof (tmp));
 		s = (i > 0) ? tmp : NULL;
-
-		for (reg = 0; reg < 6; ++reg) {
+        
+		for (reg = 0; reg < 6; ++reg)
+        {
 			gd->bd->bi_enetaddr[reg] = s ? simple_strtoul (s, &e, 16) : 0;
 			if (s)
 				s = (*e) ? e + 1 : e;
 		}
 	}
-
+    
 	devices_init ();	/* get the devices list going. */
-
+    
 	jumptable_init ();
-
+    
 #if !defined(CONFIG_SMDK6442)
 	console_init_r ();	/* fully init console as a device */	// has exe
 #endif
-
+    
 	/* enable exceptions */
 	enable_interrupts ();
 

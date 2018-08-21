@@ -14,7 +14,7 @@ fi
 # no modify
 cp -f uboot/include/configs/x210_sd.h /home/aston/src/uboot/include/configs/
 
-#board.c -- start_armboot.c不相关宏删除
+#board.c -- 删除一些宏定义代码; 添加打印信息
 cp -f uboot/lib_arm/board.c /home/aston/src/uboot/lib_arm/
 
 # env_init() in which file -- not in below files
@@ -32,12 +32,18 @@ cp -f uboot/common/env_common.c /home/aston/src/uboot/common/env_common.c
 
 # test main_loop()
 cp -f uboot/common/main.c /home/aston/src/uboot/common/main.c
+
+# command.c格式修改
+cp -f uboot/common/command.c /home/aston/src/uboot/common/command.c
+
+# cmd_bootm.c -- for do_bootm()
+cp -f uboot/common/cmd_bootm.c /home/aston/src/uboot/common/cmd_bootm.c
 ############################################################################
 
 
 cd /home/aston/src/uboot/
 
-#CLEAN = "dist clean"	warning: shell script need consider [space] carefually
+#CLEAN = "distclean"	warning: shell script need consider [space] carefually
 CLEAN="distclean"
 
 make ${CLEAN}

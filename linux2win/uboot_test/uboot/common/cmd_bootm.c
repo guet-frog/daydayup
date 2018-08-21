@@ -196,42 +196,45 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 #ifdef CONFIG_ZIMAGE_BOOT
 #define LINUX_ZIMAGE_MAGIC	0x016f2818
 	/* find out kernel image address */
-	if (argc < 2) {
+	if (argc < 2)
+    {
 		addr = load_addr;
-		debug ("*  kernel: default image load address = 0x%08lx\n",
-				load_addr);
-	} else {
+		debug ("*  kernel: default image load address = 0x%08lx\n", load_addr);
+	}
+    else
+    {
 		addr = simple_strtoul(argv[1], NULL, 16);
 		debug ("*  kernel: cmdline image address = 0x%08lx\n", img_addr);
+        printf("*  kernel: cmdline image address = 0x%08lx\n", addr);
 	}
 
-
-	if (*(ulong *)(addr + 9*4) == LINUX_ZIMAGE_MAGIC) {
+	if (*(ulong *)(addr + 9*4) == LINUX_ZIMAGE_MAGIC)
+    {
 		printf("Boot with zImage\n");
 		addr = virt_to_phys(addr);
 		hdr = (image_header_t *)addr;
 		hdr->ih_os = IH_OS_LINUX;
 		hdr->ih_ep = ntohl(addr);
-
+        
 		memmove (&images.legacy_hdr_os_copy, hdr, sizeof(image_header_t));
-
+        
 		/* save pointer to image header */
 		images.legacy_hdr_os = hdr;
-
+        
 		images.legacy_hdr_valid = 1;
-
+        
 		goto after_header_check;
 	}
 #endif
 
 	/* get kernel image header, start address and length */
-	os_hdr = boot_get_kernel (cmdtp, flag, argc, argv,
-			&images, &os_data, &os_len);
-	if (os_len == 0) {
+	os_hdr = boot_get_kernel (cmdtp, flag, argc, argv, &images, &os_data, &os_len);
+	if (os_len == 0)
+    {
 		puts ("ERROR: can't get kernel image!\n");
 		return 1;
 	}
-
+    
 	/* get image parameters */
 	switch (genimg_get_format (os_hdr)) {
 	case IMAGE_FORMAT_LEGACY:

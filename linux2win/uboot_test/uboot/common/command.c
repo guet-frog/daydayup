@@ -348,17 +348,19 @@ cmd_tbl_t *find_cmd (const char *cmd)
 	const char *p;
 	int len;
 	int n_found = 0;
-
+    
+    printf("#####func@find_cmd() func find_cmd exe\n");
+    
 	/*
 	 * Some commands allow length modifiers (like "cp.b");
 	 * compare command name only until first dot.
 	 */
 	len = ((p = strchr(cmd, '.')) == NULL) ? strlen (cmd) : (p - cmd);
-
-	for (cmdtp = &__u_boot_cmd_start;
-	     cmdtp != &__u_boot_cmd_end;
-	     cmdtp++) {
-		if (strncmp (cmd, cmdtp->name, len) == 0) {
+    
+	for (cmdtp = &__u_boot_cmd_start; cmdtp != &__u_boot_cmd_end; cmdtp++)
+    {
+		if (strncmp (cmd, cmdtp->name, len) == 0)
+        {
 			if (len == strlen (cmdtp->name))
 				return cmdtp;	/* full match */
 
@@ -366,10 +368,11 @@ cmd_tbl_t *find_cmd (const char *cmd)
 			n_found++;
 		}
 	}
-	if (n_found == 1) {			/* exactly one match */
+	if (n_found == 1)   /* exactly one match */
+    {
 		return cmdtp_temp;
 	}
-
+    
 	return NULL;	/* not found or ambiguous command */
 }
 

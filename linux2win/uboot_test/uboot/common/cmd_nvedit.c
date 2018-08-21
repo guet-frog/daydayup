@@ -498,22 +498,29 @@ int do_askenv ( cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 char *getenv (char *name)
 {
 	int i, nxt;
-
+    
 	WATCHDOG_RESET();
-
-	for (i=0; env_get_char(i) != '\0'; i=nxt+1) {
+    
+	for (i=0; env_get_char(i) != '\0'; i=nxt+1)
+    {
 		int val;
-
-		for (nxt=i; env_get_char(nxt) != '\0'; ++nxt) {
-			if (nxt >= CFG_ENV_SIZE) {
+        
+		for (nxt=i; env_get_char(nxt) != '\0'; ++nxt)
+        {
+			if (nxt >= CFG_ENV_SIZE)
+            {
 				return (NULL);
 			}
 		}
+        
 		if ((val=envmatch((uchar *)name, i)) < 0)
-			continue;
+        {
+            continue;
+        }
+        
 		return ((char *)env_get_addr(val));
 	}
-
+    
 	return (NULL);
 }
 

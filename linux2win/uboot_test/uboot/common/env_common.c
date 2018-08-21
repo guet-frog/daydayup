@@ -162,7 +162,9 @@ static uchar env_get_char_init (int index)
 	if (gd->env_valid)
 	{
 		c = env_get_char_spec(index);
-	} else {
+	}
+    else
+    {
 		c = default_environment[index];
 	}
 
@@ -199,18 +201,27 @@ uchar env_get_char (int index)
 
 	/* if relocated to RAM */
 	if (gd->flags & GD_FLG_RELOC)
-		c = env_get_char_memory(index);
+    {
+        printf("#####func@env_get_char() gd->flags has GD_FLG_RELOC\n");
+        c = env_get_char_memory(index);
+    }
 	else
-		c = env_get_char_init(index);
-
+    {
+        printf("#####func@env_get_char() gd->flags not GD_FLG_RELOC\n");
+        c = env_get_char_init(index);
+    }
+	
 	return (c);
 }
 
 uchar *env_get_addr (int index)
 {
-	if (gd->env_valid) {
+	if (gd->env_valid)
+    {
 		return ( ((uchar *)(gd->env_addr + index)) );
-	} else {
+	}
+    else
+    {
 		return (&default_environment[index]);
 	}
 }
@@ -234,8 +245,8 @@ void set_default_env(void)
 
 void env_relocate (void)
 {
-	DEBUGF ("%s[%d] offset = 0x%lx\n", __FUNCTION__,__LINE__,
-		gd->reloc_off);
+	DEBUGF ("%s[%d] offset = 0x%lx\n", __FUNCTION__, __LINE__, gd->reloc_off);
+    printf("%s[%d] offset = 0x%lx\n", __FUNCTION__, __LINE__, gd->reloc_off);
 
 #ifdef CONFIG_AMIGAONEG3SE
 	enable_nvram();
@@ -253,6 +264,8 @@ void env_relocate (void)
 	/*
 	 * We must allocate a buffer for the environment
 	 */
+    printf("#####func@env_relocate() env_ptr init value = %p\n", env_ptr);
+    
 	env_ptr = (env_t *)malloc (CFG_ENV_SIZE);
 	DEBUGF ("%s[%d] malloced ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
 	printf ("%s[%d] malloced ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
