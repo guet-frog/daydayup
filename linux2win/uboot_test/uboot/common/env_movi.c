@@ -78,8 +78,6 @@ int env_init(void)
 	gd->env_valid = 1;
 #endif /* ENV_IS_EMBEDDED */
 
-	printf("env_init func in env_movi.c\n");
-
 	return (0);
 }
 

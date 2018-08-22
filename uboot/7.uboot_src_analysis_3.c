@@ -46,6 +46,9 @@
 		(1)SD卡/iNand/Nand/NorFlash 	// raw分区
 			uboot读取命令: X210的iNand版本是movi命令, X210的Nand版本就是Nand命令
 		(2)	movi read kernel 0x30008000	// kernel分区
+		
+		// bootcmd ""
+		// bootm ""
 
 	(2)tftp、nfs等网络下载方式从远端服务器获取镜像
 		uboot支持远程启动, 内核镜像放在主机的服务器中(远端)，启动时uboot通过网络从服务器中下载镜像到本地的DDR中。
@@ -58,21 +61,24 @@
 		(1)内核一定要放在链接地址处，链接地址去内核源代码的链接脚本或者Makefile中去查找。X210中是0x30008000。
 
 	// 编译uboot load zImage  启动测试
-	// fastboot 命令
+	// fastboot 命令 -- 查看分区起始地址 + 长度, 没有指明则默认接连上一个分区
+	// android 默认分区较多, 典型linux只有3个分区 BootLoader kernel rootfs
 	// help -- movi
-	
-2.7.3.zImage和uImage的区别联系
-	2.7.3.1、bootm命令对应do_bootm函数
-		(1)命令名前加do_即可构成这个命令对应的函数，
-			因此当我们bootm命令执行时，uboot实际执行的函数叫do_bootm函数，在cmd_bootm.c。
-		(2)do_bootm刚开始定义了一些变量，然后用宏来条件编译执行了secureboot的一些代码（主要进行签名认证）
-		   然后进行了一些一些细节部分操作，然后到了CONFIG_ZIMAGE_BOOT，用这个宏来控制进行条件编译一段代码，
-		   这段代码是用来支持zImage格式的内核启动的。
 
 	2.7.3.2、vmlinuz和zImage和uImage
-		(1)uboot经过编译直接生成的elf格式的可执行程序是u-boot，这个程序类似于windows下的exe格式，在操作系统下是可以直接执行的。但是这种格式不能用来烧录下载。我们用来烧录下载的是u-boot.bin，这个东西是由u-boot使用arm-linux-objcopy工具进行加工（主要目的是去掉一些无用的）得到的。这个u-boot.bin就叫镜像（image），镜像就是用来烧录到iNand中执行的。
-		(2)linux内核经过编译后也会生成一个elf格式的可执行程序，叫vmlinux或vmlinuz，(/boot/vmlinuz-3.13.0-32-generic)这个就是原始的未经任何处理加工的原版内核elf文件；嵌入式系统部署时烧录的一般不是这个vmlinuz/vmlinux，而是要用objcopy工具去制作成烧录镜像格式（就是u-boot.bin这种，但是内核没有.bin后缀），经过制作加工成烧录镜像的文件就叫Image（制作把78M大的精简成了7.5M，因此这个制作烧录镜像主要目的就是缩减大小，节省磁盘）。
-		(3)原则上Image就可以直接被烧录到Flash上进行启动执行（类似于u-boot.bin），但是实际上并不是这么简单。实际上linux的作者们觉得Image还是太大了所以对Image进行了压缩，并且在image压缩后的文件的前端附加了一部分解压缩代码。构成了一个压缩格式的镜像就叫zImage。（因为当年Image大小刚好比一张软盘（软盘有2种，1.2M的和1.44MB两种）大，为了节省1张软盘的钱于是乎设计了这种压缩Image成zImage的技术）。
+		(1)uboot经过编译直接生成的elf格式的可执行程序是u-boot，
+			这个程序类似于windows下的exe格式，在操作系统下是可以直接执行的。但是这种格式不能用来烧录下载。
+			我们用来烧录下载的是u-boot.bin，这个东西是由u-boot使用arm-linux-objcopy工具进行加工（主要目的是去掉一些无用的）得到的。
+			这个u-boot.bin就叫镜像（image），镜像就是用来烧录到iNand中执行的。
+		(2)linux内核经过编译后也会生成一个elf格式的可执行程序，叫vmlinux或vmlinuz，
+			(/boot/vmlinuz-3.13.0-32-generic)这个就是原始的未经任何处理加工的原版内核elf文件；
+			嵌入式系统部署时烧录的一般不是这个vmlinuz/vmlinux，而是要用objcopy工具去制作成烧录镜像格式（就是u-boot.bin这种，但是内核没有.bin后缀），
+			经过制作加工成烧录镜像的文件就叫Image（制作把78M大的精简成了7.5M，因此这个制作烧录镜像主要目的就是缩减大小，节省磁盘）。
+		(3)原则上Image就可以直接被烧录到Flash上进行启动执行（类似于u-boot.bin），
+			但是实际上并不是这么简单。实际上linux的作者们觉得Image还是太大了所以对Image进行了压缩，
+			并且在image压缩后的文件的前端附加了一部分解压缩代码。构成了一个压缩格式的镜像就叫zImage。
+			（因为当年Image大小刚好比一张软盘（软盘有2种，1.2M的和1.44MB两种）大，
+			为了节省1张软盘的钱于是乎设计了这种压缩Image成zImage的技术）。
 		(4)uboot为了启动linux内核，还发明了一种内核格式叫uImage。uImage是由zImage加工得到的，
 			uboot中有一个工具，可以将zImage加工生成uImage。
 			注意：uImage不关linux内核的事，linux内核只管生成zImage即可，
@@ -86,7 +92,13 @@
 			/common/Cmd_bootm.c		//CONFIG_ZIMAGE_BOOT 支持
 			/tools/mkimage.c
 
-// ubuntu 用grob来启动
+	// ubuntu用grob来启动 -- 可以直接加载elf格式镜像
+	
+	// du -h linux
+	
+	// linux file 命令
+	
+	// linux采用自解压方式, zImage: Image压缩并附加一段自解压代码
 
 2.7.3.3、编译内核得到uImage去启动
 	(1)如果直接在kernel底下去make uImage会提供mkimage command not found

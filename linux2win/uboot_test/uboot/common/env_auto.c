@@ -137,12 +137,9 @@ int env_init(void)
 	else if (gd->env_valid == 2)
 		env_ptr = tmp_env2;
 #else /* ENV_IS_EMBEDDED */
+	
 	gd->env_addr  = (ulong)&default_environment[0];
 	gd->env_valid = 1;
-
-	printf("\n#####env_init in file env_auto.c\n");
-	printf("#####ENV_IS_EMBEDDED not defined\n");
-	printf("#####default_environment[] define in env_common.c\n");
 	
 #endif /* ENV_IS_EMBEDDED */
 

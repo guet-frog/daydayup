@@ -38,9 +38,9 @@
 
 2.8.3.3、uboot实现命令管理
 	(1) 填充一个cmd_tbl_t实例构成一条命令	// cmd_tbl_t实例附加自定义段属性(用户自定义段) -- for link
-	
+
 	(2) uboot重定位时将该段整体加载到ddr中	// 类似于结构体数组    -- warning: 区别于 default_environment[]
-	
+
 	(3) 段起始地址和结束地址		// 用于遍历段
 
 2.8.4.1、U_BOOT_CMD
@@ -49,7 +49,7 @@
 
 	#define U_BOOT_CMD(name, maxargs, rep, cmd, usage, help) \
 		cmd_tbl_t __u_boot_cmd_##name Struct_Section = {#name, maxargs, rep, cmd, usage, help}	 // gcc扩展语法: ##name #name
-		
+
 	U_BOOT_CMD(
 		version,	1,		1,	do_version,		// version not "version"
 		"version - print monitor version\n",
@@ -62,7 +62,7 @@
 
 2.8.4.2、find_cmd函数
 	(1)find_cmd()从当前uboot的命令集中查找是否有某个命令, 如果找到则返回这个命令结构体的指针，如果未找到返回NULL。
-	
+
 	// cmd_tbl_t *cmdtp_tmp = &__u_uboot_cmd_start;
 	// len = ((p = strchr(cmd, '.')) == NULL) ? strlen(cmd) : (p - cmd);	// -- md.b md.w md.l
 	// cmdtp_tmp++ 	// 指针的++, 要考虑指针的数据类型

@@ -202,12 +202,12 @@ uchar env_get_char (int index)
 	/* if relocated to RAM */
 	if (gd->flags & GD_FLG_RELOC)
     {
-        printf("#####func@env_get_char() gd->flags has GD_FLG_RELOC\n");
+        //printf("#####func@env_get_char() gd->flags has GD_FLG_RELOC\n");
         c = env_get_char_memory(index);
     }
 	else
     {
-        printf("#####func@env_get_char() gd->flags not GD_FLG_RELOC\n");
+        //printf("#####func@env_get_char() gd->flags not GD_FLG_RELOC\n");
         c = env_get_char_init(index);
     }
 	
