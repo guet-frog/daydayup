@@ -85,8 +85,10 @@
 		} bi_dram[CONFIG_NR_DRAM_BANKS]; /* RAM configuration */
 	} bd_t;
 	
+	// movi.c movi_bl2_copy() puts("other SDHC info");
 
-
+	// eat leading white space
+	// for (p = commandline; *p == ' '; p++);
 
 
 

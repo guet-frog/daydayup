@@ -82,7 +82,7 @@ _pad:
 .global _end_vect
 _end_vect:
 
-	.balignl 16,0xdeadbeef							// 内存对齐--16字节 伪指令
+	.balignl 16,0xdeadbeef				// 内存对齐--16字节 伪指令
 /*
  *************************************************************************
  *
@@ -218,13 +218,16 @@ lp2:
 	orr	r0, r0, #0x00000002     @ set bit 1 (--A-) Align
 	orr	r0, r0, #0x00000800     @ set bit 12 (Z---) BTB
 	mcr 	p15, 0, r0, c1, c0, 0
-	
+
+	// 由OMPIN确定启动方式, 读reg(E000_0004), 取出有效位放入r2
+	// 比较r2设定启动方式, 暂存入r3, str r3 [E010_F00C]
+
 	/* Read booting information */
-	ldr	r0, =PRO_ID_BASE				// defined in reg.h -> ./include/s5pc110.h
+	ldr	r0, =PRO_ID_BASE
 	ldr	r1, [r0,#OMR_OFFSET]
-	bic	r2, r1, #0xffffffc1				// 1100-0001	r2 for boot mode
+	bic	r2, r1, #0xffffffc1		// r2: boot mode有效位
 	
-#ifdef CONFIG_VOGUES	// -- not defined
+#ifdef CONFIG_VOGUES
 	/* PS_HOLD(GPH0_0) set to output high */
 	ldr	r0, =ELFIN_GPIO_BASE
 	ldr	r1, =0x00000001
@@ -254,7 +257,7 @@ lp2:
 	moveq	r3, #BOOT_ONENAND
 
 	/* SD/MMC BOOT */
-	cmp     r2, #0xc						// judge boot mode
+	cmp     r2, #0xc			// judge boot mode, str in r3
 	moveq   r3, #BOOT_MMCSD
 
 	/* NOR BOOT */
@@ -272,8 +275,8 @@ lp2:
 	cmp     r2, #(0x1<<4)
 	moveq   r3, #BOOT_SEC_DEV
 	
-	ldr	r0, =INF_REG_BASE				/// 软件自定义的boot mode序号
-	str	r3, [r0, #INF_REG3_OFFSET]		/// store r3(boot mode) in memory 0xE010_F00C
+	ldr	r0, =INF_REG_BASE
+	str	r3, [r0, #INF_REG3_OFFSET]		// store r3(boot mode) in reg 0xE010_F00C
 	
 	/*
 	 * Go setup Memory and board specific bits prior to relocation.
@@ -283,11 +286,12 @@ lp2:
 	sub	sp, sp, #12	/* set stack */									// for function call, for store lr
 	mov	fp, #0
 	
-	bl	lowlevel_init	/* go setup pll,mux,memory */				// ./board/samsung/x210/lowlevel_init.S
+	bl	lowlevel_init	/* go setup pll,mux,memory */
+
 	/* To hold max8698 output before releasing power on switch,
 	 * set PS_HOLD signal to high
 	 */
-	ldr	r0, =0xE010E81C  /* PS_HOLD_CONTROL register */				// 软开关相关
+	ldr	r0, =0xE010E81C  /* PS_HOLD_CONTROL register */
 	ldr	r1, =0x00005301	 /* PS_HOLD output high	*/					// 一般为"读 改 写" -- reflect
 	str	r1, [r0]
 	
@@ -317,14 +321,19 @@ lp2:
 	
 	ldr	r0, =INF_REG_BASE			/// boot mode save in line277
 	ldr	r1, [r0, #INF_REG3_OFFSET]
+	
 	cmp	r1, #BOOT_NAND
 	beq	nand_boot
+	
 	cmp	r1, #BOOT_ONENAND
 	beq	onenand_boot
+	
 	cmp     r1, #BOOT_MMCSD
 	beq     mmcsd_boot
+	
 	cmp     r1, #BOOT_NOR
 	beq     nor_boot
+	
 	cmp     r1, #BOOT_SEC_DEV
 	beq     mmcsd_boot
 	
@@ -339,7 +348,7 @@ onenand_boot:
 	
 mmcsd_boot:
 #if DELETE						// #if 0
-	ldr     sp, _TEXT_PHY_BASE      
+	ldr     sp, _TEXT_PHY_BASE
 	sub     sp, sp, #12
 	mov     fp, #0
 #endif

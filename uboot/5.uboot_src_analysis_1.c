@@ -3,7 +3,7 @@
 	(1)C语言中整个项目的入口就是main函数
 	(2)在uboot中包含汇编阶段, 因此程序的入口在链接脚本中ENTRY声明的位置: ENTRY(_start) // not main()
 
-2.5.2.1、不简单的头文件包含
+2.5.2.1、头文件包含
 	(1)#include <config.h>  // < > not " "  -- SRCTREE/include 路径导出到PATH环境变量中?
 		config.h在include目录下, 配置过程中自动生成的文件   //#include <configs/x210_sd.h>
 	(3)#include <version.h>
@@ -15,7 +15,7 @@
 
 2.5.3.1、启动代码的16字节头部
 	(1)SD卡启动/Nand启动等整个镜像开头需要16字节的校验头 // usb启动不需要, sd卡启动通过mkv210image.c来制作镜像
-	(2)uboot这里start.S中在开头位置放了16字节的填充占位, 后面去计算校验和再重新填充
+	(2)uboot这里start.S中在开头位置放了16字节的/*填充占位*/, 后面去计算校验和再重新填充
 		// uboot从SD/Nand等启动时的16字节校验头和异常向量表的建立
 		// -- 应该和单片机start.s文件一样, 编译链接后, bin文件的起始就是中断向量表 -- 且这16个字节校验在bin文件最前面
 
@@ -39,7 +39,6 @@
 	(2)在调用函数前初始化栈, 主要原因是在被调用的函数内/*再次执行了调用函数*/
 		bl将返回地址存储到lr中, 再次执行函数调用前要先将lr入栈, 否则函数返回时第一层的返回地址就被覆盖了
 		// setup stack in sram      // ddr not init, insure stack_pointer in legal addr
-		// lowlevel_init            // ./board/samsung/x210/lowlevel_init.S
 
 		//push	{lr}	lr 		-> memory
 		//pop	{pc}	memory 	-> pc
@@ -48,17 +47,18 @@
 	(1)复杂CPU允许多种复位情况: 直接冷上电, 热启动, 睡眠(低功耗)状态下的唤醒等
 		//冷上电时ddr需要初始化和code的重定位, 而热启动或者低功耗状态下的复位则不需要再次初始化ddr
 
-2.5.5.5、供电锁存    			// line 100-104
+2.5.5.5、供电锁存
 	// orr r1, r1, #0x301       // error
 
 2.5.6.1、判断当前代码执行位置  // line 110-115
 	(1)代码运行地址在sram中还是在ddr中     // bl1(uboot的前16K)
+	
 	(2)bic	r1, pc, r0  //r1 = pc & ~(r0)
+	
 		// bl system_clock_init
 		// bl mem_ctrl_asm_init
 
-2.5.6.2、system_clock_init   // current file line 205
-	// x210_sd.h --时钟相关的配置值 line300-428
+2.5.6.2、system_clock_init
 
 2.5.7.1、mem_ctrl_asm_init   // uboot/cpu/s5pc11x/s5pc110/cpu_init.S
 	(4)DMC0_MEMCONFIG_0: 在裸机中配置值为0x20E01323
@@ -76,7 +76,7 @@
 2.5.7.4 pop {pc}以返回
 	(1)返回前通过串口打印'K'	//lowlevel_init.S执行成功串口打印出"OK"
 
-	lowlevel_init.S: clock_init, ddr_init, print"OK"
+	//lowlevel_init.S -- clock_init, ddr_init, print"OK"
 
 2.5.8.1、再次设置栈（DDR中的栈）
 	(2)第一次设置栈: 调用lowlevel_init前     //start.S line284-287
@@ -85,11 +85,10 @@
 
 2.5.8.2、再次判断当前地址以决定是否重定位
 	(1)第二次判断程序运行在sram还是在ddr     // need relocate?
-	(2)重定位: 冷启动时加载sd卡的前8KB在sram中运行, uboot的第二部分(整个uboot.bin)在sd卡中
-		uboot第一阶段完成必要初始化, 运行结束之前把第二部分加载到ddr的链接地址处0x33E0_0000
-		加载过程就叫重定位
-	//默认sd卡启动, inand中uboot被破坏 -- SD Checksum Error
-	//默认USB启动, -- print?
+	(2)重定位: 	冷启动时加载sd卡的前8KB在sram中运行, uboot的第二部分(整个uboot.bin)在sd卡中
+				uboot第一阶段完成必要初始化, 运行结束之前把第二部分加载到ddr的链接地址处0x33E0_0000
+	
+	// 默认sd卡启动, inand(SD通道0)中uboot被破坏 -- SD Checksum Error
 	
 	// second boot: SD卡的channel2
 
@@ -186,6 +185,8 @@
 
 2.5.13.1、再次设置栈      // U_BOOT_BASE 0x33e0_0000 or 0xc3e0_0000
 	(1)第三次设置栈(in ddr appropriate location): 设置在/*uboot起始地址*//*上方2MB处*/
+	
+	// line405-415 clear_bss	-- bss in ddr
 
 2.5.13.3 ldr	pc, _start_armboot
 	(1)void start_armboot(void): ./lib_arm/board.c		//这个函数开始uboot的第二阶段(uboot boundary)

@@ -74,8 +74,12 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
 #endif
 
 	/* find kernel entry point */
-	if (images->legacy_hdr_valid) {
+	if (images->legacy_hdr_valid)
+    {
 		ep = image_get_ep (&images->legacy_hdr_os_copy);
+    
+        printf("#####bootm.c -- do_bootm_linux() kernel entry point %ld\n", ep);
+
 #if defined(CONFIG_FIT)
 	} else if (images->fit_uname_os) {
 		ret = fit_image_get_entry (images->fit_hdr_os,
@@ -85,14 +89,18 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
 			goto error;
 		}
 #endif
-	} else {
+	}
+    else
+    {
 		puts ("Could not find kernel entry point!\n");
 		goto error;
 	}
-	theKernel = (void (*)(int, int, uint))ep;
+	
+    theKernel = (void (*)(int, int, uint))ep;
 
 	s = getenv ("machid");
-	if (s) {
+	if (s)
+    {
 		machid = simple_strtoul (s, NULL, 16);
 		printf ("Using machid 0x%x from environment\n", machid);
 	}
@@ -157,6 +165,7 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
 
 	theKernel (0, machid, bd->bi_boot_params);
 	/* does not return */
+
 	return;
 
 error:

@@ -31,9 +31,11 @@ cp -f uboot/common/main.c /home/aston/src/uboot/common/main.c
 # command.c	-- find_cmd()
 cp -f uboot/common/command.c /home/aston/src/uboot/common/command.c
 
-# cmd_bootm.c -- for do_bootm()
+# cmd_bootm.c -- for do_bootm() image addr
 cp -f uboot/common/cmd_bootm.c /home/aston/src/uboot/common/cmd_bootm.c
 
+# bootm.c -- for do_bootm_linux() kernel entry pointe
+cp -f uboot/lib_arm/bootm.c /home/aston/src/uboot/lib_arm/bootm.c
 ############################################################################
 
 
