@@ -266,8 +266,7 @@ void env_relocate (void)
 	 */
     printf("#####func@env_relocate() env_ptr init value = %p\n", env_ptr);
     
-	env_ptr = (env_t *)malloc (CFG_ENV_SIZE);
-	DEBUGF ("%s[%d] malloced ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
+	env_ptr = (env_t *)malloc(CFG_ENV_SIZE);
 	printf ("%s[%d] malloced ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
 #endif
 

@@ -65,14 +65,20 @@ struct mmc *find_mmc_device(int dev_num)
 	struct mmc *m;
 	struct list_head *entry;
 
-	list_for_each(entry, &mmc_devices) {
+	list_for_each(entry, &mmc_devices)
+    {
 		m = list_entry(entry, struct mmc, link);
 
 		if (m->block_dev.dev == dev_num)
-			return m;
+        {
+            printf("MMC Device %d has found, m = %p, m->block_dev.dev = %d\n", dev_num, m, m->block_dev.dev);
+            
+            return m;
+        }
 	}
-
+    
 	printf("MMC Device %d not found\n", dev_num);
+    printf("m = %p, m->block_dev.dev = %d\n", m, m->block_dev.dev);
 
 	return NULL;
 }
@@ -1192,7 +1198,11 @@ int mmc_initialize(bd_t *bis)
 #ifdef CONFIG_CHECK_X210CV3
 	mmc = find_mmc_device(1);//lqm
 #else
+
 	mmc = find_mmc_device(0);
+
+    mmc = find_mmc_device(2);    // for detect SD card
+
 #endif
 	if (mmc)
     {

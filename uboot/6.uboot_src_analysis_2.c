@@ -1,5 +1,4 @@
 
-2.6.1.start_armboot		// 整个函数构成了uboot启动的第二阶段
 2.6.1.3、宏观分析：uboot第二阶段应该做什么
 	(1)uboot step1: 主要初始化了SoC内部的一些部件(看门狗、时钟), 然后初始化ddr并且完成重定位
 	(2)uboot step2: init SoC板级硬件(iNand、网卡芯片等), uboot本身的一些东西(uboot的命令、环境变量等)
@@ -8,13 +7,6 @@
 2.6.1.4、思考：uboot第二阶段完结于何处
 	(2)如果用户没有干涉则会执行bootcmd进入自动启动内核流程, uboot执行完毕
 	(3)uboot的命令行是一个死循环, 循环体内不断重复: 接收命令, 解析命令, 执行命令
-
-2.6.2.1、init_fnc_t
-	(1)typedef int (init_fnc_t) (void)		// 函数类型  -- init_fnc_t *init_sequence[] = {}
-	(2)init_fnc_t **init_fnc_ptr			// 二重指针  -> 指针数组 
-											// 干掉一个 * -- init_fnc_t *init_sequence[]
-		// 二重函数指针: ①指向一重指针, ②指向指针数组
-		// 一般将二重指针理解为指针数组
 
 2.6.2.2、DECLARE_GLOBAL_DATA_PTR   			// 结构体指针会不会重复定义? -- 这是一个declare
 	(1)#define DECLARE_GLOBAL_DATA_PTR     register volatile gd_t *gd asm ("r8")	//gd: global data
@@ -29,7 +21,7 @@
 	(7)栈区			// ↓
 
 	// (5) (6) (7) 调节顺序 -- board.c start_armboot() line530
-	
+
 	// CFG_UBOOT_BASE	0xC3E0_0000
 	// CFG_UBOOT_SIZE	2*1024*1024
 
@@ -42,7 +34,14 @@
 
 	//compile optimization barrier: 内存间隔, 为了防止高版本的gcc的优化造成错误
 
-2.6.4.1、执行init_sequence
+2.6.4.1、init_sequence与init_fnc_t
+
+	(1)typedef int (init_fnc_t) (void)		// 函数类型  -- init_fnc_t *init_sequence[] = {}
+	(2)init_fnc_t **init_fnc_ptr			// 二重指针  -> 指针数组 
+											// 干掉一个 * -- init_fnc_t *init_sequence[]
+	// 二重函数指针: ①指向一重指针, ②指向指针数组 -- 指向数组
+	// 一般将二重指针理解为指针数组
+
 	(1)init_fnc_t *init_sequence[]	//函数指针数组 -- init_fnc_t *
 	(3)init_fnc_t **init_fnc_ptr	//二重函数指针 -- init_fnc_t **		init_fnc_ptr 指向 init_sequence	
 
@@ -51,13 +50,12 @@
 
 2.6.4.2、board_init
 	(1)eth init: config controller's gpio, controller control regs
-	(2)gd->bd->bi_arch_number		// board机器码 -- 内核启动前检验uboot传参中的机器码, 判断是否启动
-	(3)gd->bd->bi_boot_params		// uboot给内核启动时的传参地址(字符串首地址0x3000_0100), bootargs
+	(2)gd->bd->bi_arch_number		// board mac id
+	(3)gd->bd->bi_boot_params
 
-	// pc机设备 标准化
-	// 嵌入式设备 定制化 软硬件可裁剪
+	// PC机设备标准化, 嵌入式设备定制化软硬件可裁剪
 	// 强制类型转换给内存地址赋值  	指针 -> 变量(内存)
-	// 实例化: 		 				类 -> 对象
+	// 实例化: 		 				类   -> 对象
 	// 控制台是基于串口, 控制台可以实现标准输入输出
 	// hang()/*挂起*/
 
@@ -67,18 +65,19 @@
 	(2)软件初始化: 软件架构中一些ddr相关的属性配置, 地址设置
 		// uboot&&linux如何获取当前系统内存相关信息, 如: 内存数量, 内存总容量, 起始地址等
 		①: x210_sd.h中用宏定义指明, 然后uboot直接使用这些信息
-		②: 类似于PC的bios通过读取硬件信息来确定
+		②: 类似于PC的BIOS通过读取硬件信息来确定
 
 2.6.4.4、interrupt_init
 		(1)TIM4 init
 			read_reg -> r,m,p,s -> get_pllclk() -> get_hclk -> get_pclk() -> timer_load_val
 
 2.6.6.2、env_init
-	(1)uboot支持各种不同的启动介质(norflash、nandflash、inand、sd卡...), 因此有多个env_init()
 	(2)这个函数只是对/*内存*/里维护的那一份uboot的env做了基本的初始化	// judge valid or not -- no
 	   当前env没有从SD卡到DDR中的relocate/*only relocate firmware*/	    // -- current env invalid
 	(4)在start_armboot函数中(line776)调用env_relocate(), 进行env从SD卡中到DDR中的重定位
 		重定位之后需要环境变量时才可以从DDR中去取, 重定位之前如果要使用环境变量只能从SD卡中去读取 -- // ?
+
+		// only relocate uboot.bin not relocate env.bin
 
 2.6.7.1、init_baudrate
 	(2)getenv_r函数用来读取环境变量的值	// 读取到的为string类型而不是int类型 -- simple_strtoul() -- // ?
@@ -121,29 +120,13 @@
 	// bl2_position=9
 	// uboot_position=57
 
-	// 改的内容不涉及到Makefile 不涉及到 x210_sd.h 则直接make可以
-
 2.6.10.1、dram_init
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;		// 记录当前开发板ddr配置信息
 	gd->bd->bi_dram[0].size  = PHYS_SDRAM_1_SIZE; 
 
 2.6.10.2、display_dram_config	// print dram config info
 
-2.6.10.3、init_sequence总结
-	(1) 板级硬件的初始化
-		eth init(gpio)、Timer4 init(10ms)
-	(2) gd成员变量初始化
-		gd->bd->bi_arch_number	// machine code
-		gd->bd->bi_boot_params	// 内核传参首地址
-		gd->bd->bi_baudrate和gd->baudrate	// baudrate
-		gd->have_console设置为1		// console step1 init
-		gd->bd->bi_dram	// ddr config info init
-	(3) 其他打印信息
-
-2.6.11.1、CFG_NO_FLASH	// test macro in board.c
-	(1)NandFlash: nand;		NorFlash: flash
-	(2)flash_init: norflash init
-	   display_flash_config: print norflash config info		// Flash: 8MB
+	//	NandFlash: nand		NorFlash: flash
 
 2.6.11.2、CONFIG_VFD、CONFIG_LCD
 		uboot中自带的LCD显示的软件框架, 本次移植自己添加LCD显示相关代码
@@ -154,13 +137,10 @@
 	(3)mmc_initialize(): 初始化SoC内部的SD/MMC控制器		// ./drivers/mmc/mmc.c
 	(4)uboot对硬件的操作是移植linux内核中的驱动来实现		// ./drivers -- linux driver src
 	(5)mmc_initialize是具体硬件架构无关的一个MMC初始化函数
-		所有的使用了这套架构的代码都掉用这个函数来完成MMC的初始化。
+		所有的使用了这套架构的代码都掉用这个函数来完成MMC的初始化
 		mmc_initialize中再调用board_mmc_init和cpu_mmc_init来完成具体的硬件的MMC控制器初始化工作
 		// board层面sd卡控制器, usb外扩sd卡控制器芯片
-		// 210CPU内置sd卡控制器, 所以mmc_init就在CPU层面执行
-	(6)cpu_mmc_init在uboot/cpu/s5pc11x/cpu.c
-		这里面又间接的调用了drivers/mmc/s3c_mmcxxx.c中的驱动代码来初始化硬件MMC控制器
-		// uboot/soc/s5pc11x/cpu.c
+		// x210CPU内置sd卡控制器, 所以mmc_init就在CPU层面执行
 
 // uboot本身没有单独实现驱动
 // uboot是裸机程序使用物理地址, Linux使用虚拟地址, 理论上uboot不能使用Linux中的驱动
@@ -169,55 +149,39 @@
 // drivers/mmc 通用mmc控制器驱动 mmc.h是核心文件linux mmc mtd驱动架构
 
 2.6.13.1、env_relocate		// env is embeded in text segment  -- warning: text segment will copy to ddr
-	(1)env_relocate: 环境变量重定位 //将环境变量从SD卡读取到DDR中
-	(2)环境变量存储位置:
-		SD卡中有8个独立的扇区作为环境变量存储区域（4KB）
+		
+	(2) flash中有8个独立的扇区作为环境变量存储区域(4KB)
 		烧录/部署系统时, 烧录(uboot、kernel、rootfs), 没有烧录env分区
-		烧录/部署完系统第一次启动时ENV分区是空的
-		第一次从SD卡加载环境变量(必然)失败, uboot加载内部default env(in text segment)
-		整个uboot在运行时都加载到ddr中, 此时default env也在ddr中
-		然后被写入(可能是saveenv时写入, 也可能是第一次读取默认环境变量后就被写入到SD卡的ENV分区)
-		以后上电初始化时读取就OK
-	(3)真正的从SD卡到DDR中重定位ENV的代码是在env_relocate_spec内部的movi_read_env完成的
-	
-	-- env_relocate()
+		第一次启动时flash中env分区为空, 加载flash中env失败, uboot加载内部default env
+
+		// flash中env分区是如何填充 	-- saveenv or auto?
+
+	-- env_relocate()	// 环境变量重定位到ddr中
 	  |
 	  | -- env_ptr = (env_t *)malloc (CFG_ENV_SIZE)
 	  |
 	  | -- env_relocate_spec()
+		 |
+		 | -- env_relocate_spec_movinand()
+		    |
+			| -- movi_read_env(virt_to_phys(env_ptr))	// assign value env_ptr
+			|
+			| -- if (crc32(0, env_ptr->data, ENV_SIZE) != env_ptr->crc)	// crc exe error
+			   |
+		       | -- use_default()
 	  |
-	  | -- gd->env_addr = (uint32_t)&(env_ptr->data)
-	
-
-	// set_default_env()	// default_environment in config_sd.h  -- 已经加载一次修改该文件没有效果
-	// env_movi.c
-
-	// dataflash
+	  | -- gd->env_addr = (uint32_t)&(env_ptr->data)		// 索引env -- gd->env_addr
 
 2.6.14.1、IP地址、MAC地址的确定
-	(1) 设备的ip地址在gd->bd->bi_ip_addr中维护, 来源于环境变量ipaddr
-		getenv获取ip地址字符串格式, string_to_ip转化为点分十进制(仍是字符串)	// 都是ASCII码形式
-		// x210_sd.h中配置的是默认环境变量
 
-2.6.14.2、devices_init
-	(1)devices_init看名字就是设备的初始化。这里的设备指的就是开发板上的硬件设备。
-		放在这里初始化的设备都是驱动设备，这个函数本来就是从驱动框架中衍生出来的。
-		uboot中很多设备的驱动是直接移植linux内核的（譬如网卡、SD卡），
-		linux内核中的驱动都有相应的设备初始化函数。
-		linux内核在启动过程中就有一个devices_init(名字不一定完全对，但是差不多)，
-		作用就是集中执行各种硬件驱动的init函数。
-	(2)uboot的这个函数其实就是从linux内核中移植过来的，
-		它的作用也是去执行所有的从linux内核中继承来的那些硬件驱动的初始化函数。
+2.6.14.2、devices_init		// linux kernel启动的devices_init
 
-2.6.14.3、jumptable_init
-	(1)jumptable跳转表，本身是一个函数指针数组，里面记录了很多函数的函数名。
-		看这阵势是要实现一个函数指针到具体函数的映射关系，
-		将来通过跳转表中的函数指针就可以执行具体的函数。
-		这个其实就是在用C语言实现面向对象编程。在linux内核中有很多这种技巧。
-	(2)通过分析发现跳转表只是被赋值从未被引用，因此跳转表在uboot中根本就没使用。
-	
+	//集中执行各种硬件设备的驱动的init函数
+
+2.6.14.3、jumptable_init	// no use
+
 	// C语言是非面向对象的，但是C语言编写的Linux内核是面向对象的
-	
+
 2.6.15.start_armboot解析13
 2.6.15.1、console_init_r
 (1)console_init_f是控制台的第一阶段初始化，console_init_r是第二阶段初始化。
@@ -228,41 +192,24 @@
 所以用不用console实际并没有什么分别。
 （在linux内console就可以提供缓冲机制等不用console不能实现的东西）。
 
-2.6.15.2、enable_interrupts
-(1)看名字应该是中断初始化代码。这里指的是CPSR中总中断标志位的使能。
-(2)因为我们uboot中没有使用中断，因此没有定义CONFIG_USE_IRQ宏，因此我们这里这个函数是个空壳子。
-(3)uboot中经常出现一种情况就是根据一个宏是否定义了来条件编译决定是否调用一个函数内部的代码。
-uboot中有2种解决方案来处理这种情况：
-方案一：在调用函数处使用条件编译，然后函数体实际完全提供代码。
-方案二：在调用函数处直接调用，然后在函数体处提供2个函数体，一个是有实体的一个是空壳子，
-用宏定义条件编译来决定实际编译时编译哪个函数进去。
+2.6.15.2、enable_interrupts		// no use, uboot not use irq
 
 2.6.15.3、loadaddr、bootfile两个环境变量
-(1)这两个环境变量都是内核启动有关的，在启动linux内核时会参考这两个环境变量的值。
+	// 这两个环境变量都是内核启动有关的，在启动linux内核时会参考这两个环境变量的值。
 
-2.6.15.4、board_late_init
-(1)看名字这个函数就是开发板级别的一些初始化里比较晚的了，就是晚期初始化。
-所以晚期就是前面该初始化的都初始化过了，剩下的一些必须放在后面初始化的就在这里了。
-侧面说明了开发板级别的硬件软件初始化告一段落了。
-(2)对于X210来说，这个函数是空的。
+2.6.15.4、board_late_init	// no use
 
-2.6.16.start_armboot解析14
 2.6.16.1、eth_initialize
-(1)看名字应该是网卡相关的初始化。这里不是SoC与网卡芯片连接时SoC这边的初始化，而是网卡芯片本身的一些初始化。
-(2)对于X210（DM9000）来说，这个函数是空的。X210的网卡初始化在board_init函数中，网卡芯片的初始化在驱动中。
+(1)看名字应该是网卡相关的初始化。这里不是SoC与网卡芯片连接时SoC这边的初始化，而是网卡芯片本身的一些初始化
+(2)对于X210（DM9000）来说，这个函数是空的。X210的网卡初始化在board_init函数中，网卡芯片的初始化在驱动中
 
-2.6.16.2、x210_preboot_init（LCD和logo显示）
-(1)x210开发板在启动起来之前的一些初始化，以及LCD屏幕上的logo显示。
+	// 	IDE接口硬盘
 
-2.6.16.3、check menukey to update from sd
-(1)uboot启动的最后阶段设计了一个自动更新的功能。就是：我们可以将要升级的镜像放到SD卡的固定目录中，然后开机时在uboot启动的最后阶段检查升级标志（是一个按键。按键中标志为"LEFT"的那个按键，这个按键如果按下则表示update mode，如果启动时未按下则表示boot mode）。如果进入update mode则uboot会自动从SD卡中读取镜像文件然后烧录到iNand中；如果进入boot mode则uboot不执行update，直接启动正常运行。
-(2)这种机制能够帮助我们快速烧录系统，常用于量产时用SD卡进行系统烧录部署。
+2.6.16.2、x210_preboot_init(LCD和logo显示)	//start_armboot解析14
 
-2.6.16.4、死循环
-(1)解析器
-(2)开机倒数自动执行
-(3)命令补全
+2.6.16.3、check menu key to update from sd		// SD量产卡
 
+2.6.16.4、main_loop
 
 (1)第二阶段主要是对开发板级别的硬件、软件数据结构进行初始化。
 

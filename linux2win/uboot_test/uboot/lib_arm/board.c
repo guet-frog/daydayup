@@ -585,7 +585,7 @@ void start_armboot (void)
 	else
 	{
 		puts ("[LEFT UP] boot mode\n");
-	}		
+	}
 
 	/* main_loop() can return to retry autoboot, if so just run it again. */
 	for (;;)

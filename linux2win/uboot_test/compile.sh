@@ -36,6 +36,10 @@ cp -f uboot/common/cmd_bootm.c /home/aston/src/uboot/common/cmd_bootm.c
 
 # bootm.c -- for do_bootm_linux() kernel entry pointe
 cp -f uboot/lib_arm/bootm.c /home/aston/src/uboot/lib_arm/bootm.c
+
+# mmc.c -- for test mmc init(SD card init?)
+# find_mac_device() -- printf
+cp -f uboot/drivers/mmc/mmc.c /home/aston/src/uboot/drivers/mmc/mmc.c
 ############################################################################
 
 

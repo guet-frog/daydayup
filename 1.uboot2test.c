@@ -89,6 +89,10 @@
 
 	// eat leading white space
 	// for (p = commandline; *p == ' '; p++);
+	
+	// set uboot env && save in inand, then download uboot && exe print command
+	
+	// setenv(stdio_names[i], stdio_devices[i]->name)
 
 
 
