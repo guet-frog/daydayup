@@ -86,7 +86,7 @@
 
 	(2)以mmc驱动为例来分析各个文件的作用：
 		uboot/drivers/mmc/mmc.c：本文件的主要内容是和MMC卡操作有关的方法，譬如MMC卡设置空闲状态的、卡读写数据等。
-			但是本文件中并没有具体的硬件操作函数，操作最终指向的是struct mmc结构体中的函数指针，
+			/*但是本文件中并没有具体的硬件操作函数*/，操作最终指向的是struct mmc结构体中的函数指针，
 			这些函数指针是在驱动构建的时候和真正硬件操作的函数挂接的（真正的硬件操作的函数在别的文件中）。
 		uboot/drivers/mmc/s3c_hsmmc.c:本文件中是SoC内部MMC控制器的硬件操作的方法，譬如向SD卡发送命令的函数（s3c_hsmmc_send_command），
 			譬如和SD卡读写数据的函数（s3c_hsmmc_set_ios），这些函数就是具体操作硬件的函数，也就是mmc.c中需要的那些硬件操作函数。
@@ -102,7 +102,7 @@
 			因为这里面的2个函数（setup_hsmmc_clock和setup_hsmmc_cfg_gpio）都是和SoC有关的初始化函数，这两个函数不能放到drivers目录下去。
 			实际上如果非把这两个函数放在uboot/drivers/mmc/s3c_hsmmc.c文件中也凑活能说过去。
 
-
+	// 将驱动设备抽象为结构体
 
 
 
