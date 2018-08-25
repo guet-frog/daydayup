@@ -245,52 +245,13 @@ void set_default_env(void)
 
 void env_relocate (void)
 {
-	DEBUGF ("%s[%d] offset = 0x%lx\n", __FUNCTION__, __LINE__, gd->reloc_off);
-    printf("%s[%d] offset = 0x%lx\n", __FUNCTION__, __LINE__, gd->reloc_off);
-
-#ifdef CONFIG_AMIGAONEG3SE
-	enable_nvram();
-#endif
-
-#ifdef ENV_IS_EMBEDDED
-	/*
-	 * The environment buffer is embedded with the text segment,
-	 * just relocate the environment pointer
-	 */
-	env_ptr = (env_t *)((ulong)env_ptr + gd->reloc_off);
-	DEBUGF ("%s[%d] embedded ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
-	printf ("%s[%d] embedded ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
-#else
-	/*
-	 * We must allocate a buffer for the environment
-	 */
-    printf("#####func@env_relocate() env_ptr init value = %p\n", env_ptr);
-    
+	// We must allocate a buffer for the environment
 	env_ptr = (env_t *)malloc(CFG_ENV_SIZE);
-	printf ("%s[%d] malloced ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
-#endif
+	printf ("#####%s[%d] malloced ENV at %p\n", __FUNCTION__,__LINE__,env_ptr);
 
-	if (gd->env_valid == 0)
-	{
-#if defined(CONFIG_GTH)	|| defined(CFG_ENV_IS_NOWHERE)	/* Environment not changable */
-		puts ("Using default environment\n\n");
-#else
-		puts ("*** Warning - bad CRC, using default environment\n\n");
-		show_boot_progress (-60);
-#endif
-		set_default_env();
-		printf("#####gd->env_valid == 0\n");
-	}
-	else
-	{
-		printf("#####gd->env_valid == 1\n");
-		env_relocate_spec ();
-	}
+	env_relocate_spec ();
+
 	gd->env_addr = (ulong)&(env_ptr->data);
-
-#ifdef CONFIG_AMIGAONEG3SE
-	disable_nvram();
-#endif
 }
 
 #ifdef CONFIG_AUTO_COMPLETE

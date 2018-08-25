@@ -195,12 +195,14 @@ mmc_bwrite(int dev_num, ulong start, lbaint_t blkcnt, const void *src)
 
 ulong movi_write(ulong start, lbaint_t blkcnt, void *src)
 {
-	return mmc_bwrite(0, start, blkcnt, src);
+	//return mmc_bwrite(0, start, blkcnt, src);
+	return mmc_bwrite(2, start, blkcnt, src);		// for saveenv test 2018-8-25 23:01:01
 }
 
 ulong movi_read(ulong start, lbaint_t blkcnt, void *dst)
 {
-	return mmc_bread(0, start, blkcnt, dst);
+	//return mmc_bread(0, start, blkcnt, dst);
+	return mmc_bread(2, start, blkcnt, dst);		// for test read env
 }
 
 int mmc_go_idle(struct mmc *host)
@@ -1201,7 +1203,7 @@ int mmc_initialize(bd_t *bis)
 
 	mmc = find_mmc_device(0);
 
-    mmc = find_mmc_device(2);    // for detect SD card
+    //mmc = find_mmc_device(2);    // error 2018-8-25 19:30:03
 
 #endif
 	if (mmc)
