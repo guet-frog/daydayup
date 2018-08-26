@@ -78,7 +78,7 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
     {
 		ep = image_get_ep (&images->legacy_hdr_os_copy);
     
-        printf("#####bootm.c -- do_bootm_linux() kernel entry point %ld\n", ep);
+        printf("#####bootm.c -- do_bootm_linux() kernel entry point %#x\n", ep);
 
 #if defined(CONFIG_FIT)
 	} else if (images->fit_uname_os) {
@@ -102,7 +102,7 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
 	if (s)
     {
 		machid = simple_strtoul (s, NULL, 16);
-		printf ("Using machid 0x%x from environment\n", machid);
+		printf ("#####Using machid 0x%x from environment\n", machid);
 	}
 
 	ret = boot_get_ramdisk (argc, argv, images, IH_ARCH_ARM,
@@ -123,7 +123,7 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
     defined (CONFIG_LCD) || \
     defined (CONFIG_VFD) || \
     defined (CONFIG_MTDPARTITION)
-	setup_start_tag (bd);
+	setup_start_tag (bd);               // struct{struct{} + union{}}   -- 统一封装结构体
 #ifdef CONFIG_SERIAL_TAG
 	setup_serial_tag (&params);
 #endif

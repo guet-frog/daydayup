@@ -205,15 +205,15 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
     {
 		addr = simple_strtoul(argv[1], NULL, 16);   // addr in argv[1]
 
-        printf("*  kernel: cmdline image address = 0x%08lx\n", addr);
+        printf("#####*  kernel: cmdline image address = 0x%08lx\n", addr);
 	}
 
 	if (*(ulong *)(addr + 9*4) == LINUX_ZIMAGE_MAGIC)
     {
-		printf("Boot with zImage\n");
+		printf("#####Boot with zImage\n");
 		addr = virt_to_phys(addr);
-		hdr = (image_header_t *)addr;
-		hdr->ih_os = IH_OS_LINUX;
+		hdr = (image_header_t *)addr;   // 编译链接kernel时, 需要留出image_header的位置
+		hdr->ih_os = IH_OS_LINUX;       // not necessary, hdr is local
 		hdr->ih_ep = ntohl(addr);
         
 		memmove (&images.legacy_hdr_os_copy, hdr, sizeof(image_header_t));

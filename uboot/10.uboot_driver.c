@@ -18,7 +18,7 @@
 
 	(4)mmc_devices链表全局变量, 用来记录系统中所有已经注册的SD/iNand设备
 		所以向系统中插入一个SD卡/iNand设备, 则系统驱动就会向mmc_devices链表中插入一个数据结构表示这个设备
-		
+
 		// 给__def_mmc_init()起了一个别名 board_mmc_init()
 
 2.10.2.3、cpu_mmc_init		// uboot/cpu/s5pc11x/cpu.c
