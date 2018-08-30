@@ -10,10 +10,10 @@
 
 	2.2.1.3、典型嵌入式linux系统启动过程
 		(1)embedded system (deployment && boot) is refer to PC	// warning: system deployment(部署)
-		(2)嵌入式系统的部署: uboot程序部署在flash/*能作为启动设备的flash*/, OS在fLash, 内存cpu在掉电时不工作
+		(2)嵌入式系统的部署: uboot程序部署在flash/*能作为启动设备的flash*/, OS在flash, 内存cpu在掉电时不工作
 		(3)启动过程: 嵌入式系统上电后先执行uboot, 然后uboot负责init ddr && flash
 						然后将OS从flash中读取到ddr中, 然后启动OS(OS启动后uboot就无用了)
-	//embedded system boot && pc system boot(BIOS->uboot, HardDisk->Flash)
+	//embedded system boot && pc system boot(BIOS->uboot, HardDisk->Flash)		// 准确来说 bios not uboot
 
 	2.2.1.4、android系统启动过程
 		(1)android系统的启动和linux系统几乎一样, 只是在内核启动后加载根文件系统后不同了
@@ -24,7 +24,7 @@
 		(2)uboot其他作用: 部署整个计算机系统, 操作flash等板子上硬盘的驱动, 提供一个命令行界面 
 
 	2.1.2.2、uboot的发展历程
-		(1)uboot: universal bootLoader
+		(1)uboot: universal bootloader
 		(2)事实上的业内bootloader标准, 大部分的嵌入式设备都会默认使用uboot来做为bootloader
 		(3)uboot版本号两种书写方式
 		(4)uboot的核心部分几乎没怎么变化, 越新的版本支持的开发板越多而已
@@ -133,7 +133,7 @@
         (3)movi read : flash -> ddr;
 		   movi write: ddr -> flash		// hardware: flash or ddr
 
-		(4)movi read  {u-boot | kernel} {addr}   
+		(4)movi read  {u-boot | kernel} {addr}
             一对大括号{}括起来的部分必选1个, 大括号中的竖线表是多选一
             中括号[]表示可选参数
 
@@ -144,12 +144,12 @@
             //uboot shell下默认是十六进制
 
     2.1.9.2、NandFlash操作指令nand
-        (1)理解方法和操作方法完全类似于movi指令  // -- mmc卡操作指令mmc ?
+        (1)理解方法和操作方法完全类似于movi指令  // -- mmc卡操作指令mmc ?  -- mmc卡, SD卡, inand卡应该相同
 
     2.1.9.3、内存操作指令：mm、mw、md
         (1)*/DDR中没有分区(只对硬盘、Flash进行分区)
             uboot裸机程序, 并不对内存进行管理
-			操作系统会所有内存, 系统负责分配和管理, 系统会保证内存不会随便越界	// 裸机注意内存地址使用
+			操作系统会管理所有内存, 系统负责分配和管理, 系统会保证内存不会随便越界	// 裸机注意内存地址使用
             //思考: dnw(usb刷机时)uboot放在0x23E0_0000地址处
             uboot中实际链接地址在0x30000000中(可能使uboot中开启了虚拟地址映射)
             1. uboot中源码对内存地址的处理方式 2. 虚拟地址映射表, 如何建立页表映射
@@ -160,7 +160,7 @@
 
     2.1.9.4、启动内核指令：bootm、go	// -- command: bootm
         (1)uboot的革命理想: 启动内核, 启动内核在uboot中表现为一个指令(never get back)
-        
+
 		(2)差别: bootm启动内核同时给内核传参, 而go命令启动内核不传参
                  go命令内部其实就是一个函数指针指向一个内存地址然后直接调用那个函数	// CR600 bootloader jump
                  go命令的实质就是PC直接跳转到一个内存地址去运行
@@ -175,7 +175,7 @@
 
     2.1.10.4网络设置：ipaddr、serverip 
         (1)ipaddr
-        (2)serverip is for tftp指令
+        (2)serverip		// for tftp instruction
         (3)gatewayip
         (4)netmask
         (5)ethaddr
@@ -195,10 +195,10 @@
         (2)uboot的环境变量中/*设置bootargs*/ 然后bootm命令启动kernel时会/*自动将bootargs传给kernel*/
 
         (3) 'bootargs=console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3'
-            'console=ttySAC2,115200'	控制台使用串口2, 波特率115200
-            'root=/dev/mmcblk0p2 rw'	rootfs在SD卡端口0设备(iNand)第2分区, 根文件系统是可读可写
-            'init=/linuxrc'			    linux的进程1(init进程)的路径
-            'rootfstype=ext3'			根文件系统的类型是ext3
+            'console=ttySAC2,115200'	// 控制台(console)		: UART2, 115200
+            'root=/dev/mmcblk0p2 rw'	// 根文件系统(rootfs)	: SD卡端口0 设备(iNand)第2分区, 根文件系统可读可写
+            'init=/linuxrc'			    // linux的进程1(init进程)的路径
+            'rootfstype=ext3'			// 根文件系统的类型是ext3
 
         (4)内核传参很重要(不传参或传参错误导致内核启动失败)
 
@@ -211,7 +211,7 @@
 
 2.1.12.uboot中对Flash和DDR的管理
 	2.1.12.1、uboot阶段Flash的分区
-		(1)分区: flash进行分块管理 // uboot var kernel rootfs
+		(1)分区: flash进行分块管理 // uboot env kernel rootfs
 
 		(2)PC整个硬盘由OS统一管理, OS使用文件系统管理硬盘空间
 
@@ -225,7 +225,7 @@
 			环境变量: 环境变量分区一般紧贴着uboot来存放, 大小为32KB或者更多一点
 			kernel：kernel大小一般为3MB或5MB
 			rootfs：······
-			剩下的就是自由分区, 一般kernel启动后将自由分区挂载到rootfs下使用
+			剩下的就是/*自由分区*/, 一般kernel启动后将自由分区挂载到rootfs下使用
 
 		总结:
 			(1)各分区彼此相连
@@ -238,7 +238,7 @@
 2.1.12.2、uboot阶段DDR的分区
 	(3)内存分区关键就在于内存中哪一块用来干什么必须分配好
 		以避免各个不同功能使用了同一块内存造成的互相踩踏
-		譬如: tftp 0x23E00000 zImage error //uboot image in here
+		譬如: tftp 0x23E00000 zImage // error: uboot image in here
 
 
 

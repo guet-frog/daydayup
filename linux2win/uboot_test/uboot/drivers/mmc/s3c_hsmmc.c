@@ -472,7 +472,7 @@ int smdk_s3c_hsmmc_init(void)
 	err = s3c_hsmmc_initialize(2);
 	if(err)
 		return err;
-#endif	
+#endif
 
 #ifdef USE_MMC3
 	err = s3c_hsmmc_initialize(3);
