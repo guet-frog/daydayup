@@ -571,7 +571,7 @@ wait_orwb:
 
 #ifdef CONFIG_ENABLE_MMU
 
-	#ifdef CONFIG_MCP_SINGLE
+#ifdef CONFIG_MCP_SINGLE
 /*
  * MMU Table for SMDKC110
  * 0x0000_0000 -- 0xBFFF_FFFF => Not Allowed

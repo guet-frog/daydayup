@@ -12,7 +12,7 @@
 	(1)#define DECLARE_GLOBAL_DATA_PTR     register volatile gd_t *gd asm ("r8")	//gd: global data
 
 2.6.3.2¡¢ÄÚ´æÅÅ²¼
-	(1)uboot code	// | 0xC3E0_0000
+	(1)uboot code	// | 0xC3E0_0000	// #define CONFIG_MEMORY_UPPER_CODE
 	(2)reserved		// |
 	(3)bd			// |
 	(4)gd			// | addr
