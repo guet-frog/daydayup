@@ -54,7 +54,7 @@
 
 	 -- printf data段, bss段起始地址
 	 -- gcc编译不使用标准库
- 
+
 ============================================================================
 	 -- for test
 	// 烧录后sd中bin文件, 其中应该有两份重复的BL1
@@ -137,11 +137,11 @@ uart.bin: start.o led.o uart.o speed.o main.o $(LIBPATH)/libgcc.a	// 链接静�
 
 ============================================================================
 	分析一个工程的源码是如何链接的 -- Makefile
-	
+
 	grep "0xc3e00000" * -nR
-	
+
 	grep "LDFLAGS" * -nR
-	
+
 	LDFLAGS += -Bstatic -T $(LDSCRIPT) $(PLATFORM_LDFLAGS)
 	ifneq ($(TEXT_BASE),)											# -Ttext	$(TEXT_BASE)
 	LDFLAGS += -Ttext $(TEXT_BASE)
@@ -159,7 +159,7 @@ uart.bin: start.o led.o uart.o speed.o main.o $(LIBPATH)/libgcc.a	// 链接静�
 
 	// 从nand启动，0地址对应的是memory			-- 可写
 	// 从norflash启动，0地址对应的是norflash    -- 不可写
-	
+
 ============================================================================
 	uboot启动内核: (1)从flash中读取内核
 						-- 分区表问题: 名称不重要，主要考虑到 addr + size
@@ -173,14 +173,14 @@ uart.bin: start.o led.o uart.o speed.o main.o $(LIBPATH)/libgcc.a	// 链接静�
 	{
 		
 	}
-	
+
 	// PC硬盘有分区表, 换到任何PC可以使用
 	// 嵌入式flash没有分区表, 分区信息通过code中写死	-- 关心 分区地址+长度
-	
+
 	uImage = head + 内核		// head(load: 加载地址 ep: 入口地址)
 	// uImage的头部存在, image可以加载都memory中任意位置 -- 判断当前运行地址和加载地址是否相等
 	如果相等直接跳转到入口地址去执行
-	
+
 ============================================================================
 	(1)uboot如何启动kernel
 		|
@@ -203,7 +203,7 @@ vim多行删除: 命令模式下, 命令输入: 32,65d
 
 	// uboot执行fastboot命令: error：no MBR is found at SD/MMC
 	// 先fdisk -c 0去重新分区，然后再fastboot
-	
+
 ============================================================================ 2018-8-25 22:54:02
 
 	// 如何破坏flash中env分区
@@ -215,25 +215,5 @@ vim多行删除: 命令模式下, 命令输入: 32,65d
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	

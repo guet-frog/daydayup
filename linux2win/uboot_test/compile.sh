@@ -38,7 +38,7 @@ cp -f uboot/common/cmd_bootm.c /home/aston/src/uboot/common/cmd_bootm.c
 cp -f uboot/lib_arm/bootm.c /home/aston/src/uboot/lib_arm/bootm.c
 
 # mmc.c -- for test mmc init(SD card init?)
-# find_mac_device() -- printf
+# find_mmc_device() -- for test init mmc channel2
 # movi_write() -- mmc_bwrite(0, start, blkcnt, src) -- for test saveenv in channel2(SD)
 # movi_read() -- for test env relocate
 cp -f uboot/drivers/mmc/mmc.c /home/aston/src/uboot/drivers/mmc/mmc.c

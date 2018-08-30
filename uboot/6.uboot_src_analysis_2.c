@@ -149,7 +149,7 @@
 // drivers/mmc 通用mmc控制器驱动 mmc.h是核心文件linux mmc mtd驱动架构
 
 2.6.13.1、env_relocate		// env is embeded in text segment  -- warning: text segment will copy to ddr
-		
+
 	(2) flash中有8个独立的扇区作为环境变量存储区域(4KB)
 		烧录/部署系统时, 烧录(uboot、kernel、rootfs), 没有烧录env分区
 		第一次启动时flash中env分区为空, 加载flash中env失败, uboot加载内部default env
@@ -158,7 +158,7 @@
 
 	-- env_relocate()	// 环境变量重定位到ddr中
 	  |
-	  | -- env_ptr = (env_t *)malloc (CFG_ENV_SIZE)
+	  | -- env_ptr = (env_t *)malloc(CFG_ENV_SIZE)
 	  |
 	  | -- env_relocate_spec()
 		 |
@@ -182,15 +182,14 @@
 
 	// C语言是非面向对象的，但是C语言编写的Linux内核是面向对象的
 
-2.6.15.start_armboot解析13
 2.6.15.1、console_init_r
-(1)console_init_f是控制台的第一阶段初始化，console_init_r是第二阶段初始化。
-实际上第一阶段初始化并没有实质性工作，第二阶段初始化才进行了实质性工作。
-(3)console_init_r就是console的纯软件架构方面的初始化
-（说白了就是去给console相关的数据结构中填充相应的值），所以属于纯软件配置类型的初始化。
-(4)uboot的console实际上并没有干有意义的转化，它就是直接调用的串口通信的函数。
-所以用不用console实际并没有什么分别。
-（在linux内console就可以提供缓冲机制等不用console不能实现的东西）。
+	(1)console_init_f是控制台的第一阶段初始化，console_init_r是第二阶段初始化
+		实际上第一阶段初始化并没有实质性工作，第二阶段初始化才进行了实质性工作
+	(3)console_init_r就是console的纯软件架构方面的初始化
+		说白了就是去给console相关的数据结构中填充相应的值，所以属于纯软件配置类型的初始化
+	(4)uboot的console实际上并没有干有意义的转化，它就是直接调用的串口通信的函数
+		所以用不用console实际并没有什么分别
+		在linux内console就可以提供缓冲机制等不用console不能实现的东西
 
 2.6.15.2、enable_interrupts		// no use, uboot not use irq
 
@@ -203,7 +202,7 @@
 (1)看名字应该是网卡相关的初始化。这里不是SoC与网卡芯片连接时SoC这边的初始化，而是网卡芯片本身的一些初始化
 (2)对于X210（DM9000）来说，这个函数是空的。X210的网卡初始化在board_init函数中，网卡芯片的初始化在驱动中
 
-	// 	IDE接口硬盘
+	// IDE接口硬盘
 
 2.6.16.2、x210_preboot_init(LCD和logo显示)	//start_armboot解析14
 
@@ -257,30 +256,14 @@
 		|
 		| -- display_dram_config()	// printf ddr config_info(size)
 		
-	mem_malloc_init		初始化uboot自己维护的堆管理器的内存
-	mmc_initialize		inand/SD卡的SoC控制器和卡的初始化
-	env_relocate		环境变量重定位
-	gd->bd->bi_ip_addr	gd数据结构赋值
-	gd->bd->bi_enetaddr	gd数据结构赋值
-	devices_init		空的
-	jumptable_init		不用关注的
-	console_init_r		真正的控制台初始化
-	enable_interrupts	空的
-	loadaddr、bootfile 	环境变量读出初始化全局变量
-	board_late_init		空的
-	eth_initialize		空的
-	x210_preboot_init	LCD初始化和显示logo
-	check_menu_update_from_sd	检查自动更新
-	main_loop			主循环
-
 2.6.17.2、启动过程特征总结
-(1)第一阶段为汇编阶段、第二阶段为C阶段
-(2)第一阶段在SRAM中、第二阶段在DRAM中
-(3)第一阶段注重SoC内部、第二阶段注重SoC外部Board内部
+	(1)第一阶段为汇编阶段、第二阶段为C阶段
+	(2)第一阶段在SRAM中、第二阶段在DRAM中
+	(3)第一阶段注重SoC内部、第二阶段注重SoC外部Board内部
 
 2.6.17.3、移植时的注意点
-(1)x210_sd.h头文件中的宏定义
-(2)特定硬件的初始化函数位置（譬如网卡）
+	(1)x210_sd.h头文件中的宏定义
+	(2)特定硬件的初始化函数位置（譬如网卡）
 
 
 

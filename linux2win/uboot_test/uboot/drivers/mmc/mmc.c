@@ -64,21 +64,21 @@ struct mmc *find_mmc_device(int dev_num)
 {
 	struct mmc *m;
 	struct list_head *entry;
-
+    
 	list_for_each(entry, &mmc_devices)
     {
 		m = list_entry(entry, struct mmc, link);
-
+        
 		if (m->block_dev.dev == dev_num)
         {
-            printf("MMC Device %d has found, m = %p, m->block_dev.dev = %d\n", dev_num, m, m->block_dev.dev);
+            printf("#####MMC Device %d has found, m = %p, m->block_dev.dev = %d\n", dev_num, m, m->block_dev.dev);
             
             return m;
         }
 	}
     
-	printf("MMC Device %d not found\n", dev_num);
-    printf("m = %p, m->block_dev.dev = %d\n", m, m->block_dev.dev);
+	//printf("#####MMC Device %d not found\n", dev_num);
+    //printf("#####m = %p, m->block_dev.dev = %d\n", m, m->block_dev.dev);
 
 	return NULL;
 }
@@ -1200,11 +1200,7 @@ int mmc_initialize(bd_t *bis)
 #ifdef CONFIG_CHECK_X210CV3
 	mmc = find_mmc_device(1);//lqm
 #else
-
-	mmc = find_mmc_device(0);
-
-    //mmc = find_mmc_device(2);    // error 2018-8-25 19:30:03
-
+	mmc = find_mmc_device(0);       // entry param: device index
 #endif
 	if (mmc)
     {
@@ -1220,5 +1216,25 @@ int mmc_initialize(bd_t *bis)
 		}
 	}
 	printf("%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));
+
+// ======================================================   for channel 2 test
+    mmc = find_mmc_device(2);   // for channel 2
+
+	if (mmc)
+    {
+		err = mmc_init(mmc);
+		if (err)
+        {
+            err = mmc_init(mmc);
+        }
+		if (err)
+        {
+			printf("Card init fail!\n");
+			return err;
+		}
+	}
+	printf("%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));
+// ======================================================
+
 	return 0;
 }

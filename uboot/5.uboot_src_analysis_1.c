@@ -196,8 +196,7 @@
 
 // 链接时将start.s放在前8K
 // ddr中uboot的第一阶段永远不会执行 -- 在ddr中运行, 肯定是从start_armboot开始 -- test adr加载时, pc指针的值
--- 应该不会执行, reset的地址是一定的.
--- 但是还是不能确定在SD卡中是否有两份BL1 -- sd卡中两份bl1 -- sd_fusing脚本决定
+-- 应该不会执行, reset的地址是一定的
 
 2.5.13.4、总结：uboot的第一阶段做了哪些工作
 (1)构建异常向量表          // like mcu start.s

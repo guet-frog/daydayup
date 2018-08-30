@@ -499,7 +499,6 @@ void start_armboot (void)
 	puts("NAND:    ");
 	nand_init();
 #endif
-
 #endif /* CONFIG_X210 */
 
 	/* initialize environment */

@@ -1,101 +1,75 @@
 
 2.7.2.启动内核第一步：加载内核到DDR中
-	本节讲述系统部署细节参数和启动介质中的分区，这些是内核启动的第一阶段，目的是将内核镜像从启动介质中搬移到ddr中适当位置处。
+	本节讲述系统部署细节参数和启动介质中的分区，这些是内核启动的第一阶段，目的是将内核镜像从启动介质中搬移到ddr中适当位置处
 2.7.3.zImage和uImage的区别联系
-	本节开始介绍bootm命令，该命令实现从DDR内存中的内核镜像处启动。
-2.7.4.zImage启动细节
-	本节详细结束zImage镜像启动时do_bootm函数中对镜像头的校验
-2.7.5.uImage启动
-	本节讲解uImage启动和FDT方式启动，主要在于uImage启动时打印信息的流程讲解，通过分析让大家了解函数运行轨迹。
-2.7.6.do_bootm_linux函数
-	本节开始讲解uboot启动内核第三阶段，即do_bootm_linux函数。
-2.7.7.传参详解
-	本节详细介绍do_bootm_linux函数中的传参设计，目的是让大家进一步了解uboot向内核传递启动参数的技术细节。
-2.7.8.uboot启动内核的总结
-	本节对本课程做总结，重点是uboot启动内核的4个步骤。目的是让大家再次回顾整个启动过程，加深理解和印象。
-	
+	本节开始介绍bootm命令，该命令实现从DDR内存中的内核镜像处启动
+
 	// Cmd_bootm.c
 	// do_bootm()
 
-2.7.1.uboot和内核到底是什么
-	2.7.1.2、内核本身也是一个"裸机程序"
-		(2)操作系统运行起来后在软件上分为内核层和应用层, 分层后权限不同(内存访问和设备操作的管理)
-		   内核可以任意访问各种硬件, 而应用程序只能被限制的访问硬件和内存地址
-			//uboot镜像: u-boot.bin, linux系统的镜像: zImage, 本质上都是裸机程序镜像
+2.7.1.2、内核本身也是一个"裸机程序"
+	(2)操作系统运行起来后在软件上分为内核层和应用层, 分层后权限不同(内存访问和设备操作的管理)
+	   内核可以任意访问各种硬件, 而应用程序只能被限制的访问硬件和内存地址
+		//uboot镜像: u-boot.bin, linux系统的镜像: zImage, 本质上都是裸机程序镜像
 
-	2.7.1.3、部署在SD卡中特定分区内
-		(1)掉电时 : bootloader、kernel、rootfs等以/*镜像*/的形式存储在启动介质中的/*指定分区*/
-		   启动时 : 运行启动代码进行相关的硬件初始化和软件架构的建立, 加载镜像到ddr中, 最终达到运行时稳定状态
-		   运行时 : 在ddr中运行, 与存储介质无关
-			// uboot和kernel中的分区表必须一致，同时和SD卡的实际使用的分区要一致
+2.7.1.3、部署在SD卡中特定分区内
+	掉电时: bootloader、kernel、rootfs等以/*镜像*/的形式存储在启动介质中的/*指定分区*/
+	启动时: 运行启动代码进行相关的硬件初始化和软件架构的建立, 加载镜像到ddr中, 最终达到运行时稳定状态
+	运行时: 在ddr中运行, 与存储介质无关
+	// uboot和kernel中的分区表必须一致，同时和SD卡的实际使用的分区要一致
 
-	2.7.1.4、运行时必须先加载到DDR中/*链接地址处*/
-		(1)uboot在step1进行重定位将step2(整个uboot镜像)加载到ddr中	//uboot的链接地址0xc3e00000 -- MMU映射表
-		(2)uboot启动内核时将zImage加载到ddr中(重定位的过程)	//内核链接地址是0x30008000
+2.7.1.4、运行时必须先加载到DDR中/*链接地址处*/
+	(1)uboot在step1进行重定位将step2(整个uboot镜像)加载到ddr中	// uboot link addr:  0x33E0_0000 -- MMU映射表
+	(2)uboot启动内核时将zImage加载到ddr中(重定位的过程)			// kernel link addr: 0x3000_8000
 
-	2.7.1.5、内核启动需要必要的启动参数
-		(2)内核需要uboot进行重定位+提供启动参数		// uboot可以自启动或bootROM引导
+2.7.1.5、内核启动需要必要的启动参数
+	(2)内核启动需要: (1)image relocate (2)boot args		// uboot可以自启动或bootROM引导
 
-2.7.2.启动内核第一步：加载内核到DDR中
-	(1)uboot启动内核2个步骤: ①将内核镜像从存储介质中加载到DDR中, ②从DDR中启动内核镜像
-		//内核直接从链接地址处开始运行
+2.7.2.0、启动内核第一步：加载内核到DDR中				// kernel直接由link addr处开始运行
 
-	2.7.2.1、静态内核镜像在哪里？
-		(1)SD卡/iNand/Nand/NorFlash 	// raw分区
-			uboot读取命令: X210的iNand版本是movi命令, X210的Nand版本就是Nand命令
-		(2)	movi read kernel 0x30008000	// kernel分区
-		
-		// bootcmd ""
-		// bootm ""
+2.7.2.1、静态内核镜像在哪里？
+	(1)SD卡/iNand/Nand/NorFlash 		// raw分区
+		uboot读取命令: movie or nand
+	(2)	movi read kernel 0x30008000		// kernel分区
 
-	(2)tftp、nfs等网络下载方式从远端服务器获取镜像
-		uboot支持远程启动, 内核镜像放在主机的服务器中(远端)，启动时uboot通过网络从服务器中下载镜像到本地的DDR中。
+	// bootcmd ""
+	// bootm ""
 
-	分析总结：最终结果要的是内核镜像到DDR中特定地址即可，不管内核镜像是怎么到DDR中的。以上2种方式各有优劣。
-		产品出厂时会设置为从SD卡中启动（客户不会还要搭建tftp服务器才能用···）；
-		tftp下载远程启动这种方式一般用来开发。
-
-	2.7.2.2、镜像要放在DDR的什么地址？
-		(1)内核一定要放在链接地址处，链接地址去内核源代码的链接脚本或者Makefile中去查找。X210中是0x30008000。
+	(3)tftp、nfs等网络下载方式从远端服务器获取镜像		// uboot支持远程启动  -- 通过网络从server下载kernel
 
 	// 编译uboot load zImage  启动测试
 	// fastboot 命令 -- 查看分区起始地址 + 长度, 没有指明则默认接连上一个分区
-	// android 默认分区较多, 典型linux只有3个分区 BootLoader kernel rootfs
+	// android 默认分区较多, 典型linux只有3个分区: bootloader kernel rootfs
 	// help -- movi
 
-	2.7.3.2、vmlinuz和zImage和uImage
-		(1)uboot经过编译直接生成的elf格式的可执行程序是u-boot，
-			这个程序类似于windows下的exe格式，在操作系统下是可以直接执行的。但是这种格式不能用来烧录下载。
-			我们用来烧录下载的是u-boot.bin，这个东西是由u-boot使用arm-linux-objcopy工具进行加工（主要目的是去掉一些无用的）得到的。
-			这个u-boot.bin就叫镜像（image），镜像就是用来烧录到iNand中执行的。
-		(2)linux内核经过编译后也会生成一个elf格式的可执行程序，叫vmlinux或vmlinuz，
-			(/boot/vmlinuz-3.13.0-32-generic)这个就是原始的未经任何处理加工的原版内核elf文件；
-			嵌入式系统部署时烧录的一般不是这个vmlinuz/vmlinux，而是要用objcopy工具去制作成烧录镜像格式（就是u-boot.bin这种，但是内核没有.bin后缀），
-			经过制作加工成烧录镜像的文件就叫Image（制作把78M大的精简成了7.5M，因此这个制作烧录镜像主要目的就是缩减大小，节省磁盘）。
-		(3)原则上Image就可以直接被烧录到Flash上进行启动执行（类似于u-boot.bin），
-			但是实际上并不是这么简单。实际上linux的作者们觉得Image还是太大了所以对Image进行了压缩，
-			并且在image压缩后的文件的前端附加了一部分解压缩代码。构成了一个压缩格式的镜像就叫zImage。
-			（因为当年Image大小刚好比一张软盘（软盘有2种，1.2M的和1.44MB两种）大，
-			为了节省1张软盘的钱于是乎设计了这种压缩Image成zImage的技术）。
-		(4)uboot为了启动linux内核，还发明了一种内核格式叫uImage。uImage是由zImage加工得到的，
-			uboot中有一个工具，可以将zImage加工生成uImage。
-			注意：uImage不关linux内核的事，linux内核只管生成zImage即可，
-			然后uboot中的mkimage工具再去由zImage加工生成uImage来给uboot启动。
-			这个加工过程其实就是在zImage前面加上64字节的uImage的头信息即可。
-			/
-		(4)原则上uboot启动时应该给他uImage格式的内核镜像，但是实际上uboot中也可以支持zImage，
-			是否支持就看x210_sd.h中是否定义了LINUX_ZIMAGE_MAGIC这个宏。
-			所以大家可以看出：有些uboot是支持zImage启动的，有些则不支持。
-			但是所有的uboot肯定都支持uImage启动。
-			/common/Cmd_bootm.c		//CONFIG_ZIMAGE_BOOT 支持
-			/tools/mkimage.c
+2.7.3.2、vmlinuz和zImage和uImage
+	(1) uboot经过编译直接生成的elf格式的可执行程序是u-boot		// 900+ KByte
+		ELF类似于windows下的exe格式, 在/*操作系统下*/可以直接执行, ELF格式不能用来烧录下载
+		u-boot.bin: 镜像(image)由u-boot使用arm-linux-objcopy工具制作, 用来烧录下载 
+		
+	(2) linux内核编译后生成可执行程序vmlinux或vmlinuz(/boot/vmlinuz-3.13.0-32-generic)	// 原始的内核ELF文件
+		使用objcopy工具制作嵌入式系统部署时的烧录镜像文件Image	// 无.bin	-- 78M -> 7.5M
+
+	(3) Image就可以直接被烧录到Flash上进行启动执行（类似于u-boot.bin），
+		但是实际上并不是这么简单。实际上linux的作者们觉得Image还是太大了所以对Image进行了压缩，
+		并且在image压缩后的文件的前端附加了一部分解压缩代码。构成了一个压缩格式的镜像就叫zImage。
+		（因为当年Image大小刚好比一张软盘（软盘有2种，1.2M的和1.44MB两种）大，
+		为了节省1张软盘的钱于是乎设计了这种压缩Image成zImage的技术）。
+	(4)uboot为了启动linux内核，还发明了一种内核格式叫uImage。uImage是由zImage加工得到的，
+		uboot中有一个工具，可以将zImage加工生成uImage。
+		注意：uImage不关linux内核的事，linux内核只管生成zImage即可，
+		然后uboot中的mkimage工具再去由zImage加工生成uImage来给uboot启动。
+		这个加工过程其实就是在zImage前面加上64字节的uImage的头信息即可。
+	(5)原则上uboot启动时应该给他uImage格式的内核镜像，但是实际上uboot中也可以支持zImage，
+		是否支持就看x210_sd.h中是否定义了LINUX_ZIMAGE_MAGIC这个宏。
+		所以大家可以看出：有些uboot是支持zImage启动的，有些则不支持。
+		但是所有的uboot肯定都支持uImage启动。
+		/common/Cmd_bootm.c		//CONFIG_ZIMAGE_BOOT 支持
+		/tools/mkimage.c
 
 	// ubuntu用grob来启动 -- 可以直接加载elf格式镜像
-	
 	// du -h linux
-	
 	// linux file 命令
-	
 	// linux采用自解压方式, zImage: Image压缩并附加一段自解压代码
 
 2.7.3.3、编译内核得到uImage去启动
