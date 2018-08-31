@@ -81,8 +81,7 @@ uchar default_environment[] = {
 	"nfsboot="	CONFIG_NFSBOOTCOMMAND		"\0"
 #endif
 #if defined(CONFIG_BOOTDELAY) && (CONFIG_BOOTDELAY >= 0)
-	//"bootdelay="	MK_STR(CONFIG_BOOTDELAY)	"\0"
-	"bootdelay="	MK_STR(12)	"\0"
+	"bootdelay="	MK_STR(CONFIG_BOOTDELAY)	"\0"
 #endif
 #if defined(CONFIG_BAUDRATE) && (CONFIG_BAUDRATE >= 0)
 	"baudrate="	MK_STR(CONFIG_BAUDRATE)		"\0"

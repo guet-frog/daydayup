@@ -75,6 +75,10 @@ struct mmc *find_mmc_device(int dev_num)
             
             return m;
         }
+		else
+		{
+			printf("#####MMC Device %d NOT found, m->block_dev.dev = %d\n", dev_num, m->block_dev.dev);
+		}
 	}
     
 	//printf("#####MMC Device %d not found\n", dev_num);
@@ -196,13 +200,13 @@ mmc_bwrite(int dev_num, ulong start, lbaint_t blkcnt, const void *src)
 ulong movi_write(ulong start, lbaint_t blkcnt, void *src)
 {
 	//return mmc_bwrite(0, start, blkcnt, src);
-	return mmc_bwrite(2, start, blkcnt, src);		// for saveenv test 2018-8-25 23:01:01
+	return mmc_bwrite(1, start, blkcnt, src);		// for saveenv test 2018-8-30 22:58:04
 }
 
 ulong movi_read(ulong start, lbaint_t blkcnt, void *dst)
 {
 	//return mmc_bread(0, start, blkcnt, dst);
-	return mmc_bread(2, start, blkcnt, dst);		// for test read env
+	return mmc_bread(1, start, blkcnt, dst);		// for test read env
 }
 
 int mmc_go_idle(struct mmc *host)
@@ -1218,7 +1222,7 @@ int mmc_initialize(bd_t *bis)
 	printf("%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));
 
 // ======================================================   for channel 2 test
-    mmc = find_mmc_device(2);   // for channel 2
+    mmc = find_mmc_device(1);   // for channel 2
 
 	if (mmc)
     {
@@ -1233,7 +1237,16 @@ int mmc_initialize(bd_t *bis)
 			return err;
 		}
 	}
-	printf("%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));
+
+	if (NULL != mmc)
+	{
+		printf("%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));
+	}
+	else
+	{
+		printf("#####mmc is NULL\n");
+	}
+	
 // ======================================================
 
 	return 0;
