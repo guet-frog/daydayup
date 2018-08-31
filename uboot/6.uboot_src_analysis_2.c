@@ -133,20 +133,53 @@
 
 2.6.11.3、mem_malloc_init	// init uboot的堆管理器(用来维护堆内存的一些代码) -- uboot heap size: 896KB
 
-2.6.12.1、开发板独有初始化：mmc初始化
-	(3)mmc_initialize(): 初始化SoC内部的SD/MMC控制器		// ./drivers/mmc/mmc.c
-	(4)uboot对硬件的操作是移植linux内核中的驱动来实现		// ./drivers -- linux driver src
-	(5)mmc_initialize是具体硬件架构无关的一个MMC初始化函数
-		所有的使用了这套架构的代码都掉用这个函数来完成MMC的初始化
-		mmc_initialize中再调用board_mmc_init和cpu_mmc_init来完成具体的硬件的MMC控制器初始化工作
-		// board层面sd卡控制器, usb外扩sd卡控制器芯片
-		// x210CPU内置sd卡控制器, 所以mmc_init就在CPU层面执行
+2.6.12.1、开发板独有初始化：mmc初始化		// ./drivers/mmc/mmc.c	-- linux src drivers
+	(1)mmc_initialize(): 抽象出的mmc初始化函数(与具体硬件无关), 内部调用具体硬件初始化函数
+	(2)uboot本身没有单独实现驱动, 借用linux驱动架构实现(mtd驱动架构)	// ./drivers is from linux src
+	(3)uboot是裸机程序使用物理地址, linux使用虚拟地址, 理论上uboot不能使用linux中的驱动
 
-// uboot本身没有单独实现驱动
-// uboot是裸机程序使用物理地址, Linux使用虚拟地址, 理论上uboot不能使用Linux中的驱动
-// uboot驱动需要对Linux内核驱动架构有所了解
-// uboot驱动形式很复杂, 因为尽量多的利用Linux内核中驱动, 因为Linux内核中有很多架构都是确定的
-// drivers/mmc 通用mmc控制器驱动 mmc.h是核心文件linux mmc mtd驱动架构
+	// int cur_dev_num = -1
+	// struct list_head  mmc_devices
+	// struct sdhci_host mmc_host[MMC_MAX_CHANNEL]
+	// struct mmc 	     mmc_channel[MMC_MAX_CHANNEL]
+	-- mmc_initialize
+	 |
+	 | -- struct mmc *mmc
+	 | -- INIT_LIST_HEAD(&mmc_devices)
+	 |
+	 | -- if (board_mmc_init() < 0)		// baord层面的sd卡控制器, 如: usb读卡器
+		|
+		| -- cpu_mmc_init()		// uboot/cpu/s5pc11x/cpu.c	-- soc内置sd/mmc controller init
+		   |
+		   | -- setup_hsmmc_clock()		// uboot/cpu/s5pc11x/setup_hsmmc.c
+		   | -- setup_hsmmc_cfg_gpio()
+		   |
+		   | -- smdk_s3c_hsmmc_init()	// uboot/drivers/mmc/s3c_hsmmc.c
+			  |
+			  | -- s3c_hsmmc_initialize(0)
+				 |
+				 | -- struct mmc *mmc;
+				 | -- mmc = &mmc_channel[channel]	// 实例化
+				 |
+				 | -- ... 成员变量、成员方法初始化
+				 |
+				 | -- mmc_register(mmc)
+				    |
+					| -- INIT_LIST_HEAD(&mmc->link)
+					|
+					| -- list_add_tail(&mmc->link, &mmc_devices)
+	 |
+	 | -- find_mmc_device(dev_num)	// uboot/drivers/mmc/mmc.c
+		|
+		| -- list_for_each(entry, &mmc_devices)		// iterate over list
+		   |
+		   | -- m = list_entry(entry, struct mmc, link)
+		   |
+		   | -- if (m->block_dev.dev == dev_num)
+			  |
+			  | -- return m
+	 |
+	 | -- mmc_init(m)	// uboot/drivers/mmc/mmc.c
 
 2.6.13.1、env_relocate		// env is embeded in text segment  -- warning: text segment will copy to ddr
 
@@ -154,7 +187,7 @@
 		烧录/部署系统时, 烧录(uboot、kernel、rootfs), 没有烧录env分区
 		第一次启动时flash中env分区为空, 加载flash中env失败, uboot加载内部default env
 
-		// flash中env分区是如何填充 	-- saveenv or auto?
+		// flash中env分区是如何更新 	-- saveenv or auto?	 -- save
 
 	-- env_relocate()	// 环境变量重定位到ddr中
 	  |
@@ -172,14 +205,10 @@
 	  |
 	  | -- gd->env_addr = (uint32_t)&(env_ptr->data)		// 索引env -- gd->env_addr
 
-2.6.14.1、IP地址、MAC地址的确定
-
 2.6.14.2、devices_init		// linux kernel启动的devices_init
-
 	//集中执行各种硬件设备的驱动的init函数
 
 2.6.14.3、jumptable_init	// no use
-
 	// C语言是非面向对象的，但是C语言编写的Linux内核是面向对象的
 
 2.6.15.1、console_init_r

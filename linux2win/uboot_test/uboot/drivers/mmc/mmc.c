@@ -81,9 +81,6 @@ struct mmc *find_mmc_device(int dev_num)
 		}
 	}
     
-	//printf("#####MMC Device %d not found\n", dev_num);
-    //printf("#####m = %p, m->block_dev.dev = %d\n", m, m->block_dev.dev);
-
 	return NULL;
 }
 
@@ -1221,8 +1218,8 @@ int mmc_initialize(bd_t *bis)
 	}
 	printf("%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));
 
-// ======================================================   for channel 2 test
-    mmc = find_mmc_device(1);   // for channel 2
+// ======================================================
+    mmc = find_mmc_device(1);   // dev_num not dev_channel
 
 	if (mmc)
     {
