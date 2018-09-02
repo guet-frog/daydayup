@@ -26,7 +26,11 @@
 		// uboot_position=49  -- 和源码相匹配
 		
 		// 需要在sd_fusing中先make clean  // make distclean没有对sd_fusing目录中生成文件删除
-		// file mkbl1 -- x86-64  -- Inter 80386
+		// file mkbl1 -- x86-64  
+		
+		make clean && make; 	file mkbl1 -- Inter 80386
+		
+		PMIC	// iic interface
 
 2.11.4.时钟和DDR的配置移植
 2.11.4.1、更改CONFIG_IDENT_STRING为"  for ASTON210"，然后同步到ubuntu中的一份代码，然后 make distclean; 
