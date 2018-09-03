@@ -42,6 +42,9 @@ cp -f uboot/lib_arm/bootm.c /home/aston/src/uboot/lib_arm/bootm.c
 # movi_write() -- mmc_bwrite(0, start, blkcnt, src) -- for test saveenv in channel2(SD)
 # movi_read() -- for test env relocate
 cp -f uboot/drivers/mmc/mmc.c /home/aston/src/uboot/drivers/mmc/mmc.c
+
+# setup_hsmmc.c -- seup_hsmmc_clock()
+cp -f uboot/cpu/s5pc11x/setup_hsmmc.c /home/aston/src/uboot/cpu/s5pc11x/setup_hsmmc.c
 ############################################################################
 
 

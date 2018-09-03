@@ -6,7 +6,7 @@
 
 void setup_hsmmc_clock(void)
 {
-	u32 tmp;
+	volatile u32 tmp;
 	u32 clock;
 	u32 i;
 
@@ -19,7 +19,8 @@ void setup_hsmmc_clock(void)
 	clock = get_MPLL_CLK()/1000000;
 	for(i=0; i<0xf; i++)
 	{
-		if((clock / (i+1)) <= 50) {
+		if((clock / (i+1)) <= 50)
+		{
 			CLK_DIV4_REG = tmp | i<<0;
 			break;
 		}

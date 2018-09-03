@@ -215,7 +215,7 @@ static __inline__ int abortboot(int bootdelay)
 #ifdef CONFIG_MENUPROMPT
 	printf(CONFIG_MENUPROMPT);
 #else
-	printf("Hit any key to stop autoboot: %2d ", bootdelay);
+	printf("#####Hit any key to stop autoboot: %2d ", bootdelay);
 #endif
 
 #if defined CONFIG_ZERO_BOOTDELAY_CHECK
@@ -251,7 +251,7 @@ static __inline__ int abortboot(int bootdelay)
 			udelay(10000);
 		}
 
-		printf("\b\b\b%2d ", bootdelay);
+		printf("\b\b\b%2d **", bootdelay);
 	}
 
 	putc('\n');
@@ -318,12 +318,10 @@ void main_loop (void)
 	s = getenv ("bootdelay");
 	bootdelay = s ? (int)simple_strtol(s, NULL, 10) : CONFIG_BOOTDELAY;
 
-	debug ("### main_loop entered: bootdelay=%d\n\n", bootdelay);
     printf("### main_loop entered: bootdelay=%d\n\n", bootdelay);
 
     s = getenv ("bootcmd");
 
-	debug ("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
     printf("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
 
 	if (bootdelay >= 0 && s && !abortboot (bootdelay))
@@ -346,6 +344,10 @@ void main_loop (void)
 #ifdef CONFIG_AUTOBOOT_KEYED
 		disable_ctrlc(prev);	/* restore Control C checking */
 #endif
+	}
+	else
+	{
+		printf("#####auto boot has breaked\n");
 	}
 
 

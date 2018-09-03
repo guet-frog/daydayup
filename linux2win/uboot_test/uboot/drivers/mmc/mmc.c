@@ -71,13 +71,13 @@ struct mmc *find_mmc_device(int dev_num)
         
 		if (m->block_dev.dev == dev_num)
         {
-            printf("#####MMC Device %d has found, m = %p, m->block_dev.dev = %d\n", dev_num, m, m->block_dev.dev);
+            printf("#####MMC Device %d has found\n", dev_num);
             
             return m;
         }
 		else
 		{
-			printf("#####MMC Device %d NOT found, m->block_dev.dev = %d\n", dev_num, m->block_dev.dev);
+			//printf("#####MMC Device %d NOT found, m->block_dev.dev = %d\n", dev_num, m->block_dev.dev);
 		}
 	}
     
@@ -196,14 +196,18 @@ mmc_bwrite(int dev_num, ulong start, lbaint_t blkcnt, const void *src)
 
 ulong movi_write(ulong start, lbaint_t blkcnt, void *src)
 {
-	//return mmc_bwrite(0, start, blkcnt, src);
-	return mmc_bwrite(1, start, blkcnt, src);		// for saveenv test 2018-8-30 22:58:04
+	return mmc_bwrite(0, start, blkcnt, src);
+	
+	//printf("#####channel2\n");
+	//return mmc_bwrite(1, start, blkcnt, src);		// for saveenv test 2018-8-30 22:58:04
 }
 
 ulong movi_read(ulong start, lbaint_t blkcnt, void *dst)
 {
-	//return mmc_bread(0, start, blkcnt, dst);
-	return mmc_bread(1, start, blkcnt, dst);		// for test read env
+	return mmc_bread(0, start, blkcnt, dst);
+	
+	//printf("#####channel2\n");
+	//return mmc_bread(1, start, blkcnt, dst);		// for test read env
 }
 
 int mmc_go_idle(struct mmc *host)

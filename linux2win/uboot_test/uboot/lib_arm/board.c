@@ -473,7 +473,7 @@ void start_armboot (void)
 	memset (gd->bd, 0, sizeof(bd_t));
     
 	monitor_flash_len = _bss_start - _armboot_start;
-    
+	
 	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr)   //函数指针类型 ++init_fnc_ptr == ((uint8_t *)(init_fnc_ptr)+4) -- 二重指针类型自增
     {
 		if ((*init_fnc_ptr)() != 0)
@@ -487,7 +487,7 @@ void start_armboot (void)
 
 #if defined(CONFIG_X210)
 #if defined(CONFIG_GENERIC_MMC)
-	puts ("SD/MMC:  ");
+	puts ("SD/MMC:\n");
 	mmc_exist = mmc_initialize(gd->bd); // all board interface
 	if (mmc_exist != 0)
 	{
@@ -545,10 +545,6 @@ void start_armboot (void)
 	{
 		load_addr = simple_strtoul (s, NULL, 16);
 		printf("load_addr = %ld\n", load_addr);
-	}
-	else
-	{
-		printf("getenv(loadaddr) == NULL\n");
 	}
 
 #if defined(CONFIG_CMD_NET)						// has include config_cmd_default.h

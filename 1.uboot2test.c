@@ -67,8 +67,14 @@
 	// char *getenv(char *name) 与 int getenv_r(char *name, char *buf, unsigned len) -- 可重入函数  // reentrant
 	
 	// uboot中访问0x2000_0000地址范围OK
-
-
+	
+	// 记录烧录flash现象
+	// mmc.c -- 只修改 movie_write() movi_read()
+	// return mmc_bwrite(1, start, blkcnt, src);	// for test flash channel2 2018-9-3 09:14:28
+	// return mmc_bread(1, start, blkcnt, dst);
+	// 在inand中的code被破坏的情况下, 从sd卡启动, 执行fastboot
+	// 第一次fastboot后, fastboot reboot可以启动
+	// 第二次fastboot后, fastboot reboot不可以启动	-- inand checksum error, sd卡中打印OK后死机
 
 
 
