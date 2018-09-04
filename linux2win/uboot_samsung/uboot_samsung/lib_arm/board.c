@@ -365,8 +365,6 @@ void start_armboot (void)
 		}
 	}
 
-	printf("#####uboot step 2\n");	
-
 #ifndef CFG_NO_FLASH
 	/* configure available FLASH banks */
 	size = flash_init ();
