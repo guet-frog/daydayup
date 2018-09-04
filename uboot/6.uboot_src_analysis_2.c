@@ -284,7 +284,7 @@
 		   | -- gd->bd->bi_dram[1].size  = PHYS_SDRAM_2_SIZE	// 0x1000_0000
 		|
 		| -- display_dram_config()	// printf ddr config_info(size)
-		
+
 2.6.17.2、启动过程特征总结
 	(1)第一阶段为汇编阶段、第二阶段为C阶段
 	(2)第一阶段在SRAM中、第二阶段在DRAM中
