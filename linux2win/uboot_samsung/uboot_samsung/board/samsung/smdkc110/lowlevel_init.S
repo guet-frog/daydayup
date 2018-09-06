@@ -593,7 +593,9 @@ mmu_table:
 	.set __base,__base+1
 	.endr
 
-	.set __base,0x200
+// 0xC000_0000 - 0xD000_0000 -> 0x3000_0000 - 0x4000_0000
+	//.set __base,0x200
+	.set __base,0x300
 	// 256MB for SDRAM with cacheable
 	.rept 0xD00 - 0xC00
 	FL_SECTION_ENTRY __base,3,0,1,1

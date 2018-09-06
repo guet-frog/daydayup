@@ -12,7 +12,7 @@ fi
 
 ############################################################################
 # no modify
-cp -f uboot_samsung/include/configs/x210_sd.h /home/aston/src/uboot_samsung/include/configs/
+cp -f uboot_samsung/include/configs/smdkv210single.h /home/aston/src/uboot_samsung/include/configs/
 
 #board.c -- 删除一些宏定义代码; 添加打印信息
 cp -f uboot_samsung/lib_arm/board.c /home/aston/src/uboot_samsung/lib_arm/
@@ -42,6 +42,8 @@ cp -f uboot_samsung/lib_arm/bootm.c /home/aston/src/uboot_samsung/lib_arm/bootm.
 # movi_write() -- mmc_bwrite(0, start, blkcnt, src) -- for test saveenv in channel2(SD)
 # movi_read() -- for test env relocate
 cp -f uboot_samsung/drivers/mmc/mmc.c /home/aston/src/uboot_samsung/drivers/mmc/mmc.c
+
+cp -f uboot_samsung/drivers/mmc/s3c_hsmmc.c /home/aston/src/uboot_samsung/drivers/mmc/s3c_hsmmc.c
 
 # setup_hsmmc.c -- seup_hsmmc_clock()
 cp -f uboot_samsung/cpu/s5pc11x/setup_hsmmc.c /home/aston/src/uboot_samsung/cpu/s5pc11x/setup_hsmmc.c

@@ -69,7 +69,10 @@ struct mmc *find_mmc_device(int dev_num)
 		m = list_entry(entry, struct mmc, link);
 
 		if (m->block_dev.dev == dev_num)
+		{
+			printf("MMC Device %d has found\n");
 			return m;
+		}
 	}
 
 	printf("MMC Device %d not found\n", dev_num);
@@ -778,6 +781,11 @@ static int mmc_read_ext_csd(struct mmc *host)
 	 * raw block in mmc_card.
 	 */
 	ext_csd = malloc(512);
+
+	printf("#####ext_csd = %p\n", ext_csd);
+	ext_csd = ext_csd - 0x90000000;
+	printf("#####ext_csd = %p\n", ext_csd);
+	
 	if (!ext_csd) {
 		printf("could not allocate a buffer to "
 			"receive the ext_csd.\n");
@@ -794,8 +802,13 @@ static int mmc_read_ext_csd(struct mmc *host)
 	if (err)
 		return err;
 
+	printf("#####mmc.c mmc_read_ext_csd() has exe\n");
+
 	err = mmc_send_ext_csd(host, ext_csd);
 	if (err) {
+
+		printf("==============================\n");
+	
 		/*
 		 * High capacity cards should have this "magic" size
 		 * stored in their CSD.
@@ -813,12 +826,21 @@ static int mmc_read_ext_csd(struct mmc *host)
 		goto out;
 	}
 
+	printf("==============================\n");
+
 	ext_csd_struct = ext_csd[EXT_CSD_REV];
 	if (ext_csd_struct > 5) {
-		printf("unrecognised EXT_CSD structure "
-			"version %d\n", ext_csd_struct);
-		err = -1;
-		goto out;
+		//printf("unrecognised EXT_CSD structure "
+			//"version %d\n", ext_csd_struct);
+		//err = -1;
+		//goto out;
+
+		printf("ext_csd_struct = %d\n", ext_csd_struct);
+		ext_csd_struct = 5;
+	}
+	else
+	{
+		printf("ext_csd_struct = %d\n", ext_csd_struct);
 	}
 
 	if (ext_csd_struct >= 2) {
@@ -910,6 +932,8 @@ int mmc_startup(struct mmc *host)
 
 	err = mmc_send_cmd(host, &cmd, NULL);
 
+	printf("#####mmc_startup has exe 1\n");
+
 	if (err)
 		return err;
 
@@ -933,6 +957,8 @@ int mmc_startup(struct mmc *host)
 	else
 		mmc_decode_csd(host);
 
+	printf("#####mmc_startup has exe 2\n");
+
 	/* Select the card, and put it into Transfer Mode */
 	cmd.opcode = MMC_CMD_SELECT_CARD;
 	cmd.resp_type = MMC_RSP_R1b;
@@ -942,14 +968,23 @@ int mmc_startup(struct mmc *host)
 	if (err)
 		return err;
 
-	if (IS_SD(host)) {
+	if (IS_SD(host))
+	{
+		printf("#####is_sd() == 1\n");
 		err = sd_change_freq(host);
-	} else {
+	}
+	else
+	{
+		printf("#####is_sd() == 0\n");
 		err = mmc_read_ext_csd(host);
 		if (err)
 			return err;
+
+		printf("#####mmc.c mmc_change_freq() has exe\n");
 		err = mmc_change_freq(host);
 	}
+
+	printf("#####mmc_startup has exe 3\n");
 
 	if (err)
 		return err;
@@ -958,7 +993,13 @@ int mmc_startup(struct mmc *host)
 	host->card_caps &= host->host_caps;
 
 	if (IS_SD(host)) {
+
+		printf("#####mmc_startup has exe 4\n");
+	
 		if (host->card_caps & MMC_MODE_4BIT) {
+
+			printf("#####mmc_startup has exe 5\n");
+		
 			cmd.opcode = MMC_CMD_APP_CMD;
 			cmd.resp_type = MMC_RSP_R1;
 			cmd.arg = host->rca << 16;
@@ -984,6 +1025,9 @@ int mmc_startup(struct mmc *host)
 		else
 			host->clock = 25000000;
 	} else {
+
+		printf("#####mmc_startup has exe 6\n");
+	
 		if (host->card_caps & MMC_MODE_4BIT) {
 			/* Set the card to use 4 bit*/
 			err = mmc_switch(host, EXT_CSD_CMD_SET_NORMAL,
@@ -1009,6 +1053,8 @@ int mmc_startup(struct mmc *host)
 		}
 	}
 
+	printf("#####mmc_startup has exe 7\n");
+
 	mmc_set_ios(host);
 
 	/* fill in device description */
@@ -1024,6 +1070,8 @@ int mmc_startup(struct mmc *host)
 	sprintf(host->block_dev.revision, "%d.%d", host->cid[2] >> 28,
 			(host->cid[2] >> 24) & 0xf);
 	init_part(&host->block_dev);
+
+	printf("#####mmc_startup has exe 8\n");
 
 #ifdef CONFIG_CMD_MOVINAND
 	init_raw_area_table(&host->block_dev);
@@ -1114,6 +1162,8 @@ int mmc_init(struct mmc *host)
 		if (err)
 			return UNUSABLE_ERR;
 
+	printf("#####mmc.c mmc_startup() has exe\n");
+
 	return mmc_startup(host);
 }
 
@@ -1157,13 +1207,35 @@ int mmc_initialize(bd_t *bis)
 	cur_dev_num = 0;
 
 	if (board_mmc_init(bis) < 0)
+	{
 		cpu_mmc_init(bis);
+
+		printf("#####mmc.c mmc_initialize() has exe\n");
+	}
+		
 
 #if defined(DEBUG_S3C_HSMMC)
 	print_mmc_devices(',');
 #endif
 
 	mmc = find_mmc_device(0);
+	if (mmc) {
+
+		printf("#####mmc.c mmc_init() has exe\n");
+	
+		err = mmc_init(mmc);
+		if (err)
+			err = mmc_init(mmc);
+		if (err) {
+			printf("Card init fail!\n");
+			return err;
+		}
+	}
+	printf("%ldMB\n", (mmc->capacity/(1024*1024/mmc->read_bl_len)));
+	
+//-----------------------------------------------------------------
+
+	mmc = find_mmc_device(1);
 	if (mmc) {
 		err = mmc_init(mmc);
 		if (err)
@@ -1174,5 +1246,7 @@ int mmc_initialize(bd_t *bis)
 		}
 	}
 	printf("%ldMB\n", (mmc->capacity/(1024*1024/mmc->read_bl_len)));
+
+	
 	return 0;
 }

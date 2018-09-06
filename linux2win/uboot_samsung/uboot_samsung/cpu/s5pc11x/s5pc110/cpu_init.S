@@ -119,7 +119,8 @@ find_lock_val:
 	ldr	r1, =0x0FFF2010				@ConControl auto refresh off
 	str	r1, [r0, #DMC_CONCONTROL]
 
-	ldr	r1, =0x00212400				@MemControl BL=4, 2 chip, DDR2 type, dynamic self refresh, force precharge, dynamic power down off
+	//ldr	r1, =0x00212400				@MemControl BL=4, 2 chip, DDR2 type, dynamic self refresh, force precharge, dynamic power down off
+	ldr r1, =DMC0_MEMCONTROL
 	str	r1, [r0, #DMC_MEMCONTROL]
 	
 	ldr	r1, =DMC0_MEMCONFIG_0			@MemConfig0 256MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed
