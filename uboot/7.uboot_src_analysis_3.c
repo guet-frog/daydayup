@@ -1,39 +1,37 @@
 
 2.7.2.启动内核第一步：加载内核到DDR中
-	本节讲述系统部署细节参数和启动介质中的分区，这些是内核启动的第一阶段，目的是将内核镜像从启动介质中搬移到ddr中适当位置处
-2.7.3.zImage和uImage的区别联系
-	本节开始介绍bootm命令，该命令实现从DDR内存中的内核镜像处启动
+	本节讲述系统部署细节参数和启动介质中的分区，这些是内核启动的第一阶段
+	目的是将内核镜像从启动介质中搬移到ddr中适当位置处
 
 	// Cmd_bootm.c
-	// do_bootm()
+	// do_bootm()	// 功能: 从ddr内存中的内核镜像处启动内存
 
-2.7.1.2、内核本身也是一个"裸机程序"
+2.7.1.2、内核本质也是一个"裸机程序"	 // zImage
 	(2)操作系统运行起来后在软件上分为内核层和应用层, 分层后权限不同(内存访问和设备操作的管理)
 	   内核可以任意访问各种硬件, 而应用程序只能被限制的访问硬件和内存地址
-		//uboot镜像: u-boot.bin, linux系统的镜像: zImage, 本质上都是裸机程序镜像
 
-2.7.1.3、部署在SD卡中特定分区内
+2.7.1.3、部署在sd卡中特定分区内
 	掉电时: bootloader、kernel、rootfs等以/*镜像*/的形式存储在启动介质中的/*指定分区*/
-	启动时: 运行启动代码进行相关的硬件初始化和软件架构的建立, 加载镜像到ddr中, 最终达到运行时稳定状态
+	启动时: 运行启动代码进行相关的硬件初始化和/*软件架构*/的建立, 加载镜像到ddr中, 最终达到运行时稳定状态
 	运行时: 在ddr中运行, 与存储介质无关
-	// uboot和kernel中的分区表必须一致，同时和SD卡的实际使用的分区要一致
+	// uboot和kernel中的分区表必须一致, 同时和sd卡的实际使用的分区要一致
 
-2.7.1.4、运行时必须先加载到DDR中/*链接地址处*/
+2.7.1.4、运行时必须先加载到ddr中/*链接地址处*/
 	(1)uboot在step1进行重定位将step2(整个uboot镜像)加载到ddr中	// uboot link addr:  0x33E0_0000 -- MMU映射表
 	(2)uboot启动内核时将zImage加载到ddr中(重定位的过程)			// kernel link addr: 0x3000_8000
 
 2.7.1.5、内核启动需要必要的启动参数
-	(2)内核启动需要: (1)image relocate (2)boot args		// uboot可以自启动或bootROM引导
+	(2)内核启动需要: ①image relocate ②boot args	// uboot可以自启动或bootROM引导
 
-2.7.2.0、启动内核第一步：加载内核到DDR中				// kernel直接由link addr处开始运行
+2.7.2.0、启动内核第一步：加载内核到ddr中	// kernel直接由link addr处开始运行
 
 2.7.2.1、静态内核镜像在哪里？
 	(1)SD卡/iNand/Nand/NorFlash 		// raw分区
-		uboot读取命令: movie or nand
+		uboot读取命令: movi or nand
 	(2)	movi read kernel 0x30008000		// kernel分区
 
 	// bootcmd ""
-	// bootm ""
+	// bootm ""	''
 
 	(3)tftp、nfs等网络下载方式从远端服务器获取镜像		// uboot支持远程启动  -- 通过网络从server下载kernel
 
@@ -46,57 +44,33 @@
 	(1) uboot经过编译直接生成的elf格式的可执行程序是u-boot		// 900+ KByte
 		ELF类似于windows下的exe格式, 在/*操作系统下*/可以直接执行, ELF格式不能用来烧录下载
 		u-boot.bin: 镜像(image)由u-boot使用arm-linux-objcopy工具制作, 用来烧录下载 
-		
+
 	(2) linux内核编译后生成可执行程序vmlinux或vmlinuz(/boot/vmlinuz-3.13.0-32-generic)	// 原始的内核ELF文件
 		使用objcopy工具制作嵌入式系统部署时的烧录镜像文件Image	// 无.bin	-- 78M -> 7.5M
 
-	(3) Image就可以直接被烧录到Flash上进行启动执行（类似于u-boot.bin），
-		但是实际上并不是这么简单。实际上linux的作者们觉得Image还是太大了所以对Image进行了压缩，
-		并且在image压缩后的文件的前端附加了一部分解压缩代码。构成了一个压缩格式的镜像就叫zImage。
-		（因为当年Image大小刚好比一张软盘（软盘有2种，1.2M的和1.44MB两种）大，
-		为了节省1张软盘的钱于是乎设计了这种压缩Image成zImage的技术）。
-	(4)uboot为了启动linux内核，还发明了一种内核格式叫uImage。uImage是由zImage加工得到的，
-		uboot中有一个工具，可以将zImage加工生成uImage。
-		注意：uImage不关linux内核的事，linux内核只管生成zImage即可，
-		然后uboot中的mkimage工具再去由zImage加工生成uImage来给uboot启动。
-		这个加工过程其实就是在zImage前面加上64字节的uImage的头信息即可。
-	(5)原则上uboot启动时应该给他uImage格式的内核镜像，但是实际上uboot中也可以支持zImage，
-		是否支持就看x210_sd.h中是否定义了LINUX_ZIMAGE_MAGIC这个宏。
-		所以大家可以看出：有些uboot是支持zImage启动的，有些则不支持。
-		但是所有的uboot肯定都支持uImage启动。
-		/common/Cmd_bootm.c		//CONFIG_ZIMAGE_BOOT 支持
-		/tools/mkimage.c
+	(3) Image可以直接烧录到flash上启动执行
+		/*自解压*/kernel: Image压缩后文件的前端附加一段解压缩代码, 构成了一个压缩格式的镜像就叫zImage
 
-	// ubuntu用grob来启动 -- 可以直接加载elf格式镜像
-	// du -h linux
-	// linux file 命令
-	// linux采用自解压方式, zImage: Image压缩并附加一段自解压代码
+	(4) uboot默认支持uImage启动		// x210_sd.h -- #define CONFIG_ZIMAGE_BOOT
+		uboot使用mkimage工具生成uImage, 在zImage头部添加64byte的uImage的头信息	// /tools/mkimage.c
+
+		// ubuntu用grob来启动 -- 可以直接加载elf格式镜像
+		// du -h linux
+		// linux file 命令
 
 2.7.3.3、编译内核得到uImage去启动
-	(1)如果直接在kernel底下去make uImage会提供mkimage command not found
-		解决方案是去uboot/tools下cp mkimage /usr/local/bin/(一般为用户自己添加的程序文件, 直接copy过去)复制mkimage工具到系统目录下。
-		再去make uImage即可。
+	(1)如果直接在kernel下make uImage会提示mkimage command not found
+		uboot/tools下cp mkimage /usr/local/bin/(一般为用户自己添加的程序文件, 直接copy过去)复制mkimage工具到系统目录下
 
-
-2.7.4.zImage启动细节
-(1)do_bootm函数中一直到397行的after_header_check这个符号处，都是在进行镜像的头部信息校验。
-	校验时就要根据不同种类的image类型进行不同的校验。
-	所以do_bootm函数的核心就是去分辨传进来的image到底是什么类型，然后按照这种类型的头信息格式去校验。
-	校验通过则进入下一步准备启动内核；如果校验失败则认为镜像有问题，所以不能启动。
-
-	2.7.4.1、LINUX_ZIMAGE_MAGIC
-		(1)这个是一个定义的魔数，这个数等于0x016f2818，表示这个镜像是一个zImage。
-			也就是说zImage格式的镜像中在头部的一个固定位置存放了这个数作为格式标记。
-			如果我们拿到了一个image，去他的那个位置去取4字节判断它是否等于LINUX_ZIMAGE_MAGIC，
-			则可以知道这个镜像是不是一个zImage。
-			// 首先第一步将kernel放置到ddr固定位置
-		(2)命令 bootm 0x30008000，所以do_boom的argc=2，argv[0]=bootm  argv[1]=0x30008000。
-			但是实际bootm命令还可以不带参数执行。如果不带参数直接bootm，
-			则会从CFG_LOAD_ADDR地址去执行（定义在x210_sd.h中）。
-		(3)zImage头部开始的第37-40字节处存放着zImage标志魔数，从这个位置取出然后对比LINUX_ZIMAGE_MAGIC。
-			可以用二进制阅读软件来打开zImage查看，就可以证明。
-			// winhex
-			// *(ulong *)(addr + 9*4) == LINUX_ZIMAGE_MAGIC	// unsigned long
+2.7.4.1、LINUX_ZIMAGE_MAGIC		// 首先第一步将kernel放置到ddr固定位置
+		
+	(2) 命令 bootm 0x30008000，所以do_boom的argc=2 argv[0]=bootm argv[1]=0x30008000
+		但是实际bootm命令还可以不带参数执行。如果不带参数直接bootm，
+		则会从CFG_LOAD_ADDR地址去执行（定义在x210_sd.h中）。
+	(3)zImage头部开始的第37-40字节处存放着zImage标志魔数，从这个位置取出然后对比LINUX_ZIMAGE_MAGIC。
+		可以用二进制阅读软件来打开zImage查看，就可以证明。
+		// winhex
+		// *(ulong *)(addr + 9*4) == LINUX_ZIMAGE_MAGIC	// unsigned long
 			
 2.7.4.2、image_header_t
 (1)这个数据结构是我们uboot启动内核使用的一个标准启动数据结构，zImage头信息也是一个image_header_t，但是在实际启动之前需要进行一些改造。hdr->ih_os = IH_OS_LINUX;
@@ -197,24 +171,6 @@
 // set xxx用来
 
 // 没有下划线自己用，一个下划线系统使用，两个下划线系统内部自己使用
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

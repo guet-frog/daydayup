@@ -206,7 +206,7 @@
 	  | -- gd->env_addr = (uint32_t)&(env_ptr->data)		// 索引env -- gd->env_addr
 
 2.6.14.2、devices_init		// linux kernel启动的devices_init
-	//集中执行各种硬件设备的驱动的init函数
+	// 集中执行各种硬件设备的驱动的init函数
 
 2.6.14.3、jumptable_init	// no use
 	// C语言是非面向对象的，但是C语言编写的Linux内核是面向对象的

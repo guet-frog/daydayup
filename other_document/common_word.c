@@ -6,5 +6,7 @@
 	| -- porting 	// 移植
 	|
 	| -- compress	// 压缩 -c;  解压缩 -x
+	|
+	| -- probe		// 探测
 	
 	
