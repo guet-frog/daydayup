@@ -27,30 +27,29 @@
 
 2.3.4.uboot的源码目录分析2
 	(1) api			硬件无关的功能函数API, uboot自身使用的API, 移植时不需要考虑
-	(3) board		问题一: 思考uboot如何支持多套开发板, 如何具有可移植性 -- //每个开发板在board目录下区分
-					问题二: board下有这么多文件夹，究竟如何确定具体使用的是哪一个 -- // 编译前配置的目的
-					问题三: board目录下以vendor命名, board/samsung/x210 -- 配置时需要注意路径
-					//warning: uboot的配置阶段(mkconfig脚本和Makefile中配置有关的部分)	\
+
+	(3) board		//warning: uboot的编译前的配置阶段(mkconfig脚本和Makefile中配置有关的部分)	\
 						主要解决的问题: 确定编译时源文件路径 -- 在可移植性上的支持
+
 	(4) common		平台无关代码, (1)uboot系统命令--cmd (2)实现环境变量--env
+
 	(5) cpu			SOC相关初始化和控制代码, 譬如CPU、中断、串口等SoC内部外设的, 包括/*起始代码*/start.S
 					//warning: 硬件平台相关, 移植时一般无需修改
-	(6) disk
-	(7) doc
+
 	(8) drivers		drivers from Linux devices driver // eth inand/sd nand...
-					uboot中的驱动其实就是linux中的驱动, uboot在一定程度上移植了linux的驱动
-					但是linux是操作系统而uboot只是个裸机程序, 因此这种移植会有不同
-					//uboot中的驱动其实是linux中的驱动的一部分
-	(9)examples
+
 	(10)fs			file system from linux src, 用来管理flash等资源
+
 	(11)include		uboot和linux kernel在管理头文件时, 把所有的头文件全部集中存放在include目录下
+
 	(12)lib_*		典型的lib_arm(arm架构)和lib_generic架构(其他架构通用)
+
 	(13)libfdt		设备树相关, linux kernel 3.4 更改了启动时传参的机制, 改用设备树来进行启动传参, 进行硬件信息的描述
-	(14)nand_spl	nand相关 //no use
+	
 	(15)net			网络相关, 譬如uboot中的tftp nfs ping实现
-	(16)onenand
-	(17)post
+
 	(18)sd_fusing	代码实现了烧录uboot镜像到SD卡 //important
+
 	(19)tools		里面是一些工具类的代码, 譬如mkimage
 
 	// important file directory:	\

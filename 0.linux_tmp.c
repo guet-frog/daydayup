@@ -37,10 +37,6 @@
 
 		shell exit 1 && exit 0
 
-		linux设备驱动不正常可能无法开机(如:显卡拔掉) -- ...
-
-		append: 附加, 添加; 贴上; 盖章
-
 	// -- 芯片在上电和休眠唤醒都需要对cache进行操作 v7_flush_dcache_all
 
 ============================================================================
@@ -139,7 +135,6 @@ uart.bin: start.o led.o uart.o speed.o main.o $(LIBPATH)/libgcc.a	// 链接静�
 	分析一个工程的源码是如何链接的 -- Makefile
 
 	grep "0xc3e00000" * -nR
-
 	grep "LDFLAGS" * -nR
 
 	LDFLAGS += -Bstatic -T $(LDSCRIPT) $(PLATFORM_LDFLAGS)
@@ -149,7 +144,7 @@ uart.bin: start.o led.o uart.o speed.o main.o $(LIBPATH)/libgcc.a	// 链接静�
 
 ============================================================================2018-8-14 22:13:23
 	//NorFlash与内存芯片接口相同, 读方式类似于内存读
-	uint32_t *pDest, *pSrc;
+	uint32_t *pDest, *pSrc;		// not uint32_t *pDest, pSrc;
 	pDest = (uint32_t *)buf;
 	pSrc  = (uint32_t *)start_addr;
 	for (uint8_t i = 0; i < size/4; i++)
@@ -182,7 +177,7 @@ uart.bin: start.o led.o uart.o speed.o main.o $(LIBPATH)/libgcc.a	// 链接静�
 	如果相等直接跳转到入口地址去执行
 
 ============================================================================
-	(1)uboot如何启动kernel
+	(1)uboot如何启动kernel		// uboot自身可启动
 		|
 		| -- 部署kernel (iNand or SD)
 		|

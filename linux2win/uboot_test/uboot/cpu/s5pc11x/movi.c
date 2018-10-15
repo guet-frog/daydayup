@@ -22,14 +22,8 @@ void movi_bl2_copy(void)
 #if defined(CONFIG_EVT1)
 
     ch = *(volatile u32 *)(0xD0037488);     /// store boot channel, 前提是sd/mmc设备启动
-    copy_sd_mmc_to_mem copy_bl2 = (copy_sd_mmc_to_mem) (*(u32 *) (0xD0037F98));  /// 定义并初始化函数指针
-
-#if defined(CONFIG_SECURE_BOOT)
-    ulong rv;
-#endif
-
+    copy_sd_mmc_to_mem copy_bl2 = (copy_sd_mmc_to_mem) (*(u32 *) (0xD0037F98));  /// 定义并初始化函数指针变量
 #else
-
 	ch = *(volatile u32 *)(0xD003A508);
 	copy_sd_mmc_to_mem copy_bl2 = (copy_sd_mmc_to_mem) (*(u32 *) (0xD003E008));
 
@@ -39,34 +33,10 @@ void movi_bl2_copy(void)
 	if (ch == 0xEB000000)
     {
 		ret = copy_bl2(0, MOVI_BL2_POS, MOVI_BL2_BLKCNT, CFG_PHY_UBOOT_BASE, 0);
-
-#if defined(CONFIG_SECURE_BOOT)
-		/* do security check */
-		rv = Check_Signature( (SecureBoot_CTX *)SECURE_BOOT_CONTEXT_ADDR,
-				      (unsigned char *)CFG_PHY_UBOOT_BASE, (1024*512-128),
-			              (unsigned char *)(CFG_PHY_UBOOT_BASE+(1024*512-128)), 128 );
-		if (rv != 0)
-        {
-            while(1);
-        }
-#endif
-
 	}
 	else if (ch == 0xEB200000)
     {
 		ret = copy_bl2(2, MOVI_BL2_POS, MOVI_BL2_BLKCNT, CFG_PHY_UBOOT_BASE, 0);
-		
-#if defined(CONFIG_SECURE_BOOT)
-		/* do security check */
-		rv = Check_Signature( (SecureBoot_CTX *)SECURE_BOOT_CONTEXT_ADDR,
-				      (unsigned char *)CFG_PHY_UBOOT_BASE, (1024*512-128),
-			              (unsigned char *)(CFG_PHY_UBOOT_BASE+(1024*512-128)), 128 );
-		if (rv != 0)
-        {
-			while(1);
-		}
-#endif
-
 	}
 	else
 		return;

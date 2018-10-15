@@ -1,6 +1,6 @@
 
 2.6.1.3、宏观分析：uboot第二阶段应该做什么
-	(1)uboot step1: 主要初始化了SoC内部的一些部件(看门狗、时钟), 然后初始化ddr并且完成重定位
+	(1)uboot step1: 主要初始化clock, ddr, 重定位
 	(2)uboot step2: init SoC板级硬件(iNand、网卡芯片等), uboot本身的一些东西(uboot的命令、环境变量等)
 					最终初始化完成后进入uboot的命令行准备接受命令
 
@@ -34,7 +34,10 @@
 
 	//compile optimization barrier: 内存间隔, 为了防止高版本的gcc的优化造成错误
 
-2.6.4.1、init_sequence与init_fnc_t
+======================================================================================================
+======================================================================================================
+
+2.6.4.1、init_sequence 与 init_fnc_t
 
 	(1)typedef int (init_fnc_t) (void)		// 函数类型  -- init_fnc_t *init_sequence[] = {}
 	(2)init_fnc_t **init_fnc_ptr			// 二重指针  -> 指针数组 
@@ -72,12 +75,11 @@
 			read_reg -> r,m,p,s -> get_pllclk() -> get_hclk -> get_pclk() -> timer_load_val
 
 2.6.6.2、env_init
-	(2)这个函数只是对/*内存*/里维护的那一份uboot的env做了基本的初始化	// judge valid or not -- no
-	   当前env没有从SD卡到DDR中的relocate/*only relocate firmware*/	    // -- current env invalid
+	(2)这个函数只是对/*内存*/里维护的那一份uboot的env做了基本的初始化
+	   当前env没有从SD卡到DDR中的relocate/*only relocate firmware -- not relocate env.bin */
 	(4)在start_armboot函数中(line776)调用env_relocate(), 进行env从SD卡中到DDR中的重定位
-		重定位之后需要环境变量时才可以从DDR中去取, 重定位之前如果要使用环境变量只能从SD卡中去读取 -- // ?
 
-		// only relocate uboot.bin not relocate env.bin
+		重定位之后需要环境变量时才可以从DDR中去取, 重定位之前如果要使用环境变量只能从SD卡中去读取 -- // 这句话应该有问题?
 
 2.6.7.1、init_baudrate
 	(2)getenv_r函数用来读取环境变量的值	// 读取到的为string类型而不是int类型 -- simple_strtoul() -- // ?
@@ -104,7 +106,7 @@
 2.6.9.3、uboot学习实践
 	(1)对uboot源代码进行完修改
 	(2)make distclean然后make x210_sd_config然后make
-	(3)编译完成得到u-boot.bin，然后去烧录。烧录方法按照裸机第三部分讲的linux下使用dd命令来烧写的方法来烧写。
+	(3)编译完成得到u-boot.bin，然后去烧录。烧录方法按照裸机第三部分讲的linux下使用dd命令来烧写的方法来烧写
 	(4)烧写过程：
 		第一步：进入sd_fusing目录下		// file mkbl1  ,,,x64
 		第二步：make clean
@@ -127,6 +129,9 @@
 2.6.10.2、display_dram_config	// print dram config info
 
 	//	NandFlash: nand		NorFlash: flash
+
+======================================================================================================
+======================================================================================================
 
 2.6.11.2、CONFIG_VFD、CONFIG_LCD
 		uboot中自带的LCD显示的软件框架, 本次移植自己添加LCD显示相关代码
@@ -228,8 +233,8 @@
 2.6.15.4、board_late_init	// no use
 
 2.6.16.1、eth_initialize
-(1)看名字应该是网卡相关的初始化。这里不是SoC与网卡芯片连接时SoC这边的初始化，而是网卡芯片本身的一些初始化
-(2)对于X210（DM9000）来说，这个函数是空的。X210的网卡初始化在board_init函数中，网卡芯片的初始化在驱动中
+	(1)看名字应该是网卡相关的初始化。这里不是SoC与网卡芯片连接时SoC这边的初始化，而是网卡芯片本身的一些初始化
+	(2)对于X210（DM9000）来说，这个函数是空的。X210的网卡初始化在board_init函数中，网卡芯片的初始化在驱动中
 
 	// IDE接口硬盘
 
@@ -238,6 +243,9 @@
 2.6.16.3、check menu key to update from sd		// SD量产卡
 
 2.6.16.4、main_loop
+
+======================================================================================================
+======================================================================================================
 
 (1)第二阶段主要是对开发板级别的硬件、软件数据结构进行初始化。
 
