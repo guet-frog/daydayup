@@ -1,4 +1,4 @@
 #!/bin/sh
-	cp ~/src/uboot/u-boot.bin /mnt/hgfs/linux2win/uboot_test/fastboot/uboot.bin
+	cp ~/src/uboot/uboot/u-boot.bin /mnt/hgfs/linux2win/uboot_test/fastboot/uboot.bin
 
-	cp ~/src/uboot/u-boot.bin /home/aston/tftpboot/uboot.bin
+	#cp ~/src/uboot/uboot/u-boot.bin /home/aston/tftpboot/uboot.bin

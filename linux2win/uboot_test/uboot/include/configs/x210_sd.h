@@ -76,8 +76,11 @@
 #define VGA_1440X900		5
 #define VGA_1280X1024		6
 
-//#define DISP_MODE		AT070TN92
-#define DISP_MODE		VS070CXN
+#define DISP_MODE		AT070TN92
+//#define DISP_MODE		VS070CXN
+
+//-------------------------------------
+
 //#define DISP_MODE		TRULY043
 //#define DISP_MODE		VGA_800X600
 //#define DISP_MODE		VGA_1024X768

@@ -57,6 +57,7 @@ make ${CLEAN}
 # if [${CLEAN} = ""];then	#error
 # if [${CLEAN}=""];then		#error
 if [ ${CLEAN}="" ]; then	# warning: = not ==
+	make distclean
 	make x210_sd_config
 	make -j4
 fi

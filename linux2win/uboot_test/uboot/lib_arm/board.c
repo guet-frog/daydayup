@@ -468,7 +468,7 @@ void start_armboot (void)
 	/* compiler optimization barrier needed for GCC >= 3.4 */
 	__asm__ __volatile__("": : :"memory");
     
-	memset ((void*)gd, 0, sizeof (gd_t));
+	memset ((void*)gd, 0, sizeof (gd_t));			/// struct gd中没有bd的memory
 	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t));     /// bd_t *bd, 需要给bd_t分配空间, 清零
 	memset (gd->bd, 0, sizeof(bd_t));
     

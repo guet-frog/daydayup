@@ -318,11 +318,11 @@ void main_loop (void)
 	s = getenv ("bootdelay");
 	bootdelay = s ? (int)simple_strtol(s, NULL, 10) : CONFIG_BOOTDELAY;
 
-    printf("### main_loop entered: bootdelay=%d\n\n", bootdelay);
+    printf("#####main_loop entered: bootdelay=%d\n\n", bootdelay);
 
     s = getenv ("bootcmd");
 
-    printf("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
+    printf("#####main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
 
 	if (bootdelay >= 0 && s && !abortboot (bootdelay))
     {
