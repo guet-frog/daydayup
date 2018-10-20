@@ -1,6 +1,6 @@
 
 2.6.1.3、宏观分析：uboot第二阶段应该做什么
-	(1)uboot step1: 主要初始化clock, ddr, 重定位
+	(1)uboot step1: 主要初始化clock, ddr, 重定位(device copy function)
 	(2)uboot step2: init SoC板级硬件(iNand、网卡芯片等), uboot本身的一些东西(uboot的命令、环境变量等)
 					最终初始化完成后进入uboot的命令行准备接受命令
 
@@ -88,7 +88,7 @@
 	(1)console_init_f是console(控制台)的第一阶段初始化, _f表示是第一阶段初始化, _r表示第二阶段初始化
 	//有时候初始化函数不能一次完成, 中间必须要夹杂一些代码 -- line826 console_init_r
 
-2.6.8.2、display_banner		// 输出U_BOOT_VERSION	
+2.6.8.2、display_banner		// 输出U_BOOT_VERSION
 	(1) ./common/console.c/printf -- CR600 tool.c/printf实现
 	(2) printf() -> puts()
 	(4) 控制台就是一个用软件虚拟出来的设备, 这个设备有一套专用的通信函数(发送、接收...)
@@ -113,8 +113,6 @@
 		第三步：make
 		第四步：插入sd卡，ls /dev/sd*得到SD卡在ubuntu中的设备号(一般是/dev/sdb)
 		第五步：./sd_fusing.sh /dev/sdb完成烧录(注意不是sd_fusing2.sh)
-
-	//代码实践, 去掉flash看会不会出错
 
 	// bl1_position=1
 	// uboot_position=49	// video start_armboot解析7 15′
@@ -147,7 +145,8 @@
 	// struct list_head  mmc_devices
 	// struct sdhci_host mmc_host[MMC_MAX_CHANNEL]
 	// struct mmc 	     mmc_channel[MMC_MAX_CHANNEL]
-	-- mmc_initialize
+
+	-- mmc_initialize		// uboot/drivers/mmc/mmc.c
 	 |
 	 | -- struct mmc *mmc
 	 | -- INIT_LIST_HEAD(&mmc_devices)
@@ -159,16 +158,16 @@
 		   | -- setup_hsmmc_clock()		// uboot/cpu/s5pc11x/setup_hsmmc.c
 		   | -- setup_hsmmc_cfg_gpio()
 		   |
-		   | -- smdk_s3c_hsmmc_init()	// uboot/drivers/mmc/s3c_hsmmc.c
+		   | -- smdk_s3c_hsmmc_init()	// uboot/drivers/mmc/s3c_hsmmc.c  -- 不同mmc支持的channel不同
 			  |
-			  | -- s3c_hsmmc_initialize(0)
+			  | -- s3c_hsmmc_initialize(0)	// uboot/drivers/mmc/s3c_hsmmc.c
 				 |
 				 | -- struct mmc *mmc;
 				 | -- mmc = &mmc_channel[channel]	// 实例化
 				 |
 				 | -- ... 成员变量、成员方法初始化
 				 |
-				 | -- mmc_register(mmc)
+				 | -- mmc_register(mmc)		// uboot/drivers/mmc/mmc.c -- mmc_channel[channel]内存注册到mmc_devices链表
 				    |
 					| -- INIT_LIST_HEAD(&mmc->link)
 					|
@@ -184,7 +183,7 @@
 			  |
 			  | -- return m
 	 |
-	 | -- mmc_init(m)	// uboot/drivers/mmc/mmc.c
+	 | -- mmc_init(m)	// uboot/drivers/mmc/mmc.c	-- send cmd(init mmc card NOT mmc card controller, mmc card software struct)
 
 2.6.13.1、env_relocate		// env is embeded in text segment  -- warning: text segment will copy to ddr
 
