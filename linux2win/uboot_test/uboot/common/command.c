@@ -349,7 +349,7 @@ cmd_tbl_t *find_cmd (const char *cmd)
 	int len;
 	int n_found = 0;
     
-    printf("#####func@find_cmd() func find_cmd exe\n");
+    printf("#####func@find_cmd() has exe\n");
     
 	/*
 	 * Some commands allow length modifiers (like "cp.b");

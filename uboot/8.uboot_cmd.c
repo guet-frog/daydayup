@@ -63,8 +63,10 @@
 2.8.4.2、find_cmd函数
 	(1)find_cmd()从当前uboot的命令集中查找是否有某个命令, 如果找到则返回这个命令结构体的指针, 如果未找到返回NULL
 
-	// cmd_tbl_t *cmdtp_tmp = &__u_uboot_cmd_start;
+	// cmd_tbl_t *cmdtp_tmp = &__u_uboot_cmd_start;		//  -- __u_uboot_cmd_start应该直接就是addr
+
 	// len = ((p = strchr(cmd, '.')) == NULL) ? strlen(cmd) : (p - cmd);	// -- md.b md.w md.l
+
 	// cmdtp_tmp++ 	// 指针的++, 要考虑指针的数据类型
 
 2.8.5.1、在已有的c文件中直接添加命令
