@@ -149,36 +149,6 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	phys_size_t	mem_size;
 
 	struct lmb lmb;
-
-#if defined(CONFIG_SECURE_BOOT)
-	int rv;
-#endif
-
-#if defined(CONFIG_SECURE_BOOT)
-	rv = Check_Signature( (SecureBoot_CTX *)SECURE_BOOT_CONTEXT_ADDR,
-                                (unsigned char*)CONFIG_SECURE_KERNEL_BASE,
-                                CONFIG_SECURE_KERNEL_SIZE-128,
-                                (unsigned char*)(CONFIG_SECURE_KERNEL_BASE+CONFIG_SECURE_KERNEL_SIZE-128),
-                                128 );
-        if(rv != SB_OK) {
-                printf("Kernel Integrity check fail\nSystem Halt....");
-                while(1);
-        }
-        printf("Kernel Integirty check success.\n");
-
-	rv = Check_Signature( (SecureBoot_CTX *)SECURE_BOOT_CONTEXT_ADDR,
-                                (unsigned char*)CONFIG_SECURE_ROOTFS_BASE,
-                                CONFIG_SECURE_ROOTFS_SIZE-128,
-                                (unsigned char*)(CONFIG_SECURE_ROOTFS_BASE+CONFIG_SECURE_ROOTFS_SIZE-128),
-                                128 );
-	if(rv != SB_OK) {
-                printf("rootfs Integrity check fail\nSystem Halt....");
-                while(1);
-        }
-
-        printf("rootfs Integirty check success.\n");
-
-#endif
 	
 	memset ((void *)&images, 0, sizeof (images));
 	images.verify = getenv_yesno ("verify");
@@ -199,13 +169,12 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	if (argc < 2)
     {
 		addr = load_addr;
-		debug ("*  kernel: default image load address = 0x%08lx\n", load_addr);
+		debug ("#####kernel: default image load address = 0x%08lx\n", load_addr);
 	}
     else
     {
 		addr = simple_strtoul(argv[1], NULL, 16);   // addr in argv[1]
-
-        printf("#####*  kernel: cmdline image address = 0x%08lx\n", addr);
+        printf("#####kernel: cmdline image address = 0x%08lx\n", addr);
 	}
 
 	if (*(ulong *)(addr + 9*4) == LINUX_ZIMAGE_MAGIC)
@@ -225,7 +194,7 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
         
 		goto after_header_check;
 	}
-#endif
+#endif /* LINUX_ZIMAGE_MAGIC */
 
 	/* get kernel image header, start address and length */
 	os_hdr = boot_get_kernel (cmdtp, flag, argc, argv, &images, &os_data, &os_len);
@@ -236,7 +205,8 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	}
     
 	/* get image parameters */
-	switch (genimg_get_format (os_hdr)) {
+	switch (genimg_get_format (os_hdr))
+	{
 	case IMAGE_FORMAT_LEGACY:
 		type = image_get_type (os_hdr);
 		comp = image_get_comp (os_hdr);

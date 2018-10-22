@@ -1,10 +1,5 @@
 
-2.7.2.启动内核第一步：加载内核到DDR中
-	本节讲述系统部署细节参数和启动介质中的分区，这些是内核启动的第一阶段
-	目的是将内核镜像从启动介质中搬移到ddr中适当位置处
-
-	// Cmd_bootm.c
-	// do_bootm()	// 功能: 从ddr内存中的内核镜像处启动内存
+	// cmd_bootm.c -- do_bootm()	// 启动内核
 
 2.7.1.2、内核本质也是一个"裸机程序"	 // zImage
 	(2)操作系统运行起来后在软件上分为内核层和应用层, 分层后权限不同(内存访问和设备操作的管理)
@@ -16,36 +11,35 @@
 	运行时: 在ddr中运行, 与存储介质无关
 	// uboot和kernel中的分区表必须一致, 同时和sd卡的实际使用的分区要一致
 
-2.7.1.4、运行时必须先加载到ddr中/*链接地址处*/
-	(1)uboot在step1进行重定位将step2(整个uboot镜像)加载到ddr中	// uboot link addr:  0x33E0_0000 -- MMU映射表
-	(2)uboot启动内核时将zImage加载到ddr中(重定位的过程)			// kernel link addr: 0x3000_8000
+2.7.1.4、运行时必须先加载到ddr中/*链接地址*/处
+	(1)uboot在step1进行重定位, 将step2(整个uboot)加载到ddr中	// uboot link addr:  0x33E0_0000 -- MMU映射表
+	(2)uboot启动内核时将zImage加载到ddr中(kernel relocate)		// kernel link addr: 0x3000_8000
 
 2.7.1.5、内核启动需要必要的启动参数
 	(2)内核启动需要: ①image relocate ②boot args	// uboot可以自启动或bootROM引导
 
-2.7.2.0、启动内核第一步：加载内核到ddr中	// kernel直接由link addr处开始运行
+2.7.2.0、启动内核第一步：加载内核到ddr中		// read kernel to ddr not uboot
 
 2.7.2.1、静态内核镜像在哪里？
 	(1)SD卡/iNand/Nand/NorFlash 		// raw分区
 		uboot读取命令: movi or nand
-	(2)	movi read kernel 0x30008000		// kernel分区
+	(2)movi read kernel 0x30008000		// kernel分区
 
-	// bootcmd ""
+	// bootcmd ""		// env
 	// bootm ""	''
 
 	(3)tftp、nfs等网络下载方式从远端服务器获取镜像		// uboot支持远程启动  -- 通过网络从server下载kernel
 
-	// 编译uboot load zImage  启动测试
 	// fastboot 命令 -- 查看分区起始地址 + 长度, 没有指明则默认接连上一个分区
 	// android 默认分区较多, 典型linux只有3个分区: bootloader kernel rootfs
 	// help -- movi
 
 2.7.3.2、vmlinuz和zImage和uImage
 	(1) uboot经过编译直接生成的elf格式的可执行程序是u-boot		// 900+ KByte
-		ELF类似于windows下的exe格式, 在/*操作系统下*/可以直接执行, ELF格式不能用来烧录下载
-		u-boot.bin: 镜像(image)由u-boot使用arm-linux-objcopy工具制作, 用来烧录下载 
+		elf类似于windows下的exe格式, 在/*操作系统下*/可以直接执行, elf格式不能用来烧录下载
+		/*u-boot.bin*/: 镜像(image)由u-boot使用arm-linux-objcopy工具制作, 用来烧录下载
 
-	(2) linux内核编译后生成可执行程序vmlinux或vmlinuz(/boot/vmlinuz-3.13.0-32-generic)	// 原始的内核ELF文件
+	(2) linux内核编译后生成可执行程序vmlinux或vmlinuz(/boot/vmlinuz-3.13.0-32-generic)	// 原始的内核elf文件
 		使用objcopy工具制作嵌入式系统部署时的烧录镜像文件Image	// 无.bin	-- 78M -> 7.5M
 
 	(3) Image可以直接烧录到flash上启动执行
@@ -63,15 +57,14 @@
 		uboot/tools下cp mkimage /usr/local/bin/(一般为用户自己添加的程序文件, 直接copy过去)复制mkimage工具到系统目录下
 
 2.7.4.1、LINUX_ZIMAGE_MAGIC		// 首先第一步将kernel放置到ddr固定位置
-		
 	(2) 命令 bootm 0x30008000，所以do_boom的argc=2 argv[0]=bootm argv[1]=0x30008000
 		但是实际bootm命令还可以不带参数执行。如果不带参数直接bootm，
-		则会从CFG_LOAD_ADDR地址去执行（定义在x210_sd.h中）。
-	(3)zImage头部开始的第37-40字节处存放着zImage标志魔数，从这个位置取出然后对比LINUX_ZIMAGE_MAGIC。
-		可以用二进制阅读软件来打开zImage查看，就可以证明。
+		则会从CFG_LOAD_ADDR地址去执行(定义在x210_sd.h中)
+	(3)zImage头部开始的第37-40字节处存放着zImage标志魔数，从这个位置取出然后对比LINUX_ZIMAGE_MAGIC
+		可以用二进制阅读软件来打开zImage查看，就可以证明
 		// winhex
 		// *(ulong *)(addr + 9*4) == LINUX_ZIMAGE_MAGIC	// unsigned long
-			
+
 2.7.4.2、image_header_t
 (1)这个数据结构是我们uboot启动内核使用的一个标准启动数据结构，zImage头信息也是一个image_header_t，但是在实际启动之前需要进行一些改造。hdr->ih_os = IH_OS_LINUX;
 		hdr->ih_ep = ntohl(addr);这两句就是在进行改造。
@@ -100,7 +93,6 @@
 	// linux kernel 更新快
 	// linux kernel driver 经典书籍 ldd3 Linux内核驱动3(很多事例代码在当前kernel已经编译不过) -- 使用2.6早期内核(与2.6晚期内核差异非常大)(2.6晚期内核与3.0早期内核也有一定差异)
 	// 2.6晚期内核使用量多, 3.x 4.x
-
 
 	// 完成校验进入step3
 	// 根据镜像头中os种类, 执行do_bootm_linux(), 传参通过&images(把镜像启动所需要的有效信息存储在images)
@@ -169,8 +161,6 @@
 // default env与current env的区别
 // env的排布方法
 // set xxx用来
-
-// 没有下划线自己用，一个下划线系统使用，两个下划线系统内部自己使用
 
 
 

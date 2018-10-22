@@ -318,10 +318,7 @@ void main_loop (void)
 	s = getenv ("bootdelay");
 	bootdelay = s ? (int)simple_strtol(s, NULL, 10) : CONFIG_BOOTDELAY;
 
-    printf("#####main_loop entered: bootdelay=%d\n\n", bootdelay);
-
     s = getenv ("bootcmd");
-
     printf("#####main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
 
 	if (bootdelay >= 0 && s && !abortboot (bootdelay))
@@ -333,11 +330,11 @@ void main_loop (void)
 #ifndef CFG_HUSH_PARSER
 		run_command (s, 0);
 #else
-        printf("#####func@main_loop() not push key\n");
+        printf("#####func@main_loop() must get here\n");
 
 		parse_string_outer(s, FLAG_PARSE_SEMICOLON | FLAG_EXIT_FROM_LOOP);
 
-        printf("#####func@main_loop() push key\n");
+        printf("#####func@main_loop() never get here\n");
         while(1);   // for test
 #endif
 
@@ -381,10 +378,8 @@ void main_loop (void)
 #ifdef CFG_HUSH_PARSER
     
 	printf("#####main.c CFG_HUSH_PARSER has defined\n");
-    
+	
 	parse_file_outer();
-    
-	printf("#####main.c this point is never reached\n");
 	
 	/* This point is never reached */
 	for (;;);

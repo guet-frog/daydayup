@@ -88,7 +88,7 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
 			puts ("Can't get entry point property!\n");
 			goto error;
 		}
-#endif
+#endif /* CONFIG_FIT */
 	}
     else
     {
