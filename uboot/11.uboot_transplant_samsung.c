@@ -1,5 +1,5 @@
 
-2.11.1.1、三星移植过的uboot源代码准备		//android_uboot_smdkv210.tar.bz2
+	//android_uboot_smdkv210.tar.bz2
 
 2.11.1.3、sshsecureshell
 	(1)Linux编辑工具: vim, gedit
@@ -20,43 +20,34 @@
 2.11.3.1、直接编译三星移植版uboot尝试运行
 	(2)检查Makefile中的交叉编译工具链	// 编译源码: ①源码 ②编译工具链
 	(3)配置时使用：make smdkv210single_config, 对应include/configs/smdkv210single.h头文件
-	(4)配置 -> 编译 -> 烧录
+	(4)config -> compile -> load
 	(5)uboot/sd_fusing/sd_fusing.sh
 		// bl1_position=1
 		// uboot_position=49  -- 和源码相匹配
-		
+
 		// 需要在sd_fusing中先make clean  // make distclean没有对sd_fusing目录中生成文件删除
-		// file mkbl1 -- x86-64  
-		
+		// file mkbl1 -- x86-64
+
 		make clean && make; 	file mkbl1 -- Inter 80386
-		
+
 		PMIC	// iic interface
 
-2.11.4.时钟和DDR的配置移植
-2.11.4.1、更改CONFIG_IDENT_STRING为"  for ASTON210"，然后同步到ubuntu中的一份代码，然后 make distclean; 
-	make smdkv210single_config，然后make，然后烧录运行，检查打印出来的banner信息是否如我们改动的那样。
-
 2.11.4.2、确认时钟部分的配置
-(1)时钟部分的运行结果本来就是对的，时钟部分的代码在lowlevel_init.S中的bl system_clock_init调用的这个函数中。
-	函数的代码部分是没任何问题的，根本不需要改动，要改动的是寄存器写入的值，
-	这些值都在配置头文件（smdkv210single.h）中用宏定义定义出来了。如果时钟部分要更改，关键是去更改头文件中的宏定义。
-(2)三星移植时已经把210常用的各种时钟配置全都计算好用宏开关来控制了。只要打开相应的宏开关就能将系统配置为各种不同的频率。
 
 2.11.4.3、DDR配置信息的更改
-(1)从运行信息以及bdinfo命令看到的结果，显示DRAM bank0和1的size值都设置错了。
-(2)使用md和mw命令测试内存，发现20000000和40000000开头的内存都是可以用的，说明代码中DDR初始化部分是正确的，只是size错了。
-(3)内存部分配置成：
-#define CONFIG_NR_DRAM_BANKS    2          /* we have 2 bank of DRAM */
-//#define SDRAM_BANK_SIZE         0x20000000    /* 512 MB */
-#define SDRAM_BANK_SIZE         0x10000000    /* 256 MB */
+	(1)从运行信息以及bdinfo命令看到的结果，显示DRAM bank0和1的size值都设置错了。
+	(2)使用md和mw命令测试内存，发现20000000和40000000开头的内存都是可以用的，说明代码中DDR初始化部分是正确的，只是size错了
+	(3)内存部分配置成：
+	#define CONFIG_NR_DRAM_BANKS    2          /* we have 2 bank of DRAM */
+	//#define SDRAM_BANK_SIZE         0x20000000    /* 512 MB */
+	#define SDRAM_BANK_SIZE         0x10000000    /* 256 MB */
 
-#define PHYS_SDRAM_1            MEMORY_BASE_ADDRESS /* SDRAM Bank #1 */
-#define PHYS_SDRAM_1_SIZE       SDRAM_BANK_SIZE
-//#define PHYS_SDRAM_2            (MEMORY_BASE_ADDRESS + SDRAM_BANK_SIZE) /* SDRAM Bank #2 */
-#define PHYS_SDRAM_2  			0x40000000
-#define PHYS_SDRAM_2_SIZE       SDRAM_BANK_SIZE
+	#define PHYS_SDRAM_1            MEMORY_BASE_ADDRESS /* SDRAM Bank #1 */
+	#define PHYS_SDRAM_1_SIZE       SDRAM_BANK_SIZE
+	//#define PHYS_SDRAM_2            (MEMORY_BASE_ADDRESS + SDRAM_BANK_SIZE) /* SDRAM Bank #2 */
+	#define PHYS_SDRAM_2  			0x40000000
+	#define PHYS_SDRAM_2_SIZE       SDRAM_BANK_SIZE
 
-2.11.5.DDR地址另外配置
 2.11.5.1、目标：将DDR端口0地址配置为30000000开头
 (1)更改有2个目的：第一是让大家体验内存配置的更改过程；
 	第二是3开头的地址和DRAM bank1上40000000开头的地址就连起来了。
