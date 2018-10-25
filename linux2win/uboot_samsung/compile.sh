@@ -48,8 +48,14 @@ cp -f uboot_samsung/drivers/mmc/s3c_hsmmc.c /home/aston/src/uboot_samsung/driver
 # setup_hsmmc.c -- seup_hsmmc_clock()
 cp -f uboot_samsung/cpu/s5pc11x/setup_hsmmc.c /home/aston/src/uboot_samsung/cpu/s5pc11x/setup_hsmmc.c
 
-# lowlevel_init.S
+# lowlevel_init.S -- MMU remap	line596
 cp -f uboot_samsung/board/samsung/smdkc110/lowlevel_init.S /home/aston/src/uboot_samsung/board/samsung/smdkc110/lowlevel_init.S
+
+# smdkc110.c -- virt_to_phy_smdkc110(ulong addr) line186
+cp -f uboot_samsung/board/samsung/smdkc110/smdkc110.c /home/aston/src/uboot_samsung/board/samsung/smdkc110/smdkc110.c
+
+#cpu_init.S -- ddr init	line122
+cp -f uboot_samsung/cpu/s5pc11x/s5pc110/cpu_init.S	/home/aston/src/uboot_samsung/cpu/s5pc11x/s5pc110/cpu_init.S
 ############################################################################
 
 
