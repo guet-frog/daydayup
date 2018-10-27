@@ -348,11 +348,10 @@ cmd_tbl_t *find_cmd (const char *cmd)
 	const char *p;
 	int len;
 	int n_found = 0;
-    
-    printf("#####func@find_cmd() has exe\n");
-    
-	/*
-	 * Some commands allow length modifiers (like "cp.b");
+    	
+	//printf("#####func@find_cmd() has exe\n");
+
+	 /* Some commands allow length modifiers (like "cp.b");
 	 * compare command name only until first dot.
 	 */
 	len = ((p = strchr(cmd, '.')) == NULL) ? strlen (cmd) : (p - cmd);

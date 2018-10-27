@@ -77,7 +77,7 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
 	if (images->legacy_hdr_valid)
     {
 		ep = image_get_ep (&images->legacy_hdr_os_copy);
-    
+    	
         printf("#####bootm.c -- do_bootm_linux() kernel entry point %#x\n", ep);
 
 #if defined(CONFIG_FIT)
