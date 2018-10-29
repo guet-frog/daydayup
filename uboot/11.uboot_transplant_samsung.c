@@ -1,5 +1,5 @@
 
-	//android_uboot_smdkv210.tar.bz2
+	//源码: android_uboot_smdkv210.tar.bz2
 
 2.11.1.3、sshsecureshell
 	(1)Linux编辑工具: vim, gedit
@@ -23,7 +23,7 @@
 	(4)config -> compile -> load
 	(5)uboot/sd_fusing/sd_fusing.sh
 		// bl1_position=1
-		// uboot_position=49  -- 和源码相匹配
+		// uboot_position=49  -- dd iflag=dsync oflag=dsync if=./u-boot.bin of=$1 seek=$uboot_position  -- 整个uboot bin
 
 		// 需要在sd_fusing中先make clean  // make distclean没有对sd_fusing目录中生成文件删除
 		// file mkbl1 -- x86-64
@@ -32,70 +32,25 @@
 
 		PMIC	// iic interface
 
-2.11.4.2、确认时钟部分的配置
+2.11.4.3、ddr配置信息的更改
 
-2.11.4.3、DDR配置信息的更改
-	(1)从运行信息以及bdinfo命令看到的结果，显示DRAM bank0和1的size值都设置错了。
-	(2)使用md和mw命令测试内存，发现20000000和40000000开头的内存都是可以用的，说明代码中DDR初始化部分是正确的，只是size错了
-	(3)内存部分配置成：
-	#define CONFIG_NR_DRAM_BANKS    2          /* we have 2 bank of DRAM */
-	//#define SDRAM_BANK_SIZE         0x20000000    /* 512 MB */
-	#define SDRAM_BANK_SIZE         0x10000000    /* 256 MB */
-
-	#define PHYS_SDRAM_1            MEMORY_BASE_ADDRESS /* SDRAM Bank #1 */
-	#define PHYS_SDRAM_1_SIZE       SDRAM_BANK_SIZE
-	//#define PHYS_SDRAM_2            (MEMORY_BASE_ADDRESS + SDRAM_BANK_SIZE) /* SDRAM Bank #2 */
-	#define PHYS_SDRAM_2  			0x40000000
-	#define PHYS_SDRAM_2_SIZE       SDRAM_BANK_SIZE
-
-2.11.5.1、目标：将DDR端口0地址配置为30000000开头
-(1)更改有2个目的：第一是让大家体验内存配置的更改过程；
-	第二是3开头的地址和DRAM bank1上40000000开头的地址就连起来了。
-	这样我们就得到了地址连续的512MB内存，而原来我们得到的512MB内存地址是断续的。
-
-2.11.5.2、DDR初始化参数更改
-(1)根据裸机中讲DDR初始化部分的课程，和uboot前面分析uboot中DDR初始化部分的代码的课程，
-	得出结论就是：DDR的初始化代码部分是在lowlevel_init.S中写的，是不动的。
-	代码部分就是对相应寄存器做相应值的初始化；要动的是值，
-	而uboot为了具有可移植性把值都宏定义在include/configs/xxx.h中了。
-	因此我们只需要去这个配置头文件中更改配置值即可。
-(2)更改内容是：#define DMC0_MEMCONFIG_0	0x20E01323改为：
-#define DMC0_MEMCONFIG_0	0x30E01323		注意20改为30了。
-
-2.11.5.3、smdkv210single.h中相关宏定义修改
-(1)//寄存器的值改了后相当于是硬件配置部分做了更改。但是uboot中DDR相关的一些软件配置值还没更改，
-还在原来位置，所以要去更改。
-(2)#define MEMORY_BASE_ADDRESS	0x20000000改为：
-#define MEMORY_BASE_ADDRESS	0x30000000
+	(1)ddr controller reg config		// ddr硬件配置
+		#define DMC0_MEMCONFIG_0	0x20E01323
+		#define DMC0_MEMCONFIG_0	0x30E01323		// E0 -> F0
+		
+	(2)sdram base && sdram bank size	// ddr软件配置
+		#define MEMORY_BASE_ADDRESS	0x20000000
+		#define MEMORY_BASE_ADDRESS	0x30000000
+		#define MEMORY_SIZE			0x10000000
 
 2.11.5.4、虚拟地址映射表中相应修改
-(1)uboot中开启了MMU对内存进行了段式映射，有一张内存映射表。之前课程中分析过，分析方法是一样的。
-(2)经过实际分析，发现这个内存映射只是把20000000开始的256MB映射到C0000000开头的256MB。
-	我们更改方法是将2改成3.
-(3)为了安全起见，再去配置头文件smdkv210single.h中查一遍，
-看看有没有其他的宏定义值和内存配置有关联的。
+	(1) asm中mmu table配置
+	(2) C中virt_to_phy_smdkc110(ulong addr)
+	
+	// 内存映射相关问题, 检查与内存相关操作
 
-重新配置编译，烧录运行查看结果。
-
-
-2.11.6.DDR初始化参数更改2
-2.11.6.1、修改DMC0的配置参数
-(1)修改DDR中DMC0的memconfig_0寄存器的配置值，将
-#define DMC0_MEMCONFIG_0	0x30E01323 改为：
-#define DMC0_MEMCONFIG_0	0x30F01323
-(2)然后重新同步、编译烧写运行，发现uboot第二阶段运行了，但是整个uboot还是不成功。
-(3)分析问题，寻找解决方案。分析方法有2种：第一种靠经验、靠发现能力、靠直觉去找；
-第二种就是在整个代码中先基本定位错误地方，然后通过在源代码中添加打印信息来精确定位出错的代码，
-然后找到精确的出错位置后再去分析错误原因，从而找到解决方案。
-
-<<<<<<< HEAD
-// 将所有动作都添加到脚本中, 脚本的意义所在
-// 以前0x20E0_1323是OK, 如果将kernel链接到0x2xxx开头位置也是error, \
-	这样配置0x2xxx内存有问题, 3xxx开头的没有问题
-=======
 // 将所有动作都添加到脚本中
 // 以前0x20E0_1323是OK, 如果将kernel链接到0x2xxx开头位置也是error, 这样配置0x2xxx内存有问题, 3xxx开头的没有问题
->>>>>>> c62f63d29b88547fff53947501f45e9483718489
 
 2.11.6.2、修改修改虚拟地址到物理地址的映射函数
 (1)修改uboot/board/samsung/smdkc110/smdkc110.c中的virt_to_phy_smdkc110，

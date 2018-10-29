@@ -447,8 +447,6 @@ int smdk_s3c_hsmmc_init(void)
 
 	int err;
 
-	printf("\n#####s3c_hsmmc.c smdk_s3c_hsmmc_init() has exe\n");
-
 #ifdef USE_MMC0
 	err = s3c_hsmmc_initialize(0);
 	if(err)

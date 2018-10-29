@@ -407,8 +407,12 @@
 #if defined(CONFIG_MCP_SINGLE)
 
 #define DMC0_MEMCONTROL		0x00202400
-#define DMC0_MEMCONFIG_0	0x30F01323
+
 //#define DMC0_MEMCONFIG_0	0x20E01323	// MemConfig0	256MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed
+//#define DMC0_MEMCONFIG_0	0x30E01323	// init error
+#define DMC0_MEMCONFIG_0	0x30F01323
+
+
 #define DMC0_MEMCONFIG_1	0x40F01323	// MemConfig1
 #define DMC0_TIMINGA_REF	0x00000618	// TimingAref	7.8us*133MHz=1038(0x40E), 100MHz=780(0x30C), 20MHz=156(0x9C), 10MHz=78(0x4E)
 #define DMC0_TIMING_ROW		0x28233287	// TimingRow	for @200MHz

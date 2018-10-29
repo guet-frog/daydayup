@@ -781,9 +781,7 @@ static int mmc_read_ext_csd(struct mmc *host)
 	 * raw block in mmc_card.
 	 */
 	ext_csd = malloc(512);
-
-	printf("#####ext_csd = %p\n", ext_csd);
-	ext_csd = ext_csd - 0x90000000;
+	
 	printf("#####ext_csd = %p\n", ext_csd);
 	
 	if (!ext_csd) {
@@ -802,13 +800,9 @@ static int mmc_read_ext_csd(struct mmc *host)
 	if (err)
 		return err;
 
-	printf("#####mmc.c mmc_read_ext_csd() has exe\n");
-
 	err = mmc_send_ext_csd(host, ext_csd);
-	if (err) {
-
-		printf("==============================\n");
-	
+	if (err)
+	{
 		/*
 		 * High capacity cards should have this "magic" size
 		 * stored in their CSD.
@@ -826,21 +820,22 @@ static int mmc_read_ext_csd(struct mmc *host)
 		goto out;
 	}
 
-	printf("==============================\n");
+	printf("#####mmc.c func@mmc_read_ext_csd() return value err = 0\n");
 
 	ext_csd_struct = ext_csd[EXT_CSD_REV];
-	if (ext_csd_struct > 5) {
+	if (ext_csd_struct > 5)
+	{
 		//printf("unrecognised EXT_CSD structure "
 			//"version %d\n", ext_csd_struct);
 		//err = -1;
 		//goto out;
 
-		printf("ext_csd_struct = %d\n", ext_csd_struct);
+		printf("#####ext_csd_struct = %d\n", ext_csd_struct);
 		ext_csd_struct = 5;
 	}
 	else
 	{
-		printf("ext_csd_struct = %d\n", ext_csd_struct);
+		printf("#####ext_csd_struct = %d\n", ext_csd_struct);
 	}
 
 	if (ext_csd_struct >= 2) {
@@ -873,6 +868,8 @@ static int mmc_read_ext_csd(struct mmc *host)
 	}
 
 out:
+	printf("#####mmc.c func@mmc_read_ext_csd() err = %d\n", err);
+
 	free(ext_csd);
 
 	return err;
@@ -932,8 +929,6 @@ int mmc_startup(struct mmc *host)
 
 	err = mmc_send_cmd(host, &cmd, NULL);
 
-	printf("#####mmc_startup has exe 1\n");
-
 	if (err)
 		return err;
 
@@ -957,8 +952,6 @@ int mmc_startup(struct mmc *host)
 	else
 		mmc_decode_csd(host);
 
-	printf("#####mmc_startup has exe 2\n");
-
 	/* Select the card, and put it into Transfer Mode */
 	cmd.opcode = MMC_CMD_SELECT_CARD;
 	cmd.resp_type = MMC_RSP_R1b;
@@ -970,15 +963,19 @@ int mmc_startup(struct mmc *host)
 
 	if (IS_SD(host))
 	{
-		printf("#####is_sd() == 1\n");
+		printf("##### Is SD card\n");
 		err = sd_change_freq(host);
 	}
 	else
 	{
-		printf("#####is_sd() == 0\n");
+		printf("##### Not SD card, is mmc card\n");
 		err = mmc_read_ext_csd(host);
 		if (err)
+		{
+			printf("#####mmc.c func@mmc_startup() -- mmc_read_ext_csd() return err\n");
+		
 			return err;
+		}
 
 		printf("#####mmc.c mmc_change_freq() has exe\n");
 		err = mmc_change_freq(host);
@@ -1162,8 +1159,6 @@ int mmc_init(struct mmc *host)
 		if (err)
 			return UNUSABLE_ERR;
 
-	printf("#####mmc.c mmc_startup() has exe\n");
-
 	return mmc_startup(host);
 }
 
@@ -1209,20 +1204,15 @@ int mmc_initialize(bd_t *bis)
 	if (board_mmc_init(bis) < 0)
 	{
 		cpu_mmc_init(bis);
-
-		printf("#####mmc.c mmc_initialize() has exe\n");
 	}
-		
 
 #if defined(DEBUG_S3C_HSMMC)
 	print_mmc_devices(',');
 #endif
 
 	mmc = find_mmc_device(0);
-	if (mmc) {
-
-		printf("#####mmc.c mmc_init() has exe\n");
-	
+	if (mmc)
+	{
 		err = mmc_init(mmc);
 		if (err)
 			err = mmc_init(mmc);
@@ -1247,6 +1237,5 @@ int mmc_initialize(bd_t *bis)
 	}
 	printf("%ldMB\n", (mmc->capacity/(1024*1024/mmc->read_bl_len)));
 
-	
 	return 0;
 }
