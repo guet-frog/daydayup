@@ -49,117 +49,72 @@
 	
 	
 	
-第三部分、随堂记录
-2.12.1.选择合适的官方原版uboot
-2.12.1.1、官方原版uboot的版本
-(1)版本号。刚开始是1.3.4，后来变成2009.08
-(2)新版和旧版的差别。uboot的架构很早就定下来了，然后里面普遍公用的东西（common目录下、drivers目录下、fs目录下等···）在各个版本之间几乎是完全一样的。差别最大的是board和cpu目录，这两个目录正是单板（开发板）相关的。越新的uboot版本支持越多的开发板（CPU），所以越新的uboot越庞大。
-(3)并不是越新的版本就越好。越新的uboot中会多出更多的开发板的支持代码，如果我们的开发板并不是很新，就没必要去用很新版本的uboot。因为多出来的代码自己也用不到而且还会成为累赘。
-
-2.12.1.2、官方原版uboot的来源
-(1)从uboot官方网站ftp下载
-(2)从一些镜像网站下载
 
 2.12.1.3、新版uboot配置体系的改变
-(1)在最新的uboot版本（准确的说是2013.10到2014.10中的某个版本）中，uboot的文件体系发生了一个很大的变化。这个变化就是uboot引入了linux kernel的配置体系（Kbuild、Kconfig、menuconfig），从而让我们可以在图形界面下，像配置内核一样配置uboot。
-(2)所以新版本的uboot配置时和我们之前的课程讲的就不同了。我们移植时不能选择这种配置方式更改之后的uboot版本。我们要选择更改之前的。
-(3)新版本的配置方式本质上和linux kernel一样的，所以在学完linux kernel移植后自己就能看懂，因此不用担心。
+	(1) 引入linux kernel的配置体系(Kbuild、Kconfig、menuconfig), 可以在图形界面下, 像配置内核一样配置uboot
 
-2.12.1.4、结论：选择合适的官方原版uboot进行移植
-(1)结合以上，选择2013.10版本进行实验移植是比较合理的。
-
-2.12.1.5、注意：实践工作中一般是从SoC厂商的uboot出发移植的
-(1)在工作中一般是不需要从uboot官方版本出发去做移植的，而是从SoC厂商提供的开发板配套的uboot去做移植的。
-
-
-2.12.2.先初步浏览官方原版uboot
 2.12.2.1、文件夹结构浏览
-(1)文件夹结构分析、主要文件检视
-总的来说，文件夹结构和以前基本一样。不同的主要是lib，以前是lib_arm和lib_generic，现在是arch和lib。arch目录下放的是和cpu架构有关的东西。
-总的来说，2013.10版本的uboot在结构上和1.3.4版本的uboot还是有所不同的。
-(2)参照物开发板的选择
-我们开发板使用的CPU是S5PV210，所以要找uboot中针对S5PV210或者S5PC110进行移植的作为参考。
-根据规律，我们应该参考include/configs/s5p_goni.h，对应的board在uboot/board/samsung/goni这个目录。
-
-(3)删除无关文件和文件夹
-其实不删除也可以，但是删除更好。	// 和架构有关的头文件放在 arch/arm/include目录下
-
-2.12.2.2、建立SI工程并预解析
+	// 和架构有关的头文件放在arch/arm/include目录下
 
 2.12.2.3、主Makefile浏览及boards.cfg文件
-(1)2013.10版本的uboot的Makefile中使用了boards.cfg文件，因此在配置uboot时make xxx_config，这个xxx要到boards.cfg文件中查找。
-(2)其实就相当于把以前的版本的uboot中各种开发板的配置部分规则抽离出来写到了Makefile中，然后把配置信息部分写到了一个独立文件boards.cfg。
+	(1)uboot配置相关放在board.cfg文件中		// make xxx_config
 
-2.12.2.4、mkconfig脚本浏览及符号连接的分析
-(1)下节课详细分析，给出结论。
-2.12.2.5、结论：
-(1)参照物开发板为：55p_goni
-(2)配置对应的cpu、board文件夹分别为：
-cpu:	u-boot-2013.10\arch\arm\cpu\armv7
-board:	u-boot-2013.10\board\samsung\goni
-
+	cpu:	u-boot-2013.10\arch\arm\cpu\armv7
+	board:	u-boot-2013.10\board\samsung\goni
 
 2.12.3.mkconfig脚本分析
-2.12.3.1、脚本功能浏览
-(1)首先我们在命令行配置uboot时，是：make s5p_goni_config，对应Makefile中的一个目标。
-(2)新版本的Makefile中：
-%_config::	unconfig
-	@$(MKCONFIG) -A $(@:_config=)
-从这里分析得出结论，实际配置时是调用mkconfig脚本，然后传参2个：-A和s5p_goni
-(3)到了mkconfig脚本中了。在24到35行中使用awk正则表达式/* 字符串匹配 */将boards.cfg中与刚才$1（s5p_goni）能够匹配上的那一行截取出来赋值给变量line，然后将line的内容以空格为间隔依次分开，分别赋值给$1、$2···$8。
-(4)注意在解析完boards.cfg之后，$1到$8就有了新的值。
-$1 = Active
-$2 = arm
-$3 = armv7
-$4 = s5pc1xx
-$5 = samsung
-$6 = goni
-$7 = s5p_goni
-$8 = - 
+	(1)首先我们在命令行配置uboot时，是：make s5p_goni_config，对应Makefile中的一个目标。
+	(2)新版本的Makefile中：
+		%_config::	unconfig
+			@$(MKCONFIG) -A $(@:_config=)
+		从这里分析得出结论，实际配置时是调用mkconfig脚本，然后传参2个：-A和s5p_goni
+	(3)到了mkconfig脚本中了。在24到35行中使用awk正则表达式/* 字符串匹配 */将boards.cfg中与刚才$1（s5p_goni）能够匹配上的那一行截取出来赋值给变量line，然后将line的内容以空格为间隔依次分开，分别赋值给$1、$2···$8。
+	(4)注意在解析完boards.cfg之后，$1到$8就有了新的值。
+		$1 = Active
+		$2 = arm
+		$3 = armv7
+		$4 = s5pc1xx
+		$5 = samsung
+		$6 = goni
+		$7 = s5p_goni
+		$8 = - 
 
-2.12.3.2、几个传参和其含义
-(1)几个很重要的变量
-arch=arm   
-cpu=armv7
-vendor=samsung
-soc=s5pc1xx
+2.12.3.2、几个传参和其含义		// 主要是通过这几个变量, 创建符号链接, 链接到相应的文件
+	(1)几个很重要的变量
+		arch=arm   
+		cpu=armv7
+		vendor=samsung
+		soc=s5pc1xx
 
 2.12.3.3、符号链接
-(1)include/asm  -> arch/arm/include/asm
-(2)include/asm/arch -> include/asm/arch-s5pc1xx
-(3)include/asm/proc -> include/asm/proc-armv
+	(1)include/asm  -> arch/arm/include/asm
+	(2)include/asm/arch -> include/asm/arch-s5pc1xx
+	(3)include/asm/proc -> include/asm/proc-armv
 
-最后创建了include/config.h文件。
+	最后创建了include/config.h文件。
 
 2.12.3.4、Makefile中添加交叉编译工具链
-(1)官方原版的uboot中CROSS_COMPLIE是没有定义的，需要自己去定义。如果没定义就直接去编译，就会用gcc编译。	// 这样就不是交叉编译了,(是在inter CPU下编译使用)
-(2)添加一行：
-CROSS_COMPILE = /usr/local/arm/arm-2009q3/bin/arm-none-linux-gnueabi-
+	(1)官方原版的uboot中CROSS_COMPLIE是没有定义的，需要自己去定义。如果没定义就直接去编译，就会用gcc编译。	// 这样就不是交叉编译了,(是在inter CPU下编译使用)
+	(2)添加一行：
+	CROSS_COMPILE = /usr/local/arm/arm-2009q3/bin/arm-none-linux-gnueabi-
 
 2.12.3.5、配置编译测试
-(1)编译过程：
-make distclean
-make s5p_goni_config
-make
-(2)结果：得到u-boot.bin即可
+	(1)编译过程：
+		make distclean
+		make s5p_goni_config
+		make
+	(2)结果：得到u-boot.bin即可
 
-
-2.12.4.先解决官方版本uboot的烧录运行
-2.12.4.1、如何烧录uboot
-(1)烧录u-boot.bin到SD卡中有2种方法：windows下用烧录软件；linux下用dd命令烧录脚本来烧录。因为windows下的工具不开源，出了问题没法调试，所以不推荐。
-	推荐linux下用烧录脚本来烧录（实质是dd命令进行sd卡扇区写入）
-(2)移植原来的版本的uboot中的sd_fusing文件夹到官方uboot版本中，使用这个文件夹中的sd_fusing.sh脚本来进行烧录。
 
 2.12.4.2、分析：为什么烧录运行不正确？
 (1)串口接串口2，串口有输出。但是这个串口输出不是uboot输出的，而是内部iROM中的BL0运行时输出的。
 (2)输出错误信息分析：
-第一个SD checksum Error：是第一顺序启动设备SD0（iNand）启动时校验和失败打印出来的；/*瞬间出现*/
-第二个SD checksum Error：是第二顺序启动设备SD2（外部SD卡）启动时校验和失败打印出来的/*正常不会出现*/
-剩下的是串口启动和usb启动的东西，可以不管。
-总结：从两个SD checksum Error，可以看出：外部SD卡校验和失败了。
-分析：SD卡烧录出错了，导致SD卡校验和会失败。
-正常启动后, 第二次 sd checksum error不会出来, 等到超时以后再进行Uart USB启动
-
+	第一个SD checksum Error：是第一顺序启动设备SD0（iNand）启动时校验和失败打印出来的；/*瞬间出现*/
+	第二个SD checksum Error：是第二顺序启动设备SD2（外部SD卡）启动时校验和失败打印出来的/*正常不会出现*/
+	剩下的是串口启动和usb启动的东西，可以不管。
+	总结：从两个SD checksum Error，可以看出：外部SD卡校验和失败了。
+	分析：SD卡烧录出错了，导致SD卡校验和会失败。
+	正常启动后, 第二次 sd checksum error不会出来, 等到超时以后再进行Uart USB启动
 
 2.12.4.3、解决方案分析
 (1)为什么SD卡烧录会出错？可能原因：烧录方法错误、烧录原材料错误。
