@@ -21,13 +21,7 @@
 
 	2.2.1.5、总结：uboot的作用
 		(1)uboot主要作用/*启动操作系统内核*/
-		(2)uboot其他作用: 部署整个计算机系统, 操作flash等板子上硬盘的驱动, 提供一个命令行界面 
-
-	2.1.2.2、uboot的发展历程
-		(1)uboot: universal bootloader
-		(2)事实上的业内bootloader标准, 大部分的嵌入式设备都会默认使用uboot来做为bootloader
-		(3)uboot版本号两种书写方式
-		(4)uboot的核心部分几乎没怎么变化, 越新的版本支持的开发板越多而已
+		(2)uboot其他作用: 部署整个计算机系统, 操作flash等板子上硬盘的驱动, 提供一个命令行界面
 
 2.1.3.uboot必须解决哪些问题
 	2.1.3.1、自身可开机直接启动
@@ -46,13 +40,10 @@
 	2.1.2.3、能提供/*系统部署*/
 		(1)uboot完成整个系统(包括uboot、kernel、rootfs等镜像)在flash上的烧录下载工作
 		(2)刷机利用uboot中的fastboot功能将各种镜像烧录到iNand中, 然后从iNand启动
+			//选择dnw启动就将uboot事先烧录到ram中
 
 	2.1.2.4、能进行soc级和板级硬件管理
 		(2)SoC级(譬如串口)就是SoC内部外设, 板级就是SoC外面开发板上面的硬件(譬如网卡、iNand)
-
-	2.1.2.5、uboot的“生命周期”
-		uboot入口, 开机ompin选择何种启动方式, 则uboot就先放在哪里
-		//选择dnw启动就将uboot事先烧录到ram中
 
 2.1.4.uboot的工作方式
 	2.1.4.2、uboot的命令式shell界面

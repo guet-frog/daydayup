@@ -10,7 +10,7 @@
 2.3.3.2、各文件介绍
 	(1 ) .gitignore
 	(2 ) arm_config.mk 	// 各个层级special config.mk
-	(4 ) config.mk		// 主Makefile包含, 编译工具链的配置
+	(4 ) config.mk		// 主Makefile包含, 编译工具链的配置	-- LDFLAG += TEXT_BASE
 	(5 ) COPYINGuboot	// uboot是GPL许可证
 	(7 ) image_split	// 脚本. //for split boot.bin to BL1
 	(9 ) MAKEALL		// 脚本, 帮助编译uboot
