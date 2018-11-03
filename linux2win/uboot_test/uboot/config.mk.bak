@@ -80,7 +80,7 @@ HOSTCC		= cc
 else
 HOSTCC		= gcc
 endif
-HOSTCFLAGS	= -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer					#编译链接属性设置
+HOSTCFLAGS	= -Wall -Wstrict-prototypes -O2 -fomit-frame-pointer
 HOSTSTRIP	= strip
 
 #########################################################################
@@ -94,7 +94,7 @@ cc-option = $(shell if $(CC) $(CFLAGS) $(1) -S -o /dev/null -xc /dev/null \
 #
 # Include the make variables (CC, etc...)
 #
-AS	= $(CROSS_COMPILE)as															#完整的交叉编译工具链
+AS	= $(CROSS_COMPILE)as
 LD	= $(CROSS_COMPILE)ld
 CC	= $(CROSS_COMPILE)gcc
 CPP	= $(CC) -E
@@ -108,11 +108,11 @@ RANLIB	= $(CROSS_COMPILE)RANLIB
 
 #########################################################################
 
-# Load generated board configuration												# when generated && how generated 		-- still unknow
-sinclude $(OBJTREE)/include/autoconf.mk												# autoconf.mk配置阶段没有生成, 编译生成
-																					# =====================================================================================
+# Load generated board configuration
+sinclude $(OBJTREE)/include/autoconf.mk
+
 ifdef	ARCH
-sinclude $(TOPDIR)/$(ARCH)_config.mk	# include architecture dependend rules		# 各个级别specific rules(编译属性...)
+sinclude $(TOPDIR)/$(ARCH)_config.mk	# include architecture dependend rules
 endif
 ifdef	CPU
 sinclude $(TOPDIR)/cpu/$(CPU)/config.mk	# include  CPU	specific rules
@@ -126,7 +126,7 @@ else
 BOARDDIR = $(BOARD)
 endif
 ifdef	BOARD
-sinclude $(TOPDIR)/board/$(BOARDDIR)/config.mk	# include board specific rules		# TEXT_BASE = 0xC3e0_0000  // text_base与link文件相关联, 都放在board/vendor/board目录下
+sinclude $(TOPDIR)/board/$(BOARDDIR)/config.mk	# include board specific rules
 endif
 
 #########################################################################
@@ -141,10 +141,10 @@ DBGFLAGS= -g # -DDEBUG
 OPTFLAGS= -Os #-fomit-frame-pointer
 ifndef LDSCRIPT
 #LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot.lds.debug
-ifeq ($(CONFIG_NAND_U_BOOT),y)														# ./include/autoconf.mk  -- no define CONFIG_NAND_U_BOOT
+ifeq ($(CONFIG_NAND_U_BOOT),y)
 LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot-nand.lds
 else
-LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot.lds									# u-boot 链接脚本     := $(BOARDDIR)
+LDSCRIPT := $(TOPDIR)/board/$(BOARDDIR)/u-boot.lds
 endif
 endif
 OBJCFLAGS += --gap-fill=0xff
@@ -153,7 +153,7 @@ gccincdir := $(shell $(CC) -print-file-name=include)
 
 CPPFLAGS := $(DBGFLAGS) $(OPTFLAGS) $(RELFLAGS)		\
 	-D__KERNEL__
-ifneq ($(TEXT_BASE),)																# TEXT_BASE 在配置时生成, 前面已经include, 这里判断不为空, CPPFLAGS += TEXT_BASE
+ifneq ($(TEXT_BASE),)
 CPPFLAGS += -DTEXT_BASE=$(TEXT_BASE)
 endif
 
@@ -196,7 +196,7 @@ endif
 AFLAGS := $(AFLAGS_DEBUG) -D__ASSEMBLY__ $(CPPFLAGS)
 
 LDFLAGS += -Bstatic -T $(LDSCRIPT) $(PLATFORM_LDFLAGS)
-ifneq ($(TEXT_BASE),)											# -Ttext	$(TEXT_BASE)
+ifneq ($(TEXT_BASE),)
 LDFLAGS += -Ttext $(TEXT_BASE)
 endif
 
@@ -247,7 +247,7 @@ ifndef REMOTE_BUILD
 
 else
 
-$(obj)%.s:	%.S						# 中间文件放在 $(obj)
+$(obj)%.s:	%.S
 	$(CPP) $(AFLAGS) -o $@ $<
 $(obj)%.o:	%.S
 	$(CC) $(AFLAGS) -c -o $@ $<
