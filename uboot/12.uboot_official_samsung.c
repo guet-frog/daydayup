@@ -63,13 +63,17 @@
 	board:	u-boot-2013.10\board\samsung\goni
 
 2.12.3.mkconfig脚本分析
-	(1)首先我们在命令行配置uboot时，是：make s5p_goni_config，对应Makefile中的一个目标。
-	(2)新版本的Makefile中：
+	(1)uboot config -- make s5p_goni_config
+
+	(2)新版本的Makefile中:
 		%_config::	unconfig
-			@$(MKCONFIG) -A $(@:_config=)
-		从这里分析得出结论，实际配置时是调用mkconfig脚本，然后传参2个：-A和s5p_goni
-	(3)到了mkconfig脚本中了。在24到35行中使用awk正则表达式/* 字符串匹配 */将boards.cfg中与刚才$1（s5p_goni）能够匹配上的那一行截取出来赋值给变量line，然后将line的内容以空格为间隔依次分开，分别赋值给$1、$2···$8。
-	(4)注意在解析完boards.cfg之后，$1到$8就有了新的值。
+			@$(MKCONFIG) -A $(@:_config=)	// 调用mkconfig 传参: -A s5p_goni
+
+	(3)新版本mkconfig脚本中:
+		在24到35行中使用awk正则表达式/*字符串匹配*/将boards.cfg中与$(s5p_goni)匹配的那一行截取出来赋值给变量line
+		然后将line的内容以空格为间隔分开, 分别赋值给$1、$2···$8。
+
+	(4)注意在解析完boards.cfg之后，$1到$8就有了新的值
 		$1 = Active
 		$2 = arm
 		$3 = armv7
@@ -77,7 +81,7 @@
 		$5 = samsung
 		$6 = goni
 		$7 = s5p_goni
-		$8 = - 
+		$8 = -
 
 2.12.3.2、几个传参和其含义		// 主要是通过这几个变量, 创建符号链接, 链接到相应的文件
 	(1)几个很重要的变量
@@ -91,99 +95,38 @@
 	(2)include/asm/arch -> include/asm/arch-s5pc1xx
 	(3)include/asm/proc -> include/asm/proc-armv
 
-	最后创建了include/config.h文件。
+	最后创建了include/config.h文件
 
-2.12.3.4、Makefile中添加交叉编译工具链
-	(1)官方原版的uboot中CROSS_COMPLIE是没有定义的，需要自己去定义。如果没定义就直接去编译，就会用gcc编译。	// 这样就不是交叉编译了,(是在inter CPU下编译使用)
-	(2)添加一行：
-	CROSS_COMPILE = /usr/local/arm/arm-2009q3/bin/arm-none-linux-gnueabi-
+2.12.3.4、Makefile中添加交叉编译工具链	// 首先检查tool chain配置
+
+	(1)没有定义CROSS_COMPILE	// 默认gcc编译的是在inter CPU下使用, 不是交叉编译
 
 2.12.3.5、配置编译测试
-	(1)编译过程：
-		make distclean
+	(1)	编译过程：
+		make distclean			// make clean -- error
 		make s5p_goni_config
 		make
-	(2)结果：得到u-boot.bin即可
 
+2.12.4.2、分析：为什么烧录运行不正确？	// SD checksum Error
+	// 烧录方法错误: 同样方法
+	// code错误:  -- sd checksum计算方式, sd checksum的生成方式
 
-2.12.4.2、分析：为什么烧录运行不正确？
-(1)串口接串口2，串口有输出。但是这个串口输出不是uboot输出的，而是内部iROM中的BL0运行时输出的。
-(2)输出错误信息分析：
-	第一个SD checksum Error：是第一顺序启动设备SD0（iNand）启动时校验和失败打印出来的；/*瞬间出现*/
-	第二个SD checksum Error：是第二顺序启动设备SD2（外部SD卡）启动时校验和失败打印出来的/*正常不会出现*/
-	剩下的是串口启动和usb启动的东西，可以不管。
-	总结：从两个SD checksum Error，可以看出：外部SD卡校验和失败了。
-	分析：SD卡烧录出错了，导致SD卡校验和会失败。
-	正常启动后, 第二次 sd checksum error不会出来, 等到超时以后再进行Uart USB启动
-
-2.12.4.3、解决方案分析
-(1)为什么SD卡烧录会出错？可能原因：烧录方法错误、烧录原材料错误。
-(2)经过分析，sd_fusing这个文件夹下的mkbl1这个程序肯定没错，上一层目录下的u-boot.bin是存在的，校验和失败不失败和u-boot.bin无关。
-(3)经过分析和查找，发现是mkbl1程序和start.S中前16个字节校验和的处理上面不匹配造成的，解决方法是在start.S最前面加上16个字节的占位。
-
-2.12.4.4、代码实践
-(1)重新编译烧录运行，发现结果只显示一个SD checksum Error。这一个就是内部SD0通道的inand启动校验和失败打印出来的。
-剩下的没有了说明外部SD卡校验和成功了，只是SD卡上的uboot是错误的，没有串口输出内容，所以没有输出了。
-
-
-2.12.5.start.S文件分析与移植1
-2.12.5.1、start.S流程分析
-(1)#define CONFIG_SYS_TEXT_BASE		0x34800000  可以看出我们的uboot的连接地址是在0x34800000位置。
-(2)save_boot_params是个空函数，里面直接返回的。
-(3)cpu_init_cp15这个函数功能是设置MMU、cache等。这个版本的uboot中未使用虚拟地址，因此MMU在这里直接关掉。
-(4)cpu_init_crit，这个函数里只有一句跳转指令，短跳转到lowlevel_init函数。
-注意：uboot中有2个lowlevel_init.S文件（文件中还都有lowlevel_init函数），凭一般分析无法断定2个中哪个才是我们想要的。
-通过分析两个文件所在文件夹下面的Makefile可以判定board/samsung/goni目录下的才是真正包含进来的，arch/arm/cpu/armv7目录下的并没有被包含进来。
-还可以通过实践验证的方法来辅助判断。通过查看之前已经编译过的uboot源码目录，看哪个被编程为.o文件了，就知道哪个是真正被使用的了。
-(5)lowlevel_init函数在board/samsung/goni目录下，主要作用是时钟设置、串口设置、复位状态判断···这个函数是S5PC100和S5PC110两个CPU共用的。
-(6)经过浏览，发现lowlevel_init函数中做的有意义的事情有：关看门狗、调用uart_asm_init来初始化串口、并没有做时钟初始化（下面有时钟初始化的函数，但是实际没调用。如果uboot中没有初始化时钟，那么时钟就是iROM中初始化的那种配置）
 2.12.5.2、添加开发板制锁和串口打印字符"O"
-(1)我们为了调试uboot的第一阶段，就要看到现象。为了看到现象，我们向lowlevel_init函数中添加2个代码，一个是开发板制锁，一个是串口打印"O"
-(2)这两段代码可以直接从ARM裸机全集课程中的代码中来。其实也可以从三星移植版本的uboot中来，但是因为三星移植版本中用到了很多寄存器定义，涉及到头文件的，所以移植过来不方便。
-(3)实践添加。
-2.12.5.3、实践结果及分析
-(1)实验结果是：没看到开发板制锁，串口也没有输出任何东西。实验失败。
-(2)结论：因为开发板制锁没有成功，所以我们判定，在开发板制锁代码运行之前uboot就已经挂掉了。下面就是去跟踪代码运行，然后判定问题点再去解决。
 
+	// 判断某个文件是否被编译链接 -- Makefile
 
-2.12.6.start.S文件分析与移植2
 2.12.6.1、添加LED点亮代码跟踪程序运行
-(1)在基础代码阶段，串口还没有运行，串口调试工具还无法使用时，使用LED点亮的方式来调试程序就是一个有力的手段。
-(2)有些情况下可以用Jlink等调试工具来调试这种基础代码。
-(3)从程序的基本运行路径端出发，隔一段给他添加一个LED点亮代码，然后运行时根据现象来观察，判定哪里执行了哪里没执行。从而去定位问题。
-(4)从以前的裸机代码中组织出一个标准的LED点亮然后延时一段的一个标准代码段：
-	ldr r0, =0x11111111
-	ldr r1, =0xE0200240
-	str r0, [r1]
-	ldr r0, =((1<<3) | (0<<4) | (1<<5))	// 1是灭，0是亮
-	ldr r1, =0xE0200244
-	str r0, [r1]
-	
-	ldr r2, =9000000
-	ldr r3, =0x0
-delay_loop:	
-	sub r2, r2, #1	
-	cmp r2, r3			
-	bne delay_loop
-		
-(5)之前做实验时发现一个现象：我们的uboot运行时按住电源开关时所有4颗LED都是亮的。所以我们做实验时给LED点亮是看不到现象的，所以我们的代码关键是要熄灭某些LED来判断。
-(6)我们将熄灭LED的函数在start.S中隔一段的关键部位放上1个，然后运行时通过观察LED的点亮熄灭状态，就知道程序运行到哪里了。
-(7)经过判断我们发现：start.S中工作一切正常，但是函数一旦放到lowlevel_init.S中就完全不工作了。通过分析得出结论：b lowlevel_init这句代码出了问题。
+
+	b lowlevel_init		// error -- 挂掉
 
 2.12.6.2、修改u-boot.lds将lowlevel_init.S放到前部
-(1)问题分析：跳转代码出了问题。分析问题出在代码的连接上。
-(2)三星S5PV210要求BL1大小为8KB，因此uboot第一阶段代码必须在整个uboot镜像的前8KB内，否则跳转不到。
-(3)对比三星移植版本的uboot的u-boot.lds和官方版本uboot的连接脚本u-boot.lds（注意这两个版本的uboot的连接脚本的位置是不同的），就发现lowlevel_init.S的代码段没有被放在前面。
-(4)在u-boot.lds中start.o后面添加board/samsung/goni/lowlevel_init.o (.text*)，这个就保证了lowlevel_init函数被连接到前面8kb中去。
-(5)报错，lowlevel_init重复定义了。
 
-2.12.6.3、修改board/samsung/goni/Makefile解决编译问题
-(1)问题分析：为什么会重复定义。因为lowlevel_init这个函数被连接时连接了2次。一次是board/samsung/goni这个目录下生成libgoni.o时连接了1次，第2次是连接脚本最终在连接生成u-boot时又连接了一次，所以重复定义了。
-(2)这个错误如何解决？思路是在libgoni.o中不要让他连接进lowlevel_init，让他只在最终连接u-boot时用1次，就可以避免重复定义。
-(3)参考当前版本的uboot的start.S文件的处理技巧，解决了这个问题。
+	// u-boot.map判断lowlevel_init.S是否在前8K
 
-2.12.6.4、实践验证。
-结果是开发板制锁和串口输出'O'都成功了。
+2.12.6.3、修改board/samsung/goni/Makefile解决编译问题	// -- redefinition
+
+(3)参考当前版本的uboot的start.S文件的处理技巧	// all:
+
 
 
 2.12.7.添加DDR初始化1
