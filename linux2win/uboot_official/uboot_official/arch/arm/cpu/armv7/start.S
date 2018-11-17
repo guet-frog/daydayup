@@ -19,16 +19,10 @@
 #include <asm/system.h>
 #include <linux/linkage.h>
 
-//====================================================== add for test 2018-11-3
-#define GPJ0CON	0xE0200240
-#define GPJ0DAT	0xE0200244
-#define GPD0CON	0xE02000A0
-#define GPD0DAT 0xE02000A4
-//======================================================
-
 
 
 /// for sd boot: bl1 sd checksum
+/* - for sd boot: bl1 sd checksum */
 .word 0x2000
 .word 0x0
 .word 0x0
@@ -151,33 +145,35 @@ reset:
 	ldr	r0, =_start
 	mcr	p15, 0, r0, c12, c0, 0	@Set VBAR
 #endif
-
-	/* test led */
+	
+	//============================================================	
+	/* - test led */
 	bl led_init
 	bl open_all_led
-
-	/* To hold max8698 output before releasing power on switch,
+	//============================================================
+	
+	//============================================================
+	/*
+	 * - To hold max8698 output before releasing power on switch,
 	 * set PS_HOLD signal to high
 	 */
 	ldr	r0, =0xE010E81C
 	ldr	r1, =0x00005301
 	str	r1, [r0]
-
-	ldr	sp, =0xd0036000 	/* end of sram dedicated to u-boot */
-	sub	sp, sp, #12			/* set stack */
-	mov	fp, #0
-
-
+	//============================================================
+	
+	//============================================================
+	/* - set stack */
+	//ldr	sp, =0xd0036000 	/* end of sram dedicated to u-boot */
+	//sub	sp, sp, #12			/* set stack */
+	//mov	fp, #0
+	//============================================================
+	
 	/* the mask ROM code should have PLL and others stable */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_cp15
 	bl	cpu_init_crit
 #endif
-
-//=========================
-	bl uboot_official_delay
-	bl open_left_led
-//=========================
 
 	bl	_main
 

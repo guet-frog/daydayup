@@ -197,8 +197,8 @@ skip_check_didle:
 	str	r5, [r1, #0xf00]			@ INTADDRESS
 	str	r5, [r2, #0xf00]			@ INTADDRESS
 
-	/* for UART */
-	bl	uart_asm_init			/*// init uart2 */
+	/* - modify for uart2 init */
+	bl	uart_asm_init
 	bl	internal_ram_init
 
 	cmp	r7, r8
@@ -388,11 +388,11 @@ system_clock_init:
 
 internal_ram_init:
 	ldreq	r0, =0xE3800000
-	ldrne	r0, =0xF1500000	
+	ldrne	r0, =0xF1500000
 	ldr	r1, =0x0
 	str	r1, [r0]
 	
-	mov	pc, lr		/*/ warning: push {lr}, pop {pc} */
+	mov	pc, lr		/* - warning: push {lr}, pop {pc} */
 
 /*
  * uart_asm_init: Initialize UART's pins
@@ -446,8 +446,10 @@ uart_asm_init:
 	# ldr	r1, [r0, #0x4]			@ S5PC1XX_GPIO_DAT_OFFSET
 	# orr	r1, r1, #(1 << 7)		@ 7 = 7 * 1-bit
 	# str	r1, [r0, #0x4]			@ S5PC1XX_GPIO_DAT_OFFSET
-
-//======================================================== init uart 2 && print 'O'
+	
+	/* - init uart2 && print 'O' */
+	/* - uart2 control reg has already init in bl0 */
+	//========================================================
 	ldr r0, =S5PC110_GPIO_BASE
 	ldr r1, [r0, #0x20]				@ GPIOA1 control reg
 	bic r1, r1, #0xff
@@ -457,7 +459,7 @@ uart_asm_init:
 	add r0, r0, #0x800				@ uart2 offset
 	ldr r1, =0x4f
 	str r1, [r0, #0x20]
-//========================================================
-
+	//========================================================
+	
 200:
 	mov	pc, lr
