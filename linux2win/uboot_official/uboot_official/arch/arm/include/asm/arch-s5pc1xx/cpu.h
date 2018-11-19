@@ -47,6 +47,7 @@
 #define S5PC110_USB_PHY_CONTROL 0xE010E80C
 
 
+
 #ifndef __ASSEMBLY__
 #include <asm/io.h>
 /* CPU detection macros */

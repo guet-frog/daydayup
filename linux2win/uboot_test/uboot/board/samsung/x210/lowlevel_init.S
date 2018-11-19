@@ -229,16 +229,13 @@ retryloop:
 	ldr	r1, =0x0
 	str	r1, [r0, #MPLL_CON_OFFSET]
 
-	///ldr	r1, =0x0
-	///str	r1, [r0, #MPLL_CON_OFFSET]
-
-	ldr   	r1, [r0, #CLK_DIV0_OFFSET]
+	/* - set bit */
+	ldr   	r1, [r0, #CLK_DIV0_OFFSET]		// 读
 	ldr	r2, =CLK_DIV0_MASK
 	bic	r1, r1, r2
-
 	ldr	r2, =CLK_DIV0_VAL
-	orr	r1, r1, r2
-	str	r1, [r0, #CLK_DIV0_OFFSET]
+	orr	r1, r1, r2							// 改
+	str	r1, [r0, #CLK_DIV0_OFFSET]			// 写
 
 	ldr	r1, =APLL_VAL
 	str	r1, [r0, #APLL_CON0_OFFSET]
