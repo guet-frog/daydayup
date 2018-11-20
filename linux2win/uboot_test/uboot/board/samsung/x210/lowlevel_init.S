@@ -228,7 +228,8 @@ retryloop:
 	str	r1, [r0, #APLL_CON0_OFFSET]
 	ldr	r1, =0x0
 	str	r1, [r0, #MPLL_CON_OFFSET]
-
+	
+	//-------------------------------------------
 	/* - set bit */
 	ldr   	r1, [r0, #CLK_DIV0_OFFSET]		// 读
 	ldr	r2, =CLK_DIV0_MASK
@@ -236,54 +237,51 @@ retryloop:
 	ldr	r2, =CLK_DIV0_VAL
 	orr	r1, r1, r2							// 改
 	str	r1, [r0, #CLK_DIV0_OFFSET]			// 写
-
+	//-------------------------------------------
+	
 	ldr	r1, =APLL_VAL
 	str	r1, [r0, #APLL_CON0_OFFSET]
-
+	
 	ldr	r1, =MPLL_VAL
 	str	r1, [r0, #MPLL_CON_OFFSET]
-
+	
 	ldr	r1, =VPLL_VAL
 	str	r1, [r0, #VPLL_CON_OFFSET]
-
+	
 	/*******lxg added***********************/
 	ldr	r1, =EPLL_VAL
 	str	r1, [r0, #EPLL_CON_OFFSET]
-
 	/*******lxg added***********************/
+	
 	ldr   	r1, [r0, #CLK_DIV1_OFFSET]
 	ldr	r2, =CLK_DIV1_MASK
 	bic	r1, r1, r2
-
 	ldr	r2, =CLK_DIV1_VAL
 	orr	r1, r1, r2
 	str	r1, [r0, #CLK_DIV1_OFFSET]
-
+	
 	ldr   	r1, [r0, #CLK_DIV2_OFFSET]
 	ldr	r2, =CLK_DIV2_MASK
 	bic	r1, r1, r2
-
 	ldr	r2, =CLK_DIV2_VAL
 	orr	r1, r1, r2
 	str	r1, [r0, #CLK_DIV2_OFFSET]
-
+	
 	ldr   	r1, [r0, #CLK_DIV4_OFFSET]
 	ldr	r2, =CLK_DIV4_MASK
 	bic	r1, r1, r2
-
 	ldr	r2, =CLK_DIV4_VAL
 	orr	r1, r1, r2
 	str	r1, [r0, #CLK_DIV4_OFFSET]
-
+	
 	ldr   	r1, [r0, #CLK_DIV6_OFFSET]
 	ldr	r2, =CLK_DIV6_MASK
 	bic	r1, r1, r2
-
 	ldr	r2, =CLK_DIV6_VAL
 	orr	r1, r1, r2
 	str	r1, [r0, #CLK_DIV6_OFFSET]
 	/*******end*****************/
-	/*******end*****************/
+	
 #if defined(CONFIG_EVT1)
 	ldr	r1, =AFC_ON
 	str	r1, [r0, #APLL_CON1_OFFSET]
@@ -291,34 +289,34 @@ retryloop:
 	mov	r1, #0x10000
 1:	subs	r1, r1, #1
 	bne	1b
-
+	
 #if defined(CONFIG_CHECK_MPLL_LOCK)
 	/* MPLL software workaround */
 	ldr	r1, [r0, #MPLL_CON_OFFSET]
 	orr     r1, r1, #(1<<28)
 	str	r1, [r0, #MPLL_CON_OFFSET]
-
+	
 	mov	r1, #0x100
 1:	subs	r1, r1, #1
 	bne	1b
-
+	
 	ldr	r1, [r0, #MPLL_CON_OFFSET]
 	and	r1, r1, #(1<<29)
 	cmp	r1, #(1<<29)
 	bne 	retryloop
-
+	
 	/* H/W lock detect disable */
 	ldr	r1, [r0, #MPLL_CON_OFFSET]
 	bic     r1, r1, #(1<<28)
 	str	r1, [r0, #MPLL_CON_OFFSET]
 #endif
-
+	
 	ldr	r1, [r0, #CLK_SRC0_OFFSET]
 	//ldr	r2, =0x10001111 //lxg changed.
    	ldr	r2, =0x00000111
 	orr	r1, r1, r2
 	str	r1, [r0, #CLK_SRC0_OFFSET]
-
+	
 	// added by terry 2012.12.4 for camera 
 	ldr r1, [r0, #CLK_SRC1_OFFSET]
 	bic r1, r1, #(0xf<<12)

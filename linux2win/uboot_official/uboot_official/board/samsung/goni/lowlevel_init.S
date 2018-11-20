@@ -257,6 +257,7 @@ system_clock_init:
 	str r1, [r0, #APLL_LOCK_OFFSET]
 	str r1, [r0, #MPLL_LOCK_OFFSET]
 	
+	// --------------------------------------
 	/* - set bit */
 	ldr r1, [r0, #CLK_DIV0_OFFSET]		// 读
 	ldr r2, =CLK_DIV0_MASK
@@ -264,6 +265,7 @@ system_clock_init:
 	ldr r2, =0x14131440
 	orr r1, r1, r2						// 改
 	str r1, [r0, #CLK_DIV0_OFFSET]		// 写
+	// --------------------------------------
 	
 	// 4 设置PLL
 	// FOUT = MDIV*FIN/(PDIV*2^(SDIV-1))=0x7d*24/(0x3*2^(1-1))=1000 MHz
@@ -280,7 +282,7 @@ system_clock_init:
 	str r1, [r0, #CLK_SRC0_OFFSET]
 	
 	mov pc, lr
-
+	
 /* - internal ram init */
 internal_ram_init:
 	ldreq	r0, =0xE3800000

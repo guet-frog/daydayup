@@ -310,7 +310,7 @@ lp2:
 	cmp     r1, r2
 	beq     after_copy
 	
-#if defined(CONFIG_EVT1) // 九鼎添加
+#if defined(CONFIG_EVT1)
 	/* If BL1 was copied from SD/MMC CH2 */		// line260 已经判断过 boot mode
 	ldr	r0, =0xD0037488
 	ldr	r1, [r0]
