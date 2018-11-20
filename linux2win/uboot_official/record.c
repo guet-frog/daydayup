@@ -16,3 +16,5 @@
 		
 	board/samsung/goni/lowlevel_init.S
 		// 恢复修改
+		// 整理添加system_clock_init		// 整理clock init流程, 添加pll lock check
+		// 编译error

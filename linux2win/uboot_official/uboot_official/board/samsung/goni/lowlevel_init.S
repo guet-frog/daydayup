@@ -13,6 +13,8 @@
 #include <asm/arch/clock.h>
 #include <asm/arch/power.h>
 
+#include "../../../include/configs/s5p_goni.h"
+
 
 /*
  * Register usages:
@@ -258,7 +260,7 @@ system_clock_init:
 	str r1, [r0, #MPLL_LOCK_OFFSET]
 	
 	// --------------------------------------
-	/* - set bit */
+	/* - set CLK_DIV0 bit */
 	ldr r1, [r0, #CLK_DIV0_OFFSET]		// 读
 	ldr r2, =CLK_DIV0_MASK
 	bic r1, r1, r2
@@ -267,15 +269,33 @@ system_clock_init:
 	str r1, [r0, #CLK_DIV0_OFFSET]		// 写
 	// --------------------------------------
 	
-	// 4 设置PLL
-	// FOUT = MDIV*FIN/(PDIV*2^(SDIV-1))=0x7d*24/(0x3*2^(1-1))=1000 MHz
+	/* - set pll PMS && enable pll */
 	ldr r1, =APLL_VAL
 	str r1, [r0, #APLL_CON0_OFFSET]
-	// FOUT = MDIV*FIN/(PDIV*2^SDIV)=0x29b*24/(0xc*2^1)= 667 MHz
+	
 	ldr r1, =MPLL_VAL
 	str r1, [r0, #MPLL_CON_OFFSET]
 	
-	// 5 设置各种时钟开关,使用PLL
+	/* - wait pll lock */
+# APLL_LOCK:
+	# ldr r1, [r0, #APLL_CON0_OFFSET]
+	# ldr r2, =(1<<29)
+	# and r1, r1, r2
+	# #cmp r1, #0x0		/* warning: not 0x1 && not 0x1 */
+	# #cmp r1, =(1<<29)   /* compile error */
+	# cmp r1, r2
+	# bne APLL_LOCK
+	
+# MPLL_LOCK:
+	# ldr r1, [r0, #MPLL_CON_OFFSET]
+	# ldr r2, =(1<<29)
+	# and r1, r1, r2
+	# #cmp r1, #0x0		/* warning: not 0x1 && not 0x1 */
+	# #cmp r1, =(1<<29)
+	# cmp r1, r2
+	# bne MPLL_LOCK
+	
+	/* - change clk src: FINPLL to PLL */
 	ldr r1, [r0, #CLK_SRC0_OFFSET]
 	ldr r2, =0x10001111
 	orr r1, r1, r2
