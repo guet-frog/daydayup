@@ -13,7 +13,8 @@
 #include <asm/arch/clock.h>
 #include <asm/arch/power.h>
 
-#include "../../../include/configs/s5p_goni.h"
+#include "../../../include/configs/s5p_goni.h"		// ok
+//#include <s5p_goni.h>  -- error
 
 
 /*
@@ -199,10 +200,13 @@ skip_check_didle:
 	str	r5, [r1, #0xf00]			@ INTADDRESS
 	str	r5, [r2, #0xf00]			@ INTADDRESS
 
+	/* - modify for clock init */
+	bl	system_clock_init
+	
 	/* - modify for uart2 init */
 	bl	uart_asm_init
 	bl	internal_ram_init
-
+	
 	cmp	r7, r8
 	/* Clear wakeup status register */
 	ldreq	r0, =S5PC100_WAKEUP_STAT
@@ -248,6 +252,9 @@ lockloop:
  * void system_clock_init(void)
  */
 system_clock_init:
+
+	push {lr}
+
 	ldr r0, =ELFIN_CLOCK_POWER_BASE
 	
 	/* - set mux to fin */
@@ -275,25 +282,36 @@ system_clock_init:
 	
 	ldr r1, =MPLL_VAL
 	str r1, [r0, #MPLL_CON_OFFSET]
-	
+		
 	/* - wait pll lock */
 # APLL_LOCK:
-	# ldr r1, [r0, #APLL_CON0_OFFSET]
-	# ldr r2, =(1<<29)
-	# and r1, r1, r2
-	# #cmp r1, #0x0		/* warning: not 0x1 && not 0x1 */
-	# #cmp r1, =(1<<29)   /* compile error */
-	# cmp r1, r2
-	# bne APLL_LOCK
+	# # ldr r1, [r0, #APLL_CON0_OFFSET]
+	# # ldr r2, =(1<<29)
+	# # and r1, r1, r2
+	# # #cmp r1, #0x0		/* warning: not 0x0 && not 0x1 */
+	# # #cmp r1, =(1<<29)   /* compile error */
+	# # cmp r1, r2
+	# # bne APLL_LOCK
+	
+	# bl open_medium_led
+	# //bl uboot_official_delay
 	
 # MPLL_LOCK:
-	# ldr r1, [r0, #MPLL_CON_OFFSET]
-	# ldr r2, =(1<<29)
-	# and r1, r1, r2
-	# #cmp r1, #0x0		/* warning: not 0x1 && not 0x1 */
-	# #cmp r1, =(1<<29)
-	# cmp r1, r2
+	# # ldr r1, [r0, #MPLL_CON_OFFSET]
+	# # ldr r2, =(1<<29)
+	# # and r1, r1, r2
+	# # #cmp r1, #0x0		/* warning: not 0x0 && not 0x1 */
+	# # #cmp r1, =(1<<29)
+	# # cmp r1, r2
+	# # bne MPLL_LOCK
+	
+	# ldr	r1, [r0, #MPLL_CON_OFFSET]
+	# and	r1, r1, #(1<<29)
+	# cmp	r1, #(1<<29)
 	# bne MPLL_LOCK
+	
+	# bl open_right_led
+	# //bl uboot_official_delay
 	
 	/* - change clk src: FINPLL to PLL */
 	ldr r1, [r0, #CLK_SRC0_OFFSET]
@@ -301,7 +319,8 @@ system_clock_init:
 	orr r1, r1, r2
 	str r1, [r0, #CLK_SRC0_OFFSET]
 	
-	mov pc, lr
+	//mov pc, lr
+	pop {pc}
 	
 /* - internal ram init */
 internal_ram_init:

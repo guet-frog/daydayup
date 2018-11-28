@@ -150,6 +150,7 @@ reset:
 	/* - test led */
 	bl led_init
 	bl open_all_led
+	bl uboot_official_delay
 	//============================================================
 	
 	//============================================================
@@ -172,7 +173,10 @@ reset:
 	/* the mask ROM code should have PLL and others stable */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_cp15
-	bl	cpu_init_crit
+
+	//bl uboot_official_delay
+	bl close_all_led	/* - warning: enter lowlevel_init */
+	bl cpu_init_crit
 #endif
 
 	bl	_main

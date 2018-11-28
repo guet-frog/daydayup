@@ -30,6 +30,9 @@ cp -f uboot_official/arch/arm/cpu/u-boot.lds /home/aston/src/uboot_official/arch
 # led添加到lowlevel_init.S
 cp -f uboot_official/board/samsung/goni/lowlevel_init.S /home/aston/src/uboot_official/board/samsung/goni/lowlevel_init.S
 
+# 添加s5p_goni.h相关宏定义	-- 注意及时更新文件
+cp -f uboot_official/include/configs/s5p_goni.h /home/aston/src/uboot_official/include/configs/
+
 ############################################################################
 
 

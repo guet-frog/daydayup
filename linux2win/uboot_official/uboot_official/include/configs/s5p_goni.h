@@ -223,9 +223,7 @@
 #define CONFIG_USB_GADGET_S3C_UDC_OTG
 #define CONFIG_USB_GADGET_DUALSPEED
 
-
-
-// =======================================================================
+// -----------------------------------------------------------------
 
 /* - clock reg config */
 #define ELFIN_CLOCK_POWER_BASE		0xE0100000	
@@ -271,9 +269,8 @@
 #define APLL_VAL			set_pll(APLL_MDIV,APLL_PDIV,APLL_SDIV)
 #define MPLL_VAL			set_pll(MPLL_MDIV,MPLL_PDIV,MPLL_SDIV)
 
-
-
-
 /* - end of reg config */
+
+
 
 #endif	/* __CONFIG_H */
