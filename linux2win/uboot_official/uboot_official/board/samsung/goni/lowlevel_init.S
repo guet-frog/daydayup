@@ -284,40 +284,33 @@ system_clock_init:
 	str r1, [r0, #MPLL_CON_OFFSET]
 	
 	/* - wait pll lock */
-# APLL_LOCK:
-	# # ldr r1, [r0, #APLL_CON0_OFFSET]
-	# # ldr r2, =(1<<29)
-	# # and r1, r1, r2
-	# # #cmp r1, #0x0		/* warning: not 0x0 && not 0x1 */
-	# # #cmp r1, =(1<<29)   /* compile error */
-	# # cmp r1, r2
-	# # bne APLL_LOCK
+APLL_LOCK:
+	ldr r1, [r0, #APLL_CON0_OFFSET]
+	ldr r2, =(1<<29)
+	and r1, r1, r2
+	#cmp r1, #0x0		/* warning: not 0x0 && not 0x1 */
+	#cmp r1, =(1<<29)   /* compile error */
+	cmp r1, r2
+	bne APLL_LOCK
 	
-	# bl open_medium_led
-	# //bl uboot_official_delay
+MPLL_LOCK:
+	ldr r1, [r0, #MPLL_CON_OFFSET]
+	ldr r2, =(1<<29)
+	and r1, r1, r2
+	#cmp r1, #0x0		/* warning: not 0x0 && not 0x1 */
+	#cmp r1, =(1<<29)
+	cmp r1, r2
+	bne MPLL_LOCK
+// ------------------------------------------
 	
-# MPLL_LOCK:
-	# # ldr r1, [r0, #MPLL_CON_OFFSET]
-	# # ldr r2, =(1<<29)
-	# # and r1, r1, r2
-	# # #cmp r1, #0x0		/* warning: not 0x0 && not 0x1 */
-	# # #cmp r1, =(1<<29)
-	# # cmp r1, r2
-	# # bne MPLL_LOCK
+	//push {r0}
+	//bl open_left_led		// -- warning
+	//pop {r0}
 	
-	# ldr	r1, [r0, #MPLL_CON_OFFSET]
-	# and	r1, r1, #(1<<29)
-	# cmp	r1, #(1<<29)
-	# bne MPLL_LOCK
-	
-	# bl open_right_led
-	# //bl uboot_official_delay
-	
-	/* - change clk src: FINPLL to PLL */
-	ldr r1, [r0, #CLK_SRC0_OFFSET]
-	ldr r2, =0x10001111
-	orr r1, r1, r2
-	str r1, [r0, #CLK_SRC0_OFFSET]
+	ldr	r1, [r0, #CLK_SRC0_OFFSET]
+	ldr	r2, =0x10001111
+	orr	r1, r1, r2
+	str	r1, [r0, #CLK_SRC0_OFFSET]
 	
 	//mov pc, lr
 	pop {pc}
