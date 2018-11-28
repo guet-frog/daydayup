@@ -287,7 +287,7 @@ lp2:
 	mov	fp, #0
 	
 	bl	lowlevel_init	/* go setup pll,mux,memory */
-
+	
 	/* To hold max8698 output before releasing power on switch,
 	 * set PS_HOLD signal to high
 	 */
@@ -352,7 +352,9 @@ mmcsd_boot:
 	sub     sp, sp, #12
 	mov     fp, #0
 #endif
-	bl      movi_bl2_copy		// SD代码重定位到DDR
+	
+	/* - uboot由sd卡，重定位到，ddr链接地址位置 */
+	bl      movi_bl2_copy
 	b       after_copy
 
 nor_boot:
@@ -398,7 +400,7 @@ stack_setup:
 	sub	r0, r0, #CFG_GBL_DATA_SIZE 		/* bdinfo */
 #if defined(CONFIG_USE_IRQ)
 	sub	r0, r0, #(CONFIG_STACKSIZE_IRQ+CONFIG_STACKSIZE_FIQ)
-#endif
+#endif /* CONFIG_USE_IRQ */
 	sub	sp, r0, #12		/* leave 3 words for abort-stack */
 #endif /*CONFIG_MEMORY_UPPER_CODE*/
 
@@ -407,15 +409,15 @@ clear_bss:
 	ldr	r1, _bss_end		/* stop here */
 	mov r2, #0x00000000		/* clear */
 
-clbss_l:					/* data段直接重定位就OK */
-	str	r2, [r0]			/* data段会影响到bin大小 */
+clbss_l:					/* - data段直接重定位就OK */
+	str	r2, [r0]			/* - data段会影响到bin大小 */
 	add	r0, r0, #4
 	cmp	r0, r1
 	ble	clbss_l
 	
-	ldr	pc, _start_armboot	// start_armboot符号为链接地址, 所以肯定不会运行到sram中的start_armboot
+	ldr	pc, _start_armboot	/* - _start_armboot符号为链接地址, 所以肯定不会运行到sram中的start_armboot */
 
-_start_armboot:
+_start_armboot:				/* - 类似于C语言，定义变量和赋值 */
 	.word start_armboot
 
 #if defined(CONFIG_ENABLE_MMU)

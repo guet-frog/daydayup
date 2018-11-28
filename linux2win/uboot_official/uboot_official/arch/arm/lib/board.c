@@ -431,10 +431,11 @@ void board_init_f(ulong bootflag)
 
 	/* 8-byte alignment for ABI compliance */
 	addr_sp &= ~0x07;
-#else
+#else /* - CONFIG_SPL_BUILD */
 	addr_sp += 128;	/* leave 32 words for abort-stack   */
 	gd->irq_sp = addr_sp;
-#endif
+#endif /* - CONFIG_SPL_BUILD */
+
 	interrupt_init();
 
 	debug("New Stack Pointer is: %08lx\n", addr_sp);

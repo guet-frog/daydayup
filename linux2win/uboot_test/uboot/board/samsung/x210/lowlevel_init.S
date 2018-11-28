@@ -119,8 +119,8 @@ lowlevel_init:
 	bl system_clock_init
 
 	/* Memory initialize */
-	bl mem_ctrl_asm_init			/// clock init ok then ddr
-
+	bl mem_ctrl_asm_init
+	
 1:
 	/* for UART */
 	bl uart_asm_init

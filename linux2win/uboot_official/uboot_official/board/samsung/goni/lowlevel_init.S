@@ -199,7 +199,7 @@ skip_check_didle:
 	str	r5, [r0, #0xf00]			@ INTADDRESS
 	str	r5, [r1, #0xf00]			@ INTADDRESS
 	str	r5, [r2, #0xf00]			@ INTADDRESS
-
+	
 	/* - modify for clock init */
 	bl	system_clock_init
 	
@@ -254,7 +254,7 @@ lockloop:
 system_clock_init:
 
 	push {lr}
-
+	
 	ldr r0, =ELFIN_CLOCK_POWER_BASE
 	
 	/* - set mux to fin */
@@ -282,7 +282,7 @@ system_clock_init:
 	
 	ldr r1, =MPLL_VAL
 	str r1, [r0, #MPLL_CON_OFFSET]
-		
+	
 	/* - wait pll lock */
 # APLL_LOCK:
 	# # ldr r1, [r0, #APLL_CON0_OFFSET]

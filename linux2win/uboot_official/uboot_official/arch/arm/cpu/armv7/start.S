@@ -21,7 +21,6 @@
 
 
 
-/// for sd boot: bl1 sd checksum
 /* - for sd boot: bl1 sd checksum */
 .word 0x2000
 .word 0x0
@@ -117,7 +116,9 @@ IRQ_STACK_START_IN:
  */
 
 reset:
+	/* - empty function */
 	bl	save_boot_params
+	
 	/*
 	 * disable interrupts (FIQ and IRQ), also set the cpu to SVC32 mode,
 	 * except if in HYP mode already
@@ -173,14 +174,14 @@ reset:
 	/* the mask ROM code should have PLL and others stable */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_cp15
-
+	
 	//bl uboot_official_delay
 	bl close_all_led	/* - warning: enter lowlevel_init */
 	bl cpu_init_crit
 #endif
-
+	
 	bl	_main
-
+	
 /*------------------------------------------------------------------------------*/
 
 ENTRY(c_runtime_cpu_setup)
