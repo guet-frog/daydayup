@@ -1,4 +1,5 @@
 #include "../../../include/s5pc110.h"
+#include "../../../include/configs/s5p_goni.h"
 
 
 	.globl mem_ctrl_asm_init

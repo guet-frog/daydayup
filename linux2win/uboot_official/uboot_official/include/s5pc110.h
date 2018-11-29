@@ -2,6 +2,29 @@
 #define S5PC110_H_
 
 
+/* - gpio controller reg config */
+#define ELFIN_GPIO_BASE			0xE0200000
+
+#define MP1_0DRV_SR_OFFSET 		0x3CC
+#define MP1_1DRV_SR_OFFSET 		0x3EC
+#define MP1_2DRV_SR_OFFSET 		0x40C
+#define MP1_3DRV_SR_OFFSET 		0x42C
+#define MP1_4DRV_SR_OFFSET 		0x44C
+#define MP1_5DRV_SR_OFFSET 		0x46C
+#define MP1_6DRV_SR_OFFSET 		0x48C
+#define MP1_7DRV_SR_OFFSET 		0x4AC
+#define MP1_8DRV_SR_OFFSET 		0x4CC
+
+#define MP2_0DRV_SR_OFFSET 		0x4EC
+#define MP2_1DRV_SR_OFFSET 		0x50C
+#define MP2_2DRV_SR_OFFSET 		0x52C
+#define MP2_3DRV_SR_OFFSET 		0x54C
+#define MP2_4DRV_SR_OFFSET 		0x56C
+#define MP2_5DRV_SR_OFFSET 		0x58C
+#define MP2_6DRV_SR_OFFSET 		0x5AC
+#define MP2_7DRV_SR_OFFSET 		0x5CC
+#define MP2_8DRV_SR_OFFSET 		0x5EC
+/* - end of gpio controller reg config */
 
 /* - clock controller reg config */
 #define ELFIN_CLOCK_POWER_BASE		0xE0100000	

@@ -160,8 +160,10 @@ reset:
 	/* the mask ROM code should have PLL and others stable */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_cp15
-	
+
+	bl led_init
 	bl open_all_led	/* - warning: enter lowlevel_init */
+	
 	bl cpu_init_crit
 #endif
 	

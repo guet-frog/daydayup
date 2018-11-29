@@ -20,3 +20,9 @@
 		
 		// 编译error	-- 没有及时更新s5p_goni.h文件
 		// 运行error	-- 没有push {r0}
+		
+	board/samsung/goni/ddr_init.S
+		// 添加 ddr_init.S
+		// 添加 s5pc110.h 头文件 --> 添加 ddr 相关寄存器base && offset
+		// 修改 s5p_goni.h --> 添加 ddr 寄存器set value
+		// 修改s5pc110.h --> 添加gpio相关(与ddr相连)

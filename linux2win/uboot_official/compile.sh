@@ -34,6 +34,10 @@ cp -f uboot_official/board/samsung/goni/lowlevel_init.S /home/aston/src/uboot_of
 cp -f uboot_official/include/configs/s5p_goni.h /home/aston/src/uboot_official/include/configs/
 cp -f uboot_official/include/s5pc110.h /home/aston/src/uboot_official/include/s5pc110.h
 
+# 添加ddr_init.S
+cp -f uboot_official/board/samsung/goni/ddr_init.S /home/aston/src/uboot_official/board/samsung/goni/ddr_init.S
+
+
 ############################################################################
 
 
