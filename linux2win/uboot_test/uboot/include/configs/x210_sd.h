@@ -422,17 +422,17 @@
 #define DMC1_TIMING_DATA	0x12130005
 #define	DMC1_TIMING_PWR		0x0E100222
 
-#else
+#else /* CONFIG_MCP_SINGLE */
 
 #error "You should define memory type (AC type or H type or B type)"
 
-#endif
+#endif /* CONFIG_MCP_SINGLE */
 
 #elif defined(CONFIG_CLK_800_200_166_133) || \
 	defined(CONFIG_CLK_1000_200_166_133) || \
 	defined(CONFIG_CLK_800_100_166_133) || \
 	defined(CONFIG_CLK_400_200_166_133) || \
-	defined(CONFIG_CLK_400_100_166_133)
+	defined(CONFIG_CLK_400_100_166_133) /* CONFIG_CLK_533_133_100_100 */
 
 #if defined(CONFIG_MCP_SINGLE)
 
@@ -468,13 +468,13 @@
 #define	DMC1_TIMING_PWR		0x08280232	// TimingPower
 #endif
 
-#else
+#else /* CONFIG_MCP_SINGLE */
 
 #error "You should define memory type (AC type or H type)"
 
-#endif //
+#endif /* CONFIG_MCP_SINGLE */
 
-#else
+#else /* CONFIG_CLK_533_133_100_100 */
 
 #define DMC0_TIMINGA_REF	0x50e
 #define DMC0_TIMING_ROW		0x14233287
@@ -486,7 +486,7 @@
 #define DMC1_TIMING_DATA	0x12130005
 #define	DMC1_TIMING_PWR		0x0E190222
 
-#endif
+#endif /* CONFIG_CLK_533_133_100_100 */
 
 
 #if defined(CONFIG_CLK_533_133_100_100)

@@ -223,54 +223,102 @@
 #define CONFIG_USB_GADGET_S3C_UDC_OTG
 #define CONFIG_USB_GADGET_DUALSPEED
 
-// -----------------------------------------------------------------
+// ----------------------------------------------------------------------
+/* - common board config */
+#define CONFIG_EVT1
+#define CONFIG_MCP_SINGLE
 
-/* - clock reg config */
-#define ELFIN_CLOCK_POWER_BASE		0xE0100000	
 
-#define APLL_LOCK_OFFSET		0x00		
-#define MPLL_LOCK_OFFSET		0x08
+/* - end of common board config */
 
-#define APLL_CON0_OFFSET		0x100
-#define APLL_CON1_OFFSET		0x104
-#define MPLL_CON_OFFSET			0x108
 
-#define CLK_SRC0_OFFSET			0x200
-#define CLK_SRC1_OFFSET			0x204
-#define CLK_SRC2_OFFSET			0x208
-#define CLK_SRC3_OFFSET			0x20c
-#define CLK_SRC4_OFFSET			0x210
-#define CLK_SRC5_OFFSET			0x214
-#define CLK_SRC6_OFFSET			0x218
-#define CLK_SRC_MASK0_OFFSET	0x280
-#define CLK_SRC_MASK1_OFFSET	0x284
+/* clk config */
 
-#define CLK_DIV0_OFFSET			0x300
-#define CLK_DIV1_OFFSET			0x304
-#define CLK_DIV2_OFFSET			0x308
-#define CLK_DIV3_OFFSET			0x30c
-#define CLK_DIV4_OFFSET			0x310
-#define CLK_DIV5_OFFSET			0x314
-#define CLK_DIV6_OFFSET			0x318
-#define CLK_DIV7_OFFSET			0x31c
+#define CONFIG_CLK_1000_200_166_133
 
-#define CLK_DIV0_MASK			0x7fffffff
+/* end of clk config */
 
-/* - clock value config */
-#define APLL_MDIV      	 		0x7d		// 125
-#define APLL_PDIV       		0x3
-#define APLL_SDIV       		0x1
+/* sdram config */
+#if defined(CONFIG_CLK_533_133_100_100)
 
-#define MPLL_MDIV				0x29b		// 667
-#define MPLL_PDIV				0xc
-#define MPLL_SDIV				0x1
+#if defined(CONFIG_MCP_SINGLE)
 
-#define set_pll(mdiv, pdiv, sdiv)	(1<<31 | mdiv<<16 | pdiv<<8 | sdiv)
-#define APLL_VAL			set_pll(APLL_MDIV,APLL_PDIV,APLL_SDIV)
-#define MPLL_VAL			set_pll(MPLL_MDIV,MPLL_PDIV,MPLL_SDIV)
+#define DMC0_TIMINGA_REF	0x40e
+#define DMC0_TIMING_ROW		0x10233206
+#define DMC0_TIMING_DATA	0x12130005
+#define	DMC0_TIMING_PWR		0x0E100222
 
-/* - end of reg config */
+#define DMC1_TIMINGA_REF	0x40e
+#define DMC1_TIMING_ROW		0x10233206
+#define DMC1_TIMING_DATA	0x12130005
+#define	DMC1_TIMING_PWR		0x0E100222
 
+#else /* CONFIG_MCP_SINGLE */
+
+#error "You should define memory type (AC type or H type or B type)"
+
+#endif /* CONFIG_MCP_SINGLE */
+
+#elif defined(CONFIG_CLK_800_200_166_133) || \
+	defined(CONFIG_CLK_1000_200_166_133) || \
+	defined(CONFIG_CLK_800_100_166_133) || \
+	defined(CONFIG_CLK_400_200_166_133) || \
+	defined(CONFIG_CLK_400_100_166_133) /* CONFIG_CLK_533_133_100_100 */
+
+#if defined(CONFIG_MCP_SINGLE)
+
+#define DMC0_MEMCONTROL		0x00212400	// MemControl	BL=4, 1Chip, DDR2 Type, dynamic self refresh, force precharge, dynamic power down off
+#define DMC0_MEMCONFIG_0	0x30F01313	// MemConfig0	256MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed
+#define DMC0_MEMCONFIG_1	0x40F01313	// MemConfig1
+#define DMC0_TIMINGA_REF        0x00000618      // TimingAref   7.8us*133MHz=1038(0x40E), 100MHz=780(0x30C), 20MHz=156(0x9C), 10MHz=78(0x4E)
+#define DMC0_TIMING_ROW         0x28233287      // TimingRow    for @200MHz
+#define DMC0_TIMING_DATA        0x23240304      // TimingData   CL=3
+#define DMC0_TIMING_PWR         0x09C80232      // TimingPower
+
+#define	DMC1_MEMCONTROL		0x00202400	// MemControl	BL=4, 2 chip, DDR2 type, dynamic self refresh, force precharge, dynamic power down off
+#define DMC1_MEMCONFIG_0	0x40F01313	// MemConfig0	512MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed
+#define DMC1_MEMCONFIG_1	0x00F01313	// MemConfig1
+#define DMC1_TIMINGA_REF        0x00000618      // TimingAref   7.8us*133MHz=1038(0x40E), 100MHz=780(0x30C), 20MHz=156(0x9C), 10MHz=78(0x4E)
+#define DMC1_TIMING_ROW         0x28233289      // TimingRow    for @200MHz
+#define DMC1_TIMING_DATA        0x23240304      // TimingData   CL=3
+#define DMC1_TIMING_PWR         0x08280232      // TimingPower
+#if defined(CONFIG_CLK_800_100_166_133) || defined(CONFIG_CLK_400_100_166_133)
+#define DMC0_MEMCONFIG_0	0x20E01323	// MemConfig0	256MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed
+#define DMC0_MEMCONFIG_1	0x40F01323	// MemConfig1
+#define DMC0_TIMINGA_REF	0x0000030C	// TimingAref	7.8us*133MHz=1038(0x40E), 100MHz=780(0x30C), 20MHz=156(0x9C), 10MHz=78(0x4E)
+#define DMC0_TIMING_ROW		0x28233287	// TimingRow	for @200MHz
+#define DMC0_TIMING_DATA	0x23240304	// TimingData	CL=3
+#define	DMC0_TIMING_PWR		0x09C80232	// TimingPower
+
+#define	DMC1_MEMCONTROL		0x00202400	// MemControl	BL=4, 2 chip, DDR2 type, dynamic self refresh, force precharge, dynamic power down off
+#define DMC1_MEMCONFIG_0	0x40C01323	// MemConfig0	512MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed
+#define DMC1_MEMCONFIG_1	0x00E01323	// MemConfig1
+#define DMC1_TIMINGA_REF	0x0000030C	// TimingAref	7.8us*133MHz=1038(0x40E), 100MHz=780(0x30C), 20MHz=156(0x9C), 10MHz=78(0x4
+#define DMC1_TIMING_ROW		0x28233289	// TimingRow	for @200MHz
+#define DMC1_TIMING_DATA	0x23240304	// TimingData	CL=3
+#define	DMC1_TIMING_PWR		0x08280232	// TimingPower
+#endif
+
+#else /* CONFIG_MCP_SINGLE */
+
+#error "You should define memory type (AC type or H type)"
+
+#endif /* CONFIG_MCP_SINGLE */
+
+#else /* CONFIG_CLK_533_133_100_100 */
+
+#define DMC0_TIMINGA_REF	0x50e
+#define DMC0_TIMING_ROW		0x14233287
+#define DMC0_TIMING_DATA	0x12130005
+#define	DMC0_TIMING_PWR		0x0E140222
+
+#define DMC1_TIMINGA_REF	0x618
+#define DMC1_TIMING_ROW		0x11344309
+#define DMC1_TIMING_DATA	0x12130005
+#define	DMC1_TIMING_PWR		0x0E190222
+
+#endif /* CONFIG_CLK_533_133_100_100 */
+/* end of sdram config */
 
 
 #endif	/* __CONFIG_H */

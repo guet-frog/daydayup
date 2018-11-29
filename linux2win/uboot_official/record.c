@@ -19,3 +19,4 @@
 		// 整理添加system_clock_init		// 整理clock init流程, 添加pll lock check
 		
 		// 编译error	-- 没有及时更新s5p_goni.h文件
+		// 运行error	-- 没有push {r0}

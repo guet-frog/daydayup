@@ -130,7 +130,7 @@ reset:
 	orrne	r0, r0, #0x13		@ set SVC mode
 	orr	r0, r0, #0xc0		@ disable FIQ and IRQ
 	msr	cpsr,r0
-
+	
 /*
  * Setup vector:
  * (OMAP4 spl TEXT_BASE is not 32 byte aligned.
@@ -147,36 +147,21 @@ reset:
 	mcr	p15, 0, r0, c12, c0, 0	@Set VBAR
 #endif
 	
-	//============================================================	
-	/* - test led */
-	bl led_init
-	bl open_all_led
-	bl uboot_official_delay
-	//============================================================
-	
 	//============================================================
 	/*
 	 * - To hold max8698 output before releasing power on switch,
-	 * set PS_HOLD signal to high
+	 * - set PS_HOLD signal to high
 	 */
 	ldr	r0, =0xE010E81C
 	ldr	r1, =0x00005301
 	str	r1, [r0]
 	//============================================================
 	
-	//============================================================
-	/* - set stack */
-	//ldr	sp, =0xd0036000 	/* end of sram dedicated to u-boot */
-	//sub	sp, sp, #12			/* set stack */
-	//mov	fp, #0
-	//============================================================
-	
 	/* the mask ROM code should have PLL and others stable */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_cp15
 	
-	//bl uboot_official_delay
-	bl close_all_led	/* - warning: enter lowlevel_init */
+	bl open_all_led	/* - warning: enter lowlevel_init */
 	bl cpu_init_crit
 #endif
 	

@@ -32,6 +32,7 @@ cp -f uboot_official/board/samsung/goni/lowlevel_init.S /home/aston/src/uboot_of
 
 # 添加s5p_goni.h相关宏定义	-- 注意及时更新文件
 cp -f uboot_official/include/configs/s5p_goni.h /home/aston/src/uboot_official/include/configs/
+cp -f uboot_official/include/s5pc110.h /home/aston/src/uboot_official/include/s5pc110.h
 
 ############################################################################
 

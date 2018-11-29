@@ -16,6 +16,8 @@
 #include "../../../include/configs/s5p_goni.h"		// ok
 //#include <s5p_goni.h>  -- error
 
+#include "../../../include/s5pc110.h"
+
 
 /*
  * Register usages:
@@ -203,8 +205,20 @@ skip_check_didle:
 	/* - modify for clock init */
 	bl	system_clock_init
 	
+	/* - clk init ok */
+	bl uboot_official_delay
+	bl open_left_led
+	
+	/* - add for sdram init */
+	bl mem_ctrl_asm_init
+	
+	/* - sdram init ok */
+	bl uboot_official_delay
+	bl open_medium_led
+	
 	/* - modify for uart2 init */
 	bl	uart_asm_init
+	
 	bl	internal_ram_init
 	
 	cmp	r7, r8
@@ -252,7 +266,7 @@ lockloop:
  * void system_clock_init(void)
  */
 system_clock_init:
-
+	
 	push {lr}
 	
 	ldr r0, =ELFIN_CLOCK_POWER_BASE
@@ -301,11 +315,12 @@ MPLL_LOCK:
 	#cmp r1, =(1<<29)
 	cmp r1, r2
 	bne MPLL_LOCK
-// ------------------------------------------
 	
+// ------------------------------------------
 	//push {r0}
 	//bl open_left_led		// -- warning
 	//pop {r0}
+// ------------------------------------------
 	
 	ldr	r1, [r0, #CLK_SRC0_OFFSET]
 	ldr	r2, =0x10001111
