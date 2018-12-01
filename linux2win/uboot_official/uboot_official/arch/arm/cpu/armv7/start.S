@@ -27,6 +27,9 @@
 .word 0x0
 .word 0x0
 
+/* - for compile */
+.global relocate_uboot2sdram
+
 .globl _start
 _start: b	reset
 	ldr	pc, _undefined_instruction
@@ -160,12 +163,29 @@ reset:
 	/* the mask ROM code should have PLL and others stable */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_cp15
-
+	
 	bl led_init
 	bl open_all_led	/* - warning: enter lowlevel_init */
 	
 	bl cpu_init_crit
+	
+	bl open_all_led	/* - warning: out lowlevel_init */
 #endif
+	
+	/* - uboot relocate */
+	bl relocate_uboot2sdram
+	
+	/* - uboot relocate ok, then print 'K' */	
+	//========================================================	
+	ldr r0, =S5PC110_UART_BASE
+	add r0, r0, #0x800				@ uart2 offset
+	ldr r1, =0x4B
+	str r1, [r0, #0x20]
+	//========================================================
+	
+	bl uboot_official_delay
+	bl close_all_led
+	b .
 	
 	bl	_main
 	

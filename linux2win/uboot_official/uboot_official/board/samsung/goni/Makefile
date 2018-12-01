@@ -13,7 +13,7 @@ include $(TOPDIR)/config.mk
 LIB	= $(obj)lib$(BOARD).o
 
 COBJS-y	:= goni.o onenand.o
-SOBJS	:= lowlevel_init.o uboot_official_led.o ddr_init.o
+SOBJS	:= lowlevel_init.o uboot_official_led.o ddr_init.o relocate_sd2sdram.o
 
 SRCS    := $(SOBJS:.o=.S) $(COBJS-y:.o=.c)
 OBJS	:= $(addprefix $(obj),$(COBJS-y))

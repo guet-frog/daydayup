@@ -37,6 +37,9 @@ cp -f uboot_official/include/s5pc110.h /home/aston/src/uboot_official/include/s5
 # 添加ddr_init.S
 cp -f uboot_official/board/samsung/goni/ddr_init.S /home/aston/src/uboot_official/board/samsung/goni/ddr_init.S
 
+# 添加relocate_sd2sdram.c
+cp -f uboot_official/board/samsung/goni/relocate_sd2sdram.c /home/aston/src/uboot_official/board/samsung/goni/relocate_sd2sdram.c
+
 
 ############################################################################
 

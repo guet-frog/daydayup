@@ -227,7 +227,7 @@ skip_check_didle:
 	ldrne	r0, =S5PC110_WAKEUP_STAT
 	ldr	r1, [r0]
 	str	r1, [r0]
-
+	
 	/* IO retension release */
 	ldreq	r0, =S5PC100_OTHERS			@ 0xE0108200
 	ldrne	r0, =S5PC110_OTHERS			@ 0xE010E000
@@ -236,7 +236,7 @@ skip_check_didle:
 	ldrne	r2, =((1 << 31) | (1 << 30) | (1 << 29) | (1 << 28))
 	orr	r1, r1, r2
 	str	r1, [r0]
-
+	
 	b	1f
 
 didle_wakeup:

@@ -227,15 +227,11 @@
 /* - common board config */
 #define CONFIG_EVT1
 #define CONFIG_MCP_SINGLE
-
-
 /* - end of common board config */
 
 
 /* clk config */
-
 #define CONFIG_CLK_1000_200_166_133
-
 /* end of clk config */
 
 /* sdram config */

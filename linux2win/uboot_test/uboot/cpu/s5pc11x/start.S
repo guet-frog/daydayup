@@ -221,7 +221,6 @@ lp2:
 
 	// 由OMPIN确定启动方式, 读reg(E000_0004), 取出有效位放入r2
 	// 比较r2设定启动方式, 暂存入r3, str r3 [E010_F00C]
-
 	/* Read booting information */
 	ldr	r0, =PRO_ID_BASE
 	ldr	r1, [r0,#OMR_OFFSET]
