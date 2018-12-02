@@ -205,6 +205,18 @@
 2.12.11.4、代码实践
 (1)arch/arm/include/asm/arch-s5pc1xx/cpu.h，和arch/arm/cpu/armv7/s5p-common/cpu_info.c文件同步一下
 
+// cpu.h
+	#define IS_SAMSUNG_TYPE(type, id)	\
+		static inline int cpu_is_##type(void)
+		{
+			return s5p_cpu_id == id ? 1 : 0;
+		}
+		
+	IS_SAMSUNG_TYPE(s5pc100, 0xc100)
+	IS_SAMSUNG_TYPE(s5pc110, 0xc110)
+
+	// 将宏改成函数, 下一阶段的预处理不能进行
+	// 宏定义在预处理阶段进行
 
 2.12.12.CPU时钟信息显示移植2
 
