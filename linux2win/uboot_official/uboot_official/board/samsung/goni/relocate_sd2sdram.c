@@ -4,9 +4,10 @@
 #define BOOT_CHANNEL_2		0xEB200000
 
 #define COPYFUNCADDR_SDMMC	0xD0037F98
-#define START_BLK			1
+#define START_BLK			49
 #define BLK_SIZE			(2*1024*1024/512)
-#define MEM_ADDR			0x30000000
+//#define MEM_ADDR			0x30000000
+#define MEM_ADDR			0x34800000
 
 
 //#define CopySDMMCtoMem(z,a,b,c,e)	(((bool(*)(int, unsigned int, unsigned short, unsigned int*, bool))(*((unsigned int *)0xD0037F98)))(z,a,b,c,e))

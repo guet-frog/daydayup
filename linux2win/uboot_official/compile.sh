@@ -28,18 +28,23 @@ cp -f uboot_official/board/samsung/goni/Makefile /home/aston/src/uboot_official/
 cp -f uboot_official/arch/arm/cpu/u-boot.lds /home/aston/src/uboot_official/arch/arm/cpu/u-boot.lds
 
 # led添加到lowlevel_init.S
-cp -f uboot_official/board/samsung/goni/lowlevel_init.S /home/aston/src/uboot_official/board/samsung/goni/lowlevel_init.S
+cp -f uboot_official/board/samsung/goni/lowlevel_init.S /home/aston/src/uboot_official/board/samsung/goni/
 
 # 添加s5p_goni.h相关宏定义	-- 注意及时更新文件
 cp -f uboot_official/include/configs/s5p_goni.h /home/aston/src/uboot_official/include/configs/
-cp -f uboot_official/include/s5pc110.h /home/aston/src/uboot_official/include/s5pc110.h
+cp -f uboot_official/include/s5pc110.h /home/aston/src/uboot_official/include/
 
 # 添加ddr_init.S
-cp -f uboot_official/board/samsung/goni/ddr_init.S /home/aston/src/uboot_official/board/samsung/goni/ddr_init.S
+cp -f uboot_official/board/samsung/goni/ddr_init.S /home/aston/src/uboot_official/board/samsung/goni/
 
 # 添加relocate_sd2sdram.c
-cp -f uboot_official/board/samsung/goni/relocate_sd2sdram.c /home/aston/src/uboot_official/board/samsung/goni/relocate_sd2sdram.c
+cp -f uboot_official/board/samsung/goni/relocate_sd2sdram.c /home/aston/src/uboot_official/board/samsung/goni/
 
+# 修改crt0.S
+cp -f uboot_official/arch/arm/lib/crt0.S /home/aston/src/uboot_official/arch/arm/lib/
+
+# 修改board.c
+cp -f uboot_official/arch/arm/lib/board.c /home/aston/src/uboot_official/arch/arm/lib/
 
 ############################################################################
 

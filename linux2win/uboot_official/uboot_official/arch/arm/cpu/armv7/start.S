@@ -165,7 +165,6 @@ reset:
 	bl	cpu_init_cp15
 	
 	bl led_init
-	bl open_all_led	/* - warning: enter lowlevel_init */
 	
 	bl cpu_init_crit
 	
@@ -175,8 +174,8 @@ reset:
 	/* - uboot relocate */
 	bl relocate_uboot2sdram
 	
-	/* - uboot relocate ok, then print 'K' */	
-	//========================================================	
+	/* - uboot relocate ok, then print 'K' */
+	//========================================================
 	ldr r0, =S5PC110_UART_BASE
 	add r0, r0, #0x800				@ uart2 offset
 	ldr r1, =0x4B
@@ -185,9 +184,10 @@ reset:
 	
 	bl uboot_official_delay
 	bl close_all_led
-	b .
 	
-	bl	_main
+	ldr pc, __main
+
+__main: .word _main
 	
 /*------------------------------------------------------------------------------*/
 

@@ -274,9 +274,9 @@ void board_init_f(ulong bootflag)
 #endif
 	void *new_fdt = NULL;
 	size_t fdt_size = 0;
-
+	
 	memset((void *)gd, 0, sizeof(gd_t));
-
+	
 	gd->mon_len = _bss_end_ofs;
 #ifdef CONFIG_OF_EMBED
 	/* Get a pointer to the FDT */
@@ -289,11 +289,14 @@ void board_init_f(ulong bootflag)
 	gd->fdt_blob = (void *)getenv_ulong("fdtcontroladdr", 16,
 						(uintptr_t)gd->fdt_blob);
 
+	printf("\n\nenter uboot step 2\r\n");
+	
 	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
 		if ((*init_fnc_ptr)() != 0) {
 			hang ();
 		}
 	}
+	printf("over init_sequence init \r\n");
 
 #ifdef CONFIG_OF_CONTROL
 	/* For now, put this check after the console is ready */

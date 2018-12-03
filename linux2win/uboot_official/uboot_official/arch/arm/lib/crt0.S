@@ -57,6 +57,17 @@
 
 ENTRY(_main)
 
+	bl uboot_official_delay
+	bl open_right_led
+	
+	/* - uboot relocate ok, then print 'O' */
+	//========================================================
+	ldr r0, =S5PC110_UART_BASE
+	add r0, r0, #0x800				@ uart2 offset
+	ldr r1, =0x4B
+	str r1, [r0, #0x20]
+	//========================================================
+	
 /*
  * Set up initial C runtime environment and call board_init_f(0).
  */
@@ -74,41 +85,40 @@ ENTRY(_main)
 	bl	board_init_f
 
 #if ! defined(CONFIG_SPL_BUILD)
-
 /*
  * Set up intermediate environment (new sp and gd) and call
  * relocate_code(addr_moni). Trick here is that we'll return
  * 'here' but relocated.
  */
 
-	ldr	sp, [r9, #GD_START_ADDR_SP]	/* sp = gd->start_addr_sp */
-	bic	sp, sp, #7	/* 8-byte alignment for ABI compliance */
-	ldr	r9, [r9, #GD_BD]		/* r9 = gd->bd */
-	sub	r9, r9, #GD_SIZE		/* new GD is below bd */
+	# ldr	sp, [r9, #GD_START_ADDR_SP]	/* sp = gd->start_addr_sp */
+	# bic	sp, sp, #7	/* 8-byte alignment for ABI compliance */
+	# ldr	r9, [r9, #GD_BD]		/* r9 = gd->bd */
+	# sub	r9, r9, #GD_SIZE		/* new GD is below bd */
 
-	adr	lr, here
-	ldr	r0, [r9, #GD_RELOC_OFF]		/* r0 = gd->reloc_off */
-	add	lr, lr, r0
-	ldr	r0, [r9, #GD_RELOCADDR]		/* r0 = gd->relocaddr */
-	b	relocate_code
-here:
+	# adr	lr, here
+	# ldr	r0, [r9, #GD_RELOC_OFF]		/* r0 = gd->reloc_off */
+	# add	lr, lr, r0
+	# ldr	r0, [r9, #GD_RELOCADDR]		/* r0 = gd->relocaddr */
+	# b	relocate_code
+# here:
 
-/* Set up final (full) environment */
+# /* Set up final (full) environment */
 
-	bl	c_runtime_cpu_setup	/* we still call old routine here */
+	# bl	c_runtime_cpu_setup	/* we still call old routine here */
 
-	ldr	r0, =__bss_start	/* this is auto-relocated! */
-	ldr	r1, =__bss_end		/* this is auto-relocated! */
+	# ldr	r0, =__bss_start	/* this is auto-relocated! */
+	# ldr	r1, =__bss_end		/* this is auto-relocated! */
 
-	mov	r2, #0x00000000		/* prepare zero to clear BSS */
+	# mov	r2, #0x00000000		/* prepare zero to clear BSS */
 
-clbss_l:cmp	r0, r1			/* while not at end of BSS */
-	strlo	r2, [r0]		/* clear 32-bit BSS word */
-	addlo	r0, r0, #4		/* move to next */
-	blo	clbss_l
+# clbss_l:cmp	r0, r1			/* while not at end of BSS */
+	# strlo	r2, [r0]		/* clear 32-bit BSS word */
+	# addlo	r0, r0, #4		/* move to next */
+	# blo	clbss_l
 
-	bl coloured_LED_init
-	bl red_led_on
+	# bl coloured_LED_init
+	# bl red_led_on
 
 	/* call board_init_r(gd_t *id, ulong dest_addr) */
 	mov     r0, r9                  /* gd_t */

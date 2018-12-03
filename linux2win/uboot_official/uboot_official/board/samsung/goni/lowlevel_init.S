@@ -205,16 +205,8 @@ skip_check_didle:
 	/* - modify for clock init */
 	bl	system_clock_init
 	
-	/* - clk init ok */
-	bl uboot_official_delay
-	bl open_left_led
-	
 	/* - add for sdram init */
 	bl mem_ctrl_asm_init
-	
-	/* - sdram init ok */
-	bl uboot_official_delay
-	bl open_medium_led
 	
 	/* - modify for uart2 init */
 	bl	uart_asm_init

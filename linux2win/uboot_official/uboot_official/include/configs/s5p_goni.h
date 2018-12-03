@@ -198,7 +198,7 @@
 
 #define CONFIG_DOS_PARTITION		1
 
-#define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_LOAD_ADDR - 0x1000000)
+//#define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_LOAD_ADDR - 0x1000000)
 
 #define CONFIG_SYS_CACHELINE_SIZE       64
 
@@ -228,6 +228,10 @@
 #define CONFIG_EVT1
 #define CONFIG_MCP_SINGLE
 /* - end of common board config */
+
+/* - stack addr init */
+#define CONFIG_SYS_INIT_SP_ADDR	0x34700000
+/* - end of stack addr init */
 
 
 /* clk config */

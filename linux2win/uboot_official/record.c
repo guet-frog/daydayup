@@ -26,3 +26,6 @@
 		// 添加 s5pc110.h 头文件 --> 添加 ddr 相关寄存器base && offset
 		// 修改 s5p_goni.h --> 添加 ddr 寄存器set value
 		// 修改s5pc110.h --> 添加gpio相关(与ddr相连)
+	
+	arch/arm/lib/crt0.S
+		// 
