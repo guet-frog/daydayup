@@ -20,7 +20,7 @@ typedef int (*sdmmc2sdram_copy_fn)	\
 
 void relocate_uboot2sdram(void)
 {
-	unsigned int boot_channel = 0;
+	//unsigned int boot_channel = 0;
 	
 	sdmmc2sdram_copy_fn copy_func = (sdmmc2sdram_copy_fn)(*(unsigned int *)COPYFUNCADDR_SDMMC);
 	

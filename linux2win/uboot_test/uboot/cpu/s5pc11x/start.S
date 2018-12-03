@@ -352,7 +352,7 @@ mmcsd_boot:
 	mov     fp, #0
 #endif
 	
-	/* - uboot由sd卡，重定位到，ddr链接地址位置 */
+	/* - uboot从sd卡，重定位到，ddr链接地址位置 */
 	bl      movi_bl2_copy
 	b       after_copy
 

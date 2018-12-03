@@ -288,16 +288,17 @@ void board_init_f(ulong bootflag)
 	/* Allow the early environment to override the fdt address */
 	gd->fdt_blob = (void *)getenv_ulong("fdtcontroladdr", 16,
 						(uintptr_t)gd->fdt_blob);
-
-	printf("\n\nenter uboot step 2\r\n");
+    
+	//printf("\n\nenter uboot step 2\r\n");  -- 被优化掉
 	
 	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
 		if ((*init_fnc_ptr)() != 0) {
 			hang ();
 		}
 	}
-	printf("over init_sequence init \r\n");
-
+	printf("###enter uboot step2 && over init_sequence init \r\n");
+    printf("###gd = %p, sizeof(gd_t) = %d\r\n", gd, sizeof(gd_t));
+    
 #ifdef CONFIG_OF_CONTROL
 	/* For now, put this check after the console is ready */
 	if (fdtdec_prepare_fdt()) {
@@ -305,7 +306,7 @@ void board_init_f(ulong bootflag)
 			"doc/README.fdt-control");
 	}
 #endif
-
+    
 	debug("monitor len: %08lX\n", gd->mon_len);
 	/*
 	 * Ram is setup, size stored in gd !!
@@ -447,12 +448,14 @@ void board_init_f(ulong bootflag)
 	post_bootmode_init();
 	post_run(NULL, POST_ROM | post_bootmode_get(0));
 #endif
-
+    
 	gd->bd->bi_baudrate = gd->baudrate;
+    printf("###gd->baudrate = %p\r\n", (void *)gd->baudrate);   // %p expects type void *
+    
 	/* Ram ist board specific, so move it to board code ... */
 	dram_init_banksize();
 	display_dram_config();	/* and display it */
-
+    
 	gd->relocaddr = addr;
 	gd->start_addr_sp = addr_sp;
 	gd->reloc_off = addr - _TEXT_BASE;
@@ -520,6 +523,8 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	gd->flags |= GD_FLG_RELOC;	/* tell others: relocation done */
 	bootstage_mark_name(BOOTSTAGE_ID_START_UBOOT_R, "board_init_r");
 
+    printf("###enter board_init_r\r\n");
+
 	monitor_flash_len = _end_ofs;
 
 	/* Enable caches */
@@ -527,6 +532,9 @@ void board_init_r(gd_t *id, ulong dest_addr)
 
 	debug("monitor flash len: %08lX\n", monitor_flash_len);
 	board_init();	/* Setup chipselects */
+
+    printf("###enter board_init_r\r\n");
+
 	/*
 	 * TODO: printing of the clock inforamtion of the board is now
 	 * implemented as part of bdinfo command. Currently only support for
@@ -536,6 +544,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #ifdef CONFIG_CLOCKS
 	set_cpu_clk_info(); /* Setup clock information */
 #endif
+    
 	serial_initialize();
 
 	debug("Now running in RAM - U-Boot at: %08lx\n", dest_addr);
@@ -555,6 +564,8 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	arch_early_init_r();
 #endif
 	power_init_board();
+
+    printf("###ready to flash init\r\n");
 
 #if !defined(CONFIG_SYS_NO_FLASH)
 	puts("Flash: ");

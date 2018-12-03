@@ -24,13 +24,13 @@
 #define CONFIG_DISPLAY_BOARDINFO
 
 /* input clock of PLL: has 24MHz input clock at S5PC110 */
-#define CONFIG_SYS_CLK_FREQ_C110	24000000
+//#define CONFIG_SYS_CLK_FREQ_C110	24000000
 
 /* DRAM Base */
-#define CONFIG_SYS_SDRAM_BASE		0x30000000
+//#define CONFIG_SYS_SDRAM_BASE		0x30000000
 
 /* Text Base */
-#define CONFIG_SYS_TEXT_BASE		0x34800000
+//#define CONFIG_SYS_TEXT_BASE		0x34800000
 
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_CMDLINE_TAG
@@ -175,17 +175,17 @@
 
 #define CONFIG_SYS_HZ			1000
 
-/* Goni has 3 banks of DRAM, but swap the bank */
-#define CONFIG_NR_DRAM_BANKS	3
-#define PHYS_SDRAM_1		CONFIG_SYS_SDRAM_BASE	/* OneDRAM Bank #0 */
-#define PHYS_SDRAM_1_SIZE	(80 << 20)		/* 80 MB in Bank #0 */
-#define PHYS_SDRAM_2		0x40000000		/* mDDR DMC1 Bank #1 */
-#define PHYS_SDRAM_2_SIZE	(256 << 20)		/* 256 MB in Bank #1 */
-#define PHYS_SDRAM_3		0x50000000		/* mDDR DMC2 Bank #2 */
-#define PHYS_SDRAM_3_SIZE	(128 << 20)		/* 128 MB in Bank #2 */
+// /* Goni has 3 banks of DRAM, but swap the bank */
+// #define CONFIG_NR_DRAM_BANKS	3
+// #define PHYS_SDRAM_1		CONFIG_SYS_SDRAM_BASE	/* OneDRAM Bank #0 */
+// #define PHYS_SDRAM_1_SIZE	(80 << 20)		/* 80 MB in Bank #0 */
+// #define PHYS_SDRAM_2		0x40000000		/* mDDR DMC1 Bank #1 */
+// #define PHYS_SDRAM_2_SIZE	(256 << 20)		/* 256 MB in Bank #1 */
+// #define PHYS_SDRAM_3		0x50000000		/* mDDR DMC2 Bank #2 */
+// #define PHYS_SDRAM_3_SIZE	(128 << 20)		/* 128 MB in Bank #2 */
 
-#define CONFIG_SYS_MONITOR_BASE		0x00000000
-#define CONFIG_SYS_MONITOR_LEN		(256 << 10)	/* 256 KiB */
+// #define CONFIG_SYS_MONITOR_BASE		0x00000000
+// #define CONFIG_SYS_MONITOR_LEN		(256 << 10)	/* 256 KiB */
 
 /* FLASH and environment organization */
 #define CONFIG_ENV_IS_IN_ONENAND	1
@@ -229,20 +229,16 @@
 #define CONFIG_MCP_SINGLE
 /* - end of common board config */
 
-/* - stack addr init */
-#define CONFIG_SYS_INIT_SP_ADDR	0x34700000
-/* - end of stack addr init */
-
-
 /* clk config */
+/* - input clk */
+#define CONFIG_SYS_CLK_FREQ_C110	24000000
+
 #define CONFIG_CLK_1000_200_166_133
 /* end of clk config */
 
 /* sdram config */
 #if defined(CONFIG_CLK_533_133_100_100)
-
 #if defined(CONFIG_MCP_SINGLE)
-
 #define DMC0_TIMINGA_REF	0x40e
 #define DMC0_TIMING_ROW		0x10233206
 #define DMC0_TIMING_DATA	0x12130005
@@ -252,21 +248,15 @@
 #define DMC1_TIMING_ROW		0x10233206
 #define DMC1_TIMING_DATA	0x12130005
 #define	DMC1_TIMING_PWR		0x0E100222
-
 #else /* CONFIG_MCP_SINGLE */
-
 #error "You should define memory type (AC type or H type or B type)"
-
 #endif /* CONFIG_MCP_SINGLE */
-
 #elif defined(CONFIG_CLK_800_200_166_133) || \
 	defined(CONFIG_CLK_1000_200_166_133) || \
 	defined(CONFIG_CLK_800_100_166_133) || \
 	defined(CONFIG_CLK_400_200_166_133) || \
 	defined(CONFIG_CLK_400_100_166_133) /* CONFIG_CLK_533_133_100_100 */
-
 #if defined(CONFIG_MCP_SINGLE)
-
 #define DMC0_MEMCONTROL		0x00212400	// MemControl	BL=4, 1Chip, DDR2 Type, dynamic self refresh, force precharge, dynamic power down off
 #define DMC0_MEMCONFIG_0	0x30F01313	// MemConfig0	256MB config, 8 banks,Mapping Method[12:15]0:linear, 1:linterleaved, 2:Mixed
 #define DMC0_MEMCONFIG_1	0x40F01313	// MemConfig1
@@ -298,15 +288,10 @@
 #define DMC1_TIMING_DATA	0x23240304	// TimingData	CL=3
 #define	DMC1_TIMING_PWR		0x08280232	// TimingPower
 #endif
-
 #else /* CONFIG_MCP_SINGLE */
-
 #error "You should define memory type (AC type or H type)"
-
 #endif /* CONFIG_MCP_SINGLE */
-
 #else /* CONFIG_CLK_533_133_100_100 */
-
 #define DMC0_TIMINGA_REF	0x50e
 #define DMC0_TIMING_ROW		0x14233287
 #define DMC0_TIMING_DATA	0x12130005
@@ -316,8 +301,26 @@
 #define DMC1_TIMING_ROW		0x11344309
 #define DMC1_TIMING_DATA	0x12130005
 #define	DMC1_TIMING_PWR		0x0E190222
-
 #endif /* CONFIG_CLK_533_133_100_100 */
+
+/* DRAM banks && size config */
+#define CONFIG_NR_DRAM_BANKS	2
+#define PHYS_SDRAM_1			CONFIG_SYS_SDRAM_BASE
+#define PHYS_SDRAM_1_SIZE		(256 << 20)		/* 256MB in Bank #0 */
+#define PHYS_SDRAM_2			0x40000000		/* mDDR DMC1 Bank #1 */
+#define PHYS_SDRAM_2_SIZE		(256 << 20)		/* 256 MB in Bank #1 */
+
+#define CONFIG_SYS_MONITOR_BASE		0x00000000
+#define CONFIG_SYS_MONITOR_LEN		(256 << 10)	/* 256 KiB */
+
+/* - DRAM Base */
+#define CONFIG_SYS_SDRAM_BASE		0x30000000
+
+/* - Text Base */
+#define CONFIG_SYS_TEXT_BASE		0x34800000
+
+/* - stack addr init */
+#define CONFIG_SYS_INIT_SP_ADDR	    0x34700000
 /* end of sdram config */
 
 

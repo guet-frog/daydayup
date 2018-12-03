@@ -45,8 +45,10 @@ int power_init_board(void)
 
 int dram_init(void)
 {
-	gd->ram_size = PHYS_SDRAM_1_SIZE + PHYS_SDRAM_2_SIZE +
-			PHYS_SDRAM_3_SIZE;
+    /* - modify for jiuding board */
+	//gd->ram_size = PHYS_SDRAM_1_SIZE + PHYS_SDRAM_2_SIZE + PHYS_SDRAM_3_SIZE;
+    
+    gd->ram_size = PHYS_SDRAM_1_SIZE + PHYS_SDRAM_2_SIZE;
 
 	return 0;
 }
@@ -57,8 +59,10 @@ void dram_init_banksize(void)
 	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;
 	gd->bd->bi_dram[1].start = PHYS_SDRAM_2;
 	gd->bd->bi_dram[1].size = PHYS_SDRAM_2_SIZE;
-	gd->bd->bi_dram[2].start = PHYS_SDRAM_3;
-	gd->bd->bi_dram[2].size = PHYS_SDRAM_3_SIZE;
+	
+    /* - mask 2018-12-3, for jiuding board */
+    //gd->bd->bi_dram[2].start = PHYS_SDRAM_3;
+	//gd->bd->bi_dram[2].size = PHYS_SDRAM_3_SIZE;
 }
 
 #ifdef CONFIG_DISPLAY_BOARDINFO

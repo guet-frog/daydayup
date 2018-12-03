@@ -56,7 +56,7 @@
  */
 
 ENTRY(_main)
-
+	
 	bl uboot_official_delay
 	bl open_right_led
 	
@@ -71,7 +71,7 @@ ENTRY(_main)
 /*
  * Set up initial C runtime environment and call board_init_f(0).
  */
-
+	
 #if defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_STACK)
 	ldr	sp, =(CONFIG_SPL_STACK)
 #else
@@ -83,14 +83,14 @@ ENTRY(_main)
 	mov	r9, sp		/* GD is above SP */
 	mov	r0, #0
 	bl	board_init_f
-
+	
 #if ! defined(CONFIG_SPL_BUILD)
 /*
  * Set up intermediate environment (new sp and gd) and call
  * relocate_code(addr_moni). Trick here is that we'll return
  * 'here' but relocated.
  */
-
+	
 	# ldr	sp, [r9, #GD_START_ADDR_SP]	/* sp = gd->start_addr_sp */
 	# bic	sp, sp, #7	/* 8-byte alignment for ABI compliance */
 	# ldr	r9, [r9, #GD_BD]		/* r9 = gd->bd */
@@ -119,15 +119,15 @@ ENTRY(_main)
 
 	# bl coloured_LED_init
 	# bl red_led_on
-
+	
 	/* call board_init_r(gd_t *id, ulong dest_addr) */
 	mov     r0, r9                  /* gd_t */
-	ldr	r1, [r9, #GD_RELOCADDR]	/* dest_addr */
+	ldr	r1, [r9, #GD_RELOCADDR]		/* dest_addr */
 	/* call board_init_r */
 	ldr	pc, =board_init_r	/* this is auto-relocated! */
-
+	
 	/* we should not return here. */
 
-#endif
+#endif /* - CONFIG_SPL_BUILD */
 
 ENDPROC(_main)

@@ -40,11 +40,18 @@ cp -f uboot_official/board/samsung/goni/ddr_init.S /home/aston/src/uboot_officia
 # 添加relocate_sd2sdram.c
 cp -f uboot_official/board/samsung/goni/relocate_sd2sdram.c /home/aston/src/uboot_official/board/samsung/goni/
 
+
+
+############################################################################ enter uboot step 2
+
 # 修改crt0.S
 cp -f uboot_official/arch/arm/lib/crt0.S /home/aston/src/uboot_official/arch/arm/lib/
 
 # 修改board.c
 cp -f uboot_official/arch/arm/lib/board.c /home/aston/src/uboot_official/arch/arm/lib/
+
+# 修改goni.c	-- modify dram_init_banksize()
+cp -f uboot_official/board/samsung/goni/goni.c /home/aston/src/uboot_official/board/samsung/goni/
 
 ############################################################################
 

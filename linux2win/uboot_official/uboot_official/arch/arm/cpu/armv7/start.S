@@ -160,33 +160,46 @@ reset:
 	str	r1, [r0]
 	//============================================================
 	
-	/* the mask ROM code should have PLL and others stable */
-#ifndef CONFIG_SKIP_LOWLEVEL_INIT
+	/* - lowlevel_init */
+	//============================================================
 	bl	cpu_init_cp15
 	
 	bl led_init
 	
+	bl open_all_led		/* - enter lowlevel_init */
+	
+	/* - lowlevel_init */
 	bl cpu_init_crit
 	
-	bl open_all_led	/* - warning: out lowlevel_init */
-#endif
+	bl uboot_official_delay
+	bl close_all_led	/* - out lowlevel_init */
+	//============================================================
+	
+	/* - relocate && clear bss */
+	//============================================================
+	bl uboot_official_delay
+	bl open_all_led
 	
 	/* - uboot relocate */
 	bl relocate_uboot2sdram
 	
-	/* - uboot relocate ok, then print 'K' */
-	//========================================================
-	ldr r0, =S5PC110_UART_BASE
-	add r0, r0, #0x800				@ uart2 offset
-	ldr r1, =0x4B
-	str r1, [r0, #0x20]
-	//========================================================
+	/* - clear bss */
+	# ldr r0, __bss_start
+	# ldr r1, __bss_end
+	# #ldr r2, #0x0		-- error
+	# mov r2, #0x0
+# loop:
+	# str r2, [r0]
+	# add r0, r0, #0x4
+	# cmp r0, r1
+	# ble loop
 	
 	bl uboot_official_delay
 	bl close_all_led
+	//============================================================
 	
 	ldr pc, __main
-
+	
 __main: .word _main
 	
 /*------------------------------------------------------------------------------*/
