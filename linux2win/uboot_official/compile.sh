@@ -20,6 +20,7 @@ cp -f uboot_official/arch/arm/cpu/armv7/start.S /home/aston/src/uboot_official/a
 
 # uboot_official_led.S添加
 cp -f uboot_official/board/samsung/goni/uboot_official_led.S /home/aston/src/uboot_official/board/samsung/goni/
+cp -f uboot_official/board/samsung/goni/uboot_official_led_c.c /home/aston/src/uboot_official/board/samsung/goni/
 
 # board/samsung/goni/Makefile修改
 cp -f uboot_official/board/samsung/goni/Makefile /home/aston/src/uboot_official/board/samsung/goni/Makefile
