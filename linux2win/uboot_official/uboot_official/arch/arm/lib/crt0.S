@@ -60,7 +60,7 @@ ENTRY(_main)
 	bl uboot_official_delay
 	bl open_right_led
 	
-	/* - uboot relocate ok, then print 'O' */
+	/* - uboot relocate ok, then print 'K' */
 	//========================================================
 	ldr r0, =S5PC110_UART_BASE
 	add r0, r0, #0x800				@ uart2 offset
@@ -84,7 +84,21 @@ ENTRY(_main)
 	mov	r0, #0
 	bl	board_init_f
 	
-#if ! defined(CONFIG_SPL_BUILD)
+	bl open_medium_led
+	bl uboot_official_delay
+	bl close_medium_led
+	bl uboot_official_delay
+	bl open_medium_led
+	bl uboot_official_delay
+	bl close_medium_led
+	bl uboot_official_delay
+	bl open_medium_led
+	bl uboot_official_delay
+	bl close_medium_led
+	
+	bl board_init_r
+	
+/*#if ! defined(CONFIG_SPL_BUILD)*/
 /*
  * Set up intermediate environment (new sp and gd) and call
  * relocate_code(addr_moni). Trick here is that we'll return
@@ -119,15 +133,23 @@ ENTRY(_main)
 
 	# bl coloured_LED_init
 	# bl red_led_on
+
+	/* - uboot relocate ok, then print 'K' */
+	//========================================================
+	ldr r0, =S5PC110_UART_BASE
+	add r0, r0, #0x800				@ uart2 offset
+	ldr r1, =0x49
+	str r1, [r0, #0x20]
+	//========================================================
 	
 	/* call board_init_r(gd_t *id, ulong dest_addr) */
-	mov     r0, r9                  /* gd_t */
-	ldr	r1, [r9, #GD_RELOCADDR]		/* dest_addr */
+	#mov     r0, r9                  /* gd_t */
+	#ldr	r1, [r9, #GD_RELOCADDR]		/* dest_addr */
 	/* call board_init_r */
-	ldr	pc, =board_init_r	/* this is auto-relocated! */
+	#ldr	pc, =board_init_r	/* this is auto-relocated! */
 	
 	/* we should not return here. */
 
-#endif /* - CONFIG_SPL_BUILD */
+//#endif /* - CONFIG_SPL_BUILD */
 
 ENDPROC(_main)

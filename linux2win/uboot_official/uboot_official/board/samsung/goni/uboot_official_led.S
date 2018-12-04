@@ -53,13 +53,13 @@ close_left_led:
 	mov pc, lr
 	
 close_medium_led:
-	ldr r0, =(0x1<<3)
+	ldr r0, =(0x1<<4)
 	ldr r1, =GPJ0DAT
 	str r0, [r1]
 	mov pc, lr
 	
 close_right_led:
-	ldr r0, =(0x1<<3)
+	ldr r0, =(0x1<<5)
 	ldr r1, =GPJ0DAT
 	str r0, [r1]
 	mov pc, lr

@@ -563,7 +563,8 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #ifdef CONFIG_ARCH_EARLY_INIT_R
 	arch_early_init_r();
 #endif
-	power_init_board();
+	/* - mask 2018-12-4 */
+	//power_init_board();
 
     printf("###ready to flash init\r\n");
 
@@ -592,7 +593,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 		puts(failed);
 		hang();
 	}
-#endif
+#endif /* - CONFIG_SYS_NO_FLASH */
 
 #if defined(CONFIG_CMD_NAND)
 	puts("NAND:  ");

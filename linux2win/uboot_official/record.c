@@ -32,4 +32,4 @@
 		
 	arch/arm/lib/board.c
 		// 修改DRAM bank && size config
-		// 添加打印
+		// 添加打印 -- in board_init()
