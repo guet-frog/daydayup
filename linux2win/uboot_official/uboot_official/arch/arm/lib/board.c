@@ -520,22 +520,16 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	ulong flash_size;
 #endif
     
-    led_blink(0x1, 3);
-    
 	gd->flags |= GD_FLG_RELOC;	/* tell others: relocation done */
 	bootstage_mark_name(BOOTSTAGE_ID_START_UBOOT_R, "board_init_r");
-
-    printf("###enter board_init_r\r\n");
 
 	monitor_flash_len = _end_ofs;
 
 	/* Enable caches */
-	enable_caches();
+	//enable_caches();
 
 	debug("monitor flash len: %08lX\n", monitor_flash_len);
 	board_init();	/* Setup chipselects */
-
-    printf("###enter board_init_r\r\n");
 
 	/*
 	 * TODO: printing of the clock inforamtion of the board is now
@@ -558,6 +552,9 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	post_output_backlog();
 #endif
 
+	/* - define dest_addr */
+	dest_addr = 0x48000000;
+
 	/* The Malloc area is immediately below the monitor copy in DRAM */
 	malloc_start = dest_addr - TOTAL_MALLOC_LEN;
 	mem_malloc_init (malloc_start, TOTAL_MALLOC_LEN);
@@ -568,46 +565,50 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	/* - mask 2018-12-4 */
 	//power_init_board();
 
-    printf("###ready to flash init\r\n");
+	led_blink(0x1, 2);
 
-#if !defined(CONFIG_SYS_NO_FLASH)
-	puts("Flash: ");
+// #if !defined(CONFIG_SYS_NO_FLASH)
+	// puts("Flash: ");
 
-	flash_size = flash_init();
-	if (flash_size > 0) {
-# ifdef CONFIG_SYS_FLASH_CHECKSUM
-		print_size(flash_size, "");
-		/*
-		 * Compute and print flash CRC if flashchecksum is set to 'y'
-		 *
-		 * NOTE: Maybe we should add some WATCHDOG_RESET()? XXX
-		 */
-		if (getenv_yesno("flashchecksum") == 1) {
-			printf("  CRC: %08X", crc32(0,
-				(const unsigned char *) CONFIG_SYS_FLASH_BASE,
-				flash_size));
-		}
-		putc('\n');
-# else	/* !CONFIG_SYS_FLASH_CHECKSUM */
-		print_size(flash_size, "\n");
-# endif /* CONFIG_SYS_FLASH_CHECKSUM */
-	} else {
-		puts(failed);
-		hang();
-	}
-#endif /* - CONFIG_SYS_NO_FLASH */
+	// flash_size = flash_init();
+	// if (flash_size > 0) {
+// # ifdef CONFIG_SYS_FLASH_CHECKSUM
+		// print_size(flash_size, "");
+		// /*
+		 // * Compute and print flash CRC if flashchecksum is set to 'y'
+		 // *
+		 // * NOTE: Maybe we should add some WATCHDOG_RESET()? XXX
+		 // */
+		// if (getenv_yesno("flashchecksum") == 1) {
+			// printf("  CRC: %08X", crc32(0,
+				// (const unsigned char *) CONFIG_SYS_FLASH_BASE,
+				// flash_size));
+		// }
+		// putc('\n');
+// # else	/* !CONFIG_SYS_FLASH_CHECKSUM */
+		// print_size(flash_size, "\n");
+// # endif /* CONFIG_SYS_FLASH_CHECKSUM */
+	// } else {
+		// puts(failed);
+		// hang();
+	// }
+// #endif /* - CONFIG_SYS_NO_FLASH */
 
-#if defined(CONFIG_CMD_NAND)
-	puts("NAND:  ");
-	nand_init();		/* go init the NAND */
-#endif
+// #if defined(CONFIG_CMD_NAND)
+	// puts("NAND:  ");
+	// nand_init();		/* go init the NAND */
+// #endif
 
-#if defined(CONFIG_CMD_ONENAND)
-	onenand_init();
-#endif
+// #if defined(CONFIG_CMD_ONENAND)
+//	onenand_init();
+//#endif
 
 #ifdef CONFIG_GENERIC_MMC
+	led_blink(0x2, 2);
+
 	puts("MMC:   ");
+
+	led_blink(0x4, 2);
 	mmc_initialize(gd->bd);
 #endif
 

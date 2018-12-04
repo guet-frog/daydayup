@@ -84,18 +84,6 @@ ENTRY(_main)
 	mov	r0, #0
 	bl	board_init_f
 	
-	bl open_medium_led
-	bl uboot_official_delay
-	bl close_medium_led
-	bl uboot_official_delay
-	bl open_medium_led
-	bl uboot_official_delay
-	bl close_medium_led
-	bl uboot_official_delay
-	bl open_medium_led
-	bl uboot_official_delay
-	bl close_medium_led
-	
 	bl board_init_r
 	
 /*#if ! defined(CONFIG_SPL_BUILD)*/

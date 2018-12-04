@@ -19,7 +19,7 @@ static struct s5pc110_gpio *s5pc110_gpio;
 
 int board_init(void)
 {
-	printf("enter board_init_r\r\n");
+	//printf("enter board_init_r\r\n");
 
 	/* Set Initial global variables */
 	s5pc110_gpio = (struct s5pc110_gpio *)S5PC110_GPIO_BASE;
