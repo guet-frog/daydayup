@@ -30,7 +30,8 @@
 	// CFG_STACK_SIZE	512*1024
 	// sizeof(gd_t) = 36 sizeof(bd) = 44
 
-	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t))	// 结构体变量首地址在低地址, bd->bi_baudrate在低地址
+	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t))	// bd实例化
+												// 结构体变量首地址在低地址, bd->bi_baudrate在低地址
 
 	//compile optimization barrier: 内存间隔, 为了防止高版本的gcc的优化造成错误
 
@@ -40,7 +41,7 @@
 2.6.4.1、init_sequence 与 init_fnc_t
 
 	(1)typedef int (init_fnc_t) (void)		// 函数类型  -- init_fnc_t *init_sequence[] = {}
-	(2)init_fnc_t **init_fnc_ptr			// 二重指针  -> 指针数组 
+	(2)init_fnc_t **init_fnc_ptr			// 二重指针  -> 指针数组
 											// 干掉一个 * -- init_fnc_t *init_sequence[]
 	// 二重函数指针: ①指向一重指针, ②指向指针数组 -- 指向数组
 	// 一般将二重指针理解为指针数组

@@ -468,8 +468,8 @@ void start_armboot (void)
 	/* compiler optimization barrier needed for GCC >= 3.4 */
 	__asm__ __volatile__("": : :"memory");
     
-	memset ((void*)gd, 0, sizeof (gd_t));			/// struct gd中没有bd的memory
-	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t));     /// bd_t *bd, 需要给bd_t分配空间, 清零
+	memset ((void*)gd, 0, sizeof (gd_t));	    /// struct gd中没有bd的memory, 只有bd的指针(地址), 4字节
+	gd->bd = (bd_t*)((char*)gd - sizeof(bd_t));     /// bd实例化
 	memset (gd->bd, 0, sizeof(bd_t));
     
 	monitor_flash_len = _bss_start - _armboot_start;

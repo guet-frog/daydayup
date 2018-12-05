@@ -16,7 +16,7 @@
 	(2)uboot启动内核时将zImage加载到ddr中(kernel relocate)		// kernel link addr: 0x3000_8000
 
 2.7.1.5、内核启动需要必要的启动参数
-	(2)内核启动需要: ①image relocate ②boot args	// uboot可以自启动或bootROM引导
+	(2)内核启动需要: ①relocate image ②boot args	// uboot可以自启动或bootROM引导
 
 2.7.2.0、启动内核第一步：加载内核到ddr中		// read kernel to ddr not uboot
 

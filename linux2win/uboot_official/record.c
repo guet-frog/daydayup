@@ -29,7 +29,9 @@
 	
 	arch/arm/lib/crt0.S
 		// step2 entry --> 添加uart确认enter uboot step2 -- 此时已经relocate
-		
+	
 	arch/arm/lib/board.c
 		// 修改DRAM bank && size config
 		// 添加打印 -- in board_init()
+		// 屏蔽enable_cache() printf()
+	
