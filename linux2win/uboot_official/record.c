@@ -36,4 +36,12 @@
 		// 修改DRAM bank && size config
 		// 添加打印 -- in board_init()
 		// 屏蔽enable_cache() printf()
+		
+	include/configs/s5p_goni.h
+		//#define CONFIG_ENV_IS_IN_ONENAND	1
+		#define CONFIG_ENV_IS_IN_ONENAND  	0
+		#define CONFIG_ENV_IS_IN_MMC		1
+
+		// CONFIG_ENV_IS_IN_ONENAND=0
+		// CONFIG_ENV_IS_IN_MMC=y		-- not 1
 	

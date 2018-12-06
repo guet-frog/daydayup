@@ -51,7 +51,7 @@ cp -f uboot_official/arch/arm/lib/crt0.S /home/aston/src/uboot_official/arch/arm
 # 修改board.c
 cp -f uboot_official/arch/arm/lib/board.c /home/aston/src/uboot_official/arch/arm/lib/
 
-# 修改goni.c	-- modify dram_init_banksize()
+# 修改goni.c	-- modify dram_init_banksize(), arch_num
 cp -f uboot_official/board/samsung/goni/goni.c /home/aston/src/uboot_official/board/samsung/goni/
 
 ############################################################################

@@ -70,7 +70,7 @@
 #undef CONFIG_CMD_XIMG
 #define CONFIG_CMD_CACHE
 #define CONFIG_CMD_REGINFO
-#define CONFIG_CMD_ONENAND
+//#define CONFIG_CMD_ONENAND
 #define CONFIG_CMD_MTDPARTS
 #define CONFIG_CMD_MMC
 
@@ -188,8 +188,14 @@
 // #define CONFIG_SYS_MONITOR_LEN		(256 << 10)	/* 256 KiB */
 
 /* FLASH and environment organization */
-#define CONFIG_ENV_IS_IN_ONENAND	1
-//#define CONFIG_ENV_IS_IN_ONENAND  0
+//#define CONFIG_ENV_IS_IN_ONENAND	1
+#define CONFIG_ENV_IS_IN_ONENAND  	0
+#define CONFIG_ENV_IS_IN_MMC		1
+
+// CONFIG_ENV_IS_IN_ONENAND=0
+// CONFIG_ENV_IS_IN_MMC=y		-- not 1
+
+#define CONFIG_SYS_MMC_ENV_DEV	0
 
 #define CONFIG_ENV_SIZE			(256 << 10)	/* 256 KiB, 0x40000 */
 #define CONFIG_ENV_ADDR			(1 << 20)	/* 1 MB, 0x100000 */

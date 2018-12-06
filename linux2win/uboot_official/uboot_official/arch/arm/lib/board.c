@@ -446,8 +446,7 @@ void board_init_f(ulong bootflag)
 #endif
     
 	gd->bd->bi_baudrate = gd->baudrate;
-    //printf("###gd->baudrate = %p\r\n", (void *)gd->baudrate);   // %p expects type void *
-    
+
 	/* Ram ist board specific, so move it to board code ... */
 	dram_init_banksize();
 	display_dram_config();	/* and display it */
@@ -522,7 +521,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	monitor_flash_len = _end_ofs;
 
 	/* Enable caches */
-	enable_caches();
+	//enable_caches();
 
 	debug("monitor flash len: %08lX\n", monitor_flash_len);
 	board_init();	/* Setup chipselects */
@@ -549,7 +548,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #endif
 
 	/* - define dest_addr */
-	dest_addr = 0x48000000;
+	dest_addr = 0x34600000;
 
 	/* The Malloc area is immediately below the monitor copy in DRAM */
 	malloc_start = dest_addr - TOTAL_MALLOC_LEN;
@@ -558,10 +557,10 @@ void board_init_r(gd_t *id, ulong dest_addr)
 #ifdef CONFIG_ARCH_EARLY_INIT_R
 	arch_early_init_r();
 #endif
-	/* - mask 2018-12-4 */
-	power_init_board();
+	/* - mask 2018-12-4 not have power manage */
+	//power_init_board();
 
-	led_blink(0x1, 2);
+	led_blink(0x1, 3);
 
 #if !defined(CONFIG_SYS_NO_FLASH)
 	puts("Flash: ");

@@ -24,7 +24,9 @@ int board_init(void)
 	/* Set Initial global variables */
 	s5pc110_gpio = (struct s5pc110_gpio *)S5PC110_GPIO_BASE;
 
-	gd->bd->bi_arch_number = MACH_TYPE_GONI;
+//	gd->bd->bi_arch_number = MACH_TYPE_GONI;
+	gd->bd->bi_arch_number = MACH_TYPE_SMDKV210;
+
 	gd->bd->bi_boot_params = PHYS_SDRAM_1 + 0x100;
 
 	return 0;
