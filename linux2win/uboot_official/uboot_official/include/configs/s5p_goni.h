@@ -189,6 +189,8 @@
 
 /* FLASH and environment organization */
 #define CONFIG_ENV_IS_IN_ONENAND	1
+//#define CONFIG_ENV_IS_IN_ONENAND  0
+
 #define CONFIG_ENV_SIZE			(256 << 10)	/* 256 KiB, 0x40000 */
 #define CONFIG_ENV_ADDR			(1 << 20)	/* 1 MB, 0x100000 */
 

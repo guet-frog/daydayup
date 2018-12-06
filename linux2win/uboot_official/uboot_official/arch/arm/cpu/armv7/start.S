@@ -97,6 +97,13 @@ _bss_end_ofs:
 _end_ofs:
 	.word _end - _start
 
+/* - add for relocate */
+.globl _bss_start
+_bss_start: .word __bss_start
+
+.globl _bss_end
+_bss_end: .word __bss_end
+
 #ifdef CONFIG_USE_IRQ
 /* IRQ stack memory (calculated at run-time) */
 .globl IRQ_STACK_START
@@ -165,34 +172,35 @@ reset:
 	bl	cpu_init_cp15
 	
 	bl led_init
-	
-	bl open_all_led		/* - enter lowlevel_init */
+	bl open_left_led		/* - enter lowlevel_init */
 	
 	/* - lowlevel_init */
 	bl cpu_init_crit
 	
 	bl uboot_official_delay
-	bl close_all_led	/* - out lowlevel_init */
+	bl close_all_led		/* - out lowlevel_init */
 	//============================================================
 	
 	/* - relocate && clear bss */
 	//============================================================
-	bl uboot_official_delay
-	bl open_all_led
+	bl open_right_led
 	
 	/* - uboot relocate */
 	bl relocate_uboot2sdram
 	
 	/* - clear bss */
-	# ldr r0, __bss_start
-	# ldr r1, __bss_end
-	# #ldr r2, #0x0		-- error
-	# mov r2, #0x0
-# loop:
-	# str r2, [r0]
-	# add r0, r0, #0x4
-	# cmp r0, r1
-	# ble loop
+	#ldr r0, __bss_start	/* error 1 */
+	#ldr r1, __bss_end
+	#ldr r2, #0x0			/* error 2 */
+	
+	ldr r0, _bss_start
+	ldr r1, _bss_end
+	mov r2, #0x0
+loop:
+	str r2, [r0]
+	add r0, r0, #0x4
+	cmp r0, r1
+	ble loop
 	
 	bl uboot_official_delay
 	bl close_all_led

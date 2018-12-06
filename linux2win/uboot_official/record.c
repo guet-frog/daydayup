@@ -7,6 +7,8 @@
 		// 添加16字节占位
 		// 添加led				-- 编译OK, 但是应该不在前8K, 没有正常运行
 		// 调用C函数前重新设置栈 -- bl led_init后程序挂掉 -- 不是没有正确设置栈的原因, 汇编函数返回	mov pc, lr
+		// clear bss修改 -- .globl
+		// uart_asm_init修改 -- mov r1, #0x4f
 	
 	board/samsung/goni/Makefile
 		// uboot_official_led.S -- 编译到libgoni.o中

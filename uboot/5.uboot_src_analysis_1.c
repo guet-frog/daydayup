@@ -52,9 +52,9 @@
 
 2.5.6.1、判断当前代码执行位置  // line 110-115
 	(1)代码运行地址在sram中还是在ddr中     // bl1(uboot的前16K)
-	
+
 	(2)bic	r1, pc, r0  //r1 = pc & ~(r0)
-	
+
 		// bl system_clock_init
 		// bl mem_ctrl_asm_init
 

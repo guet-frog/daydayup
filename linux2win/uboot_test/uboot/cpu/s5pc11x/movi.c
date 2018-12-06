@@ -63,9 +63,7 @@ void movi_zImage_copy(void)
 	 * TODO : eMMC will be used as boot device on HP proto2 board
 	 *        So, total size of eMMC will be re-defined next board.
 	 */
-	ret =
-	    copy_zImage(0, 0x3C6FCE, MOVI_ZIMAGE_BLKCNT, CFG_PHY_KERNEL_BASE,
-			1);
+	ret = copy_zImage(0, 0x3C6FCE, MOVI_ZIMAGE_BLKCNT, CFG_PHY_KERNEL_BASE, 1);
 
 	if (ret == 0)
 		while (1)

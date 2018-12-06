@@ -206,7 +206,7 @@ skip_check_didle:
 	bl	system_clock_init
 	
 	/* - add for sdram init */
-	bl mem_ctrl_asm_init
+	bl 	mem_ctrl_asm_init
 	
 	/* - modify for uart2 init */
 	bl	uart_asm_init
@@ -394,7 +394,11 @@ uart_asm_init:
 	
 	ldr r0, =S5PC110_UART_BASE
 	add r0, r0, #0x800				@ uart2 offset
-	ldr r1, =0x4f
+	
+	//ldr r1, =0x4f
+	//mov r1, 0x4f
+	mov r1, #0x4f
+	
 	str r1, [r0, #0x20]
 	//========================================================
 	

@@ -57,21 +57,21 @@
 
 ENTRY(_main)
 	
-	bl uboot_official_delay
-	bl open_right_led
-	
 	/* - uboot relocate ok, then print 'K' */
 	//========================================================
 	ldr r0, =S5PC110_UART_BASE
-	add r0, r0, #0x800				@ uart2 offset
-	ldr r1, =0x4B
+	add r0, r0, #0x800
+	
+	//ldr r1, =0x4B
+	mov r1, #0x4b
+	
 	str r1, [r0, #0x20]
 	//========================================================
 	
 /*
  * Set up initial C runtime environment and call board_init_f(0).
  */
-	
+
 #if defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_STACK)
 	ldr	sp, =(CONFIG_SPL_STACK)
 #else
@@ -84,7 +84,7 @@ ENTRY(_main)
 	mov	r0, #0
 	bl	board_init_f
 	
-	bl board_init_r
+	bl	board_init_r
 	
 /*#if ! defined(CONFIG_SPL_BUILD)*/
 /*
@@ -118,17 +118,9 @@ ENTRY(_main)
 	# strlo	r2, [r0]		/* clear 32-bit BSS word */
 	# addlo	r0, r0, #4		/* move to next */
 	# blo	clbss_l
-
+	
 	# bl coloured_LED_init
 	# bl red_led_on
-
-	/* - uboot relocate ok, then print 'K' */
-	//========================================================
-	ldr r0, =S5PC110_UART_BASE
-	add r0, r0, #0x800				@ uart2 offset
-	ldr r1, =0x49
-	str r1, [r0, #0x20]
-	//========================================================
 	
 	/* call board_init_r(gd_t *id, ulong dest_addr) */
 	#mov     r0, r9                  /* gd_t */
@@ -137,7 +129,7 @@ ENTRY(_main)
 	#ldr	pc, =board_init_r	/* this is auto-relocated! */
 	
 	/* we should not return here. */
-
+	
 //#endif /* - CONFIG_SPL_BUILD */
 
 ENDPROC(_main)

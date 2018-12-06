@@ -288,16 +288,12 @@ void board_init_f(ulong bootflag)
 	/* Allow the early environment to override the fdt address */
 	gd->fdt_blob = (void *)getenv_ulong("fdtcontroladdr", 16,
 						(uintptr_t)gd->fdt_blob);
-    
-	//printf("\n\nenter uboot step 2\r\n");  -- 被优化掉
 	
 	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
 		if ((*init_fnc_ptr)() != 0) {
 			hang ();
 		}
 	}
-	printf("###enter uboot step2 && over init_sequence init \r\n");
-    printf("###gd = %p, sizeof(gd_t) = %d\r\n", gd, sizeof(gd_t));
     
 #ifdef CONFIG_OF_CONTROL
 	/* For now, put this check after the console is ready */
@@ -450,7 +446,7 @@ void board_init_f(ulong bootflag)
 #endif
     
 	gd->bd->bi_baudrate = gd->baudrate;
-    printf("###gd->baudrate = %p\r\n", (void *)gd->baudrate);   // %p expects type void *
+    //printf("###gd->baudrate = %p\r\n", (void *)gd->baudrate);   // %p expects type void *
     
 	/* Ram ist board specific, so move it to board code ... */
 	dram_init_banksize();
@@ -526,7 +522,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	monitor_flash_len = _end_ofs;
 
 	/* Enable caches */
-	//enable_caches();
+	enable_caches();
 
 	debug("monitor flash len: %08lX\n", monitor_flash_len);
 	board_init();	/* Setup chipselects */
@@ -563,51 +559,51 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	arch_early_init_r();
 #endif
 	/* - mask 2018-12-4 */
-	//power_init_board();
+	power_init_board();
 
 	led_blink(0x1, 2);
 
-// #if !defined(CONFIG_SYS_NO_FLASH)
-	// puts("Flash: ");
+#if !defined(CONFIG_SYS_NO_FLASH)
+	puts("Flash: ");
 
-	// flash_size = flash_init();
-	// if (flash_size > 0) {
-// # ifdef CONFIG_SYS_FLASH_CHECKSUM
-		// print_size(flash_size, "");
-		// /*
-		 // * Compute and print flash CRC if flashchecksum is set to 'y'
-		 // *
-		 // * NOTE: Maybe we should add some WATCHDOG_RESET()? XXX
-		 // */
-		// if (getenv_yesno("flashchecksum") == 1) {
-			// printf("  CRC: %08X", crc32(0,
-				// (const unsigned char *) CONFIG_SYS_FLASH_BASE,
-				// flash_size));
-		// }
-		// putc('\n');
-// # else	/* !CONFIG_SYS_FLASH_CHECKSUM */
-		// print_size(flash_size, "\n");
-// # endif /* CONFIG_SYS_FLASH_CHECKSUM */
-	// } else {
-		// puts(failed);
-		// hang();
-	// }
-// #endif /* - CONFIG_SYS_NO_FLASH */
+	flash_size = flash_init();
+	if (flash_size > 0) {
+# ifdef CONFIG_SYS_FLASH_CHECKSUM
+		print_size(flash_size, "");
+		/*
+		 * Compute and print flash CRC if flashchecksum is set to 'y'
+		 *
+		 * NOTE: Maybe we should add some WATCHDOG_RESET()? XXX
+		 */
+		if (getenv_yesno("flashchecksum") == 1) {
+			printf("  CRC: %08X", crc32(0,
+				(const unsigned char *) CONFIG_SYS_FLASH_BASE,
+				flash_size));
+		}
+		putc('\n');
+# else	/* !CONFIG_SYS_FLASH_CHECKSUM */
+		print_size(flash_size, "\n");
+# endif /* CONFIG_SYS_FLASH_CHECKSUM */
+	} else {
+		puts(failed);
+		hang();
+	}
+#endif /* - CONFIG_SYS_NO_FLASH */
 
-// #if defined(CONFIG_CMD_NAND)
-	// puts("NAND:  ");
-	// nand_init();		/* go init the NAND */
-// #endif
+#if defined(CONFIG_CMD_NAND)
+	puts("NAND:  ");
+	nand_init();		/* go init the NAND */
+#endif
 
-// #if defined(CONFIG_CMD_ONENAND)
-//	onenand_init();
-//#endif
+#if defined(CONFIG_CMD_ONENAND)
+	onenand_init();
+#endif
 
 #ifdef CONFIG_GENERIC_MMC
 	led_blink(0x2, 2);
-
+    
 	puts("MMC:   ");
-
+    
 	led_blink(0x4, 2);
 	mmc_initialize(gd->bd);
 #endif
