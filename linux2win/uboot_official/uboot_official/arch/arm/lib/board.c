@@ -604,7 +604,7 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	puts("MMC:   ");
     
 	led_blink(0x4, 2);
-	mmc_initialize(gd->bd);
+	//mmc_initialize(gd->bd);
 #endif
 
 #ifdef CONFIG_HAS_DATAFLASH

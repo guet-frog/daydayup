@@ -167,24 +167,17 @@ reset:
 	str	r1, [r0]
 	//============================================================
 	
-	/* - lowlevel_init */
 	//============================================================
 	bl	cpu_init_cp15
 	
+	/* - for debug */
 	bl led_init
-	bl open_left_led		/* - enter lowlevel_init */
 	
 	/* - lowlevel_init */
 	bl cpu_init_crit
-	
-	bl uboot_official_delay
-	bl close_all_led		/* - out lowlevel_init */
 	//============================================================
 	
-	/* - relocate && clear bss */
 	//============================================================
-	bl open_right_led
-	
 	/* - uboot relocate */
 	bl relocate_uboot2sdram
 	
@@ -201,9 +194,6 @@ loop:
 	add r0, r0, #0x4
 	cmp r0, r1
 	ble loop
-	
-	bl uboot_official_delay
-	bl close_all_led
 	//============================================================
 	
 	ldr pc, __main

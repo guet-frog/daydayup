@@ -36,12 +36,27 @@
 		// 修改DRAM bank && size config
 		// 添加打印 -- in board_init()
 		// 屏蔽enable_cache() printf()
-		
+	
 	include/configs/s5p_goni.h
 		//#define CONFIG_ENV_IS_IN_ONENAND	1
 		#define CONFIG_ENV_IS_IN_ONENAND  	0
-		#define CONFIG_ENV_IS_IN_MMC		1
-
+		#define CONFIG_ENV_IS_IN_MMC		1		// 相同作用：#define CONFIG_ENV_IS_IN_MMC
+		
 		// CONFIG_ENV_IS_IN_ONENAND=0
 		// CONFIG_ENV_IS_IN_MMC=y		-- not 1
+		
+	/* - sd/mmc需要添加的文件 */
+	
+	s5p_goni.h		// 添加CONFIG_S3C_HSMMC
+	
+	drivers/mmc/mmc.c
+	drivers/mmc/s3c_hsmmc.c
+	
+	cpu/s5pc11x/setup_hsmmc.c
+	cpu/s5pc11x/cpu.c cpu_mmc_init() -- setup_hsmmc.c
+	
+	
+	
+	
+	
 	
