@@ -49,10 +49,10 @@
 #define CONFIG_BAUDRATE			115200
 
 /* MMC */
-#define CONFIG_GENERIC_MMC
-#define CONFIG_MMC
-//#define CONFIG_SDHCI
-//#define CONFIG_S5P_SDHCI
+//#define CONFIG_GENERIC_MMC
+//#define CONFIG_MMC
+////#define CONFIG_SDHCI
+////#define CONFIG_S5P_SDHCI
 
 /* PWM */
 #define CONFIG_PWM			1
@@ -330,6 +330,24 @@
 /* - stack addr init */
 #define CONFIG_SYS_INIT_SP_ADDR	    0x34700000
 /* end of sdram config */
+
+/* - sd/mmc config */
+#define CONFIG_GENERIC_MMC
+#define CONFIG_MMC
+//#define CONFIG_SDHCI
+//#define CONFIG_S5P_SDHCI
+
+/* - add config */
+#define CONFIG_S3C_HSMMC
+
+/* The macro for MMC channel 0 is defined by default and can't be undefined */
+#define USE_MMC0
+//#define USE_MMC0_8BIT //lqm added for test
+#define USE_MMC2
+//#define USE_MMC2_8BIT
+#define MMC_MAX_CHANNEL		4
+/* - end of sd/mmc config */
+
 
 
 #endif	/* __CONFIG_H */

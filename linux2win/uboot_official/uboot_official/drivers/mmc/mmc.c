@@ -1195,8 +1195,12 @@ int mmc_initialize(bd_t *bis)
 	INIT_LIST_HEAD(&mmc_devices);
 	cur_dev_num = 0;
 
-	if (board_mmc_init(bis) < 0)
-		cpu_mmc_init(bis);
+    /* - 2018-12-8 modify */
+	//if (board_mmc_init(bis) < 0)
+	//	cpu_mmc_init(bis);
+    setup_hsmmc_clock();
+	setup_hsmmc_cfg_gpio();
+    smdk_s3c_hsmmc_init();
 
 #if defined(DEBUG_S3C_HSMMC)
 	print_mmc_devices(',');

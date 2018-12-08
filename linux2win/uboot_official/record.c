@@ -46,14 +46,7 @@
 		// CONFIG_ENV_IS_IN_MMC=y		-- not 1
 		
 	/* - sd/mmc需要添加的文件 */
-	
-	s5p_goni.h		// 添加CONFIG_S3C_HSMMC
-	
-	drivers/mmc/mmc.c
-	drivers/mmc/s3c_hsmmc.c
-	
-	cpu/s5pc11x/setup_hsmmc.c
-	cpu/s5pc11x/cpu.c cpu_mmc_init() -- setup_hsmmc.c
+		
 	
 	
 	

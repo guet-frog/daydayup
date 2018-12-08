@@ -59,19 +59,24 @@ cp -f uboot_official/board/samsung/goni/goni.c /home/aston/src/uboot_official/bo
 
 ############################################################################
 
-# 删除原mmc.c
+# 删除原mmc.c -- 直接屏蔽相关宏
 #rm -f /home/aston/src/uboot_official/drivers/mmc/mmc.c
 #rm -f /home/aston/src/uboot_official/drivers/mmc/s5p_sdhci.c
 #rm -f /home/aston/src/uboot_official/drivers/mmc/sdhci.c
 
-# 覆盖原mmc.c, mmc.h
+# 覆盖原mmc.c, mmc.h cmd_mmc.c
 cp -f uboot_official/drivers/mmc/mmc.c /home/aston/src/uboot_official/drivers/mmc/
-cp -f uboot_official/include/mmc.h /home/aston/src/uboot_official/include/
-
-# 修改cmd_mmc.c相关 -- mmc read write相关操作
+cp -f uboot_official/drivers/mmc/s3c_hsmmc.c /home/aston/src/uboot_official/drivers/mmc/
+cp -f uboot_official/drivers/mmc/setup_hsmmc.c /home/aston/src/uboot_official/drivers/mmc/
 cp -f uboot_official/common/cmd_mmc.c /home/aston/src/uboot_official/common/
 
-# s5p_goni.h
+cp -f uboot_official/include/mmc.h /home/aston/src/uboot_official/include/
+cp -f uboot_official/include/s3c_hsmmc.h /home/aston/src/uboot_official/include/
+
+# s5p_goni.h 更新宏
+
+# 修改drivers/mmc/Makefile -- 去掉mmc_write依赖
+cp -f uboot_official/drivers/mmc/Makefile /home/aston/src/uboot_official/drivers/mmc/
 
 ############################################################################
 
