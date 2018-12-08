@@ -560,8 +560,6 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	/* - mask 2018-12-4 not have power manage */
 	//power_init_board();
 
-	led_blink(0x1, 3);
-
 #if !defined(CONFIG_SYS_NO_FLASH)
 	puts("Flash: ");
 
@@ -598,12 +596,9 @@ void board_init_r(gd_t *id, ulong dest_addr)
 	onenand_init();
 #endif
 
-#ifdef CONFIG_GENERIC_MMC
-	led_blink(0x2, 2);
-    
+#ifdef CONFIG_GENERIC_MMC    
 	puts("MMC:   ");
     
-	led_blink(0x4, 2);
 	mmc_initialize(gd->bd);
 #endif
 

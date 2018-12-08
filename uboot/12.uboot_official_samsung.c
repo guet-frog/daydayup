@@ -138,100 +138,19 @@
 2.12.15.board_init_r移植
 	// 去掉oneNand支持, 添加SD/MMC支持
 
-2.12.16.2、相关函数和文件
-drivers/mmc/mmc.c、
-drivers/mmc/sdhci.c
-board/samsung/goni/goni.c
-arch/arm/include/asm/arch-s5pc1xx/mmc.h
-
-2.12.16.3、当前错误定位及解决方案分析
-(1)错误发生路径定位
-board_init_r
-	mmc_initialize
-		do_preinit
-			mmc_start_init
-				mmc_go_idle
-					mmc_send_cmd
-						sdhci_send_command
-							sdhci_transfer_data	错误在这个函数中
-(2)错误原因分析
-sdhic.c中的所有函数构成了三星210CPU的SD/MMC控制器的驱动。
-这里面的函数是三星公司的工程师写的，内容就是用来控制210CPU的内部的SD/MMC控制器和外部的SD卡通信的。这就是所谓的驱动。
-sdhci_transfer_data函数出错，说明是SoC的SD/MMC控制器和外部SD卡（其实现在用的是SD0的iNand）的数据传输出了问题。
-（细节分析发现是控制器内部有一个中断状态错误标志被置位了。）
+	// cmd_mmc.c mmc读写相关实现
 
 
-2.12.17.SD卡驱动移植1
-2.12.17.1、分析两个版本的uboot中SD卡驱动差异
-(1)uboot2013.10中：驱动相关的文件主要有：
-drivers/mmc/mmc.c
-drivers/mmc/sdhci.c
-drivers/mmc/s5p_sdhci.c
-board/samsung/goni/goni.c
-(2)三星移植版本中，驱动相关的文件主要有：
-drivers/mmc/mmc.c
-drivers/mmc/s3c_hsmmc.c
-cpu/s5pc11x/cpu.c
-cpu/s5pc11x/setup_hsmmc.c
-(3)经过分析发现：SD卡驱动要工作要包含2部分内容，一部分是drivers/mmc目录下的是驱动，另外一部分是uboot自己提供的初始化代码（譬如GPIO初始化、时钟初始化）
-2.12.17.2、复制必要的文件并修改相应Makefile
-(1)首先解决drivers/mmc目录下的文件替换。
-(2)修改初始化代码。
-2.12.17.3、代码浏览及修补
-(1)按照代码运行时的流程来逐步浏览代码，看哪里需要修补。
-
-
-2.12.18.SD卡驱动移植2
-2.12.18.1、继续修补驱动代码
-(1)include/mmc.h
-(2)include/s3c_hsmmc.h
-2.12.18.2、同步及编译、问题解决
-(1)出错1：cmd_mmc.c中出错。原因是cmd_mmc.c和mmc驱动密切相关，所以改了驱动后这个实现文件也要跟着改，解决方法是从三星版本的直接同名文件复制过来替换
-(2)出错2：drivers/mmc/mmc_write.c编译出错。
-	原因是这个文件和本来版本中的mmc.c文件相关，但是mmc.c被替换掉了所以这个文件编译报错。解决方案就是修改makefile去掉这个文件的依赖，让他不被编译。
-(3)出错3：#include<regs.h>注释掉，然后添加#include <s5pc110.h>
-
-
-2.12.19.SD卡驱动移植3
-2.12.19.1、解决每次编译时间都很长的问题。
-(1)每次编译脚本cp.sh执行时都会先cp同步代码，然后make distclean···所以每次都会清空后从头编译，这就很费时间了。
-(2)但是实际上有时候是不会make distclean的，只需要先cp然后直接make即可
-	（当更改没有涉及到配置头文件s5p_goni.h，没有涉及到makefile文件，或者其他项目配置文件，也就是说我们的更改只是普通代码文件的更改时）
-
-2.12.19.2、效果测试
-(1)读写测试均成功
-
-
-2.12.20.环境变量的移植
-2.12.20.1、iNand分区表检查-env究竟应该放在哪
-(1)测试环境变量是否可以保存，通过开机set设置环境变量然后save，然后关机后重启来测试环境变量的保存是否成功。
-(2)我们的环境变量究竟保存到哪里去了？这个就要去分析代码中的分区表。
-(3)环境变量应该被放在哪里？虽然无法确定ENV一定要放在哪里，但是有一些地方肯定是不能放的，否则将来会出问题。
-	原则是同一个SD卡扇区只能放一种东西，不能叠加，否则就会被覆盖掉。
-	uboot烧录时使用的扇区数是：SD2的扇区1-16和49-x（x-49大于等于uboot的大小）
-(3)从uboot的烧录情况来看，SD2的扇区0空闲，扇区1-16被uboot的BL1占用，扇区17-48空闲，扇区49-x被uboot的BL2占用。
-	再往后就是内核、rootfs等镜像的分区了。系统移植工程师可以根据kernel镜像大小、rootfs大小等来自由给SD分区。
-(4)从uboot的分区情况来看，ENV不能往扇区1-16或者49-x中来放置，其他地方都可以商量。ENV的大小是16K字节也就是32个扇区。
-
-2.12.20.2、环境变量相关代码浏览
-(1)目前情况是uboot在SD2中，而ENV在SD0中，所以现在ENV不管放在哪个扇区都能工作，不会有问题。
-	但是我们还是得找到ENV分区所在并且改到不会和uboot冲突，因为将来部署系统时我们会将uboot和kernel、rootfs等都烧录到iNnand中去，那时候也要确保不会冲突。
-(2)static inline int write_env(struct mmc *mmc, unsigned long size,
-			    unsigned long offset, const void *buffer)
-类似于这种函数，在代码分析中，关键是弄明白各种参数的意义。mmc表示要写的mmc设备，size表示要写的大小，offset表示要写到SD卡的哪个扇区去，buffer是要写的内容。
-(3)CONFIG_ENV_OFFSET这个宏决定了我们的ENV在SD卡中相对SD卡扇区0的偏移量，也就是ENV写到SD卡的哪里去了。经过分析发现这个宏的值为0.所以我们的ENV
-被写到了0扇区开始的32个扇区中。
-(4)写到这里肯定不行，因为和uboot的BL1冲突了。解决方案是改变这个CONFIG_ENV_OFFSET的值，将ENV写到别的空闲扇区去。
-(5)#define MOVI_BL2_POS		((eFUSE_SIZE / MOVI_BLKSIZE) + MOVI_BL1_BLKCNT + MOVI_ENV_BLKCNT)		后面这三个其实分别是1+16+32=49
-其中的1就是扇区0（空闲的），16是就是扇区1-16（uboot的BL1），32就是扇区17-48（存放ENV的），49自然就是uboot的BL2开始扇区了。这种安排是三星移植的uboot版本中推荐的SD卡的分区方式，不一定是唯一的。
-(6)我们参考这个设计，即可实现环境变量不冲突。所以只要将ENV放到17扇区起始的地方即可。
-
+2.12.20.环境变量的移植		// 0x4000, 16KB, 32sector	-- blk #17
 
 2.12.21.环境变量的测试和配置移植
 2.12.21.1、如何测试环境变量的保存是否正确
-(1)程序修改重新编译后启动，启动后要注意iNand中本来有没有环境变量。为了保险起见对iNand的前49个扇区进行擦除，然后就可以确保里面没有之前保存过的环境变量了。使用命令：mmc write 0 30000000 0# 49来擦除SD0的扇区0-48，保证以前的环境变量都没有了。
+(1)程序修改重新编译后启动，启动后要注意iNand中本来有没有环境变量。
+	为了保险起见对iNand的前49个扇区进行擦除，然后就可以确保里面没有之前保存过的环境变量了。
+	使用命令：mmc write 0 30000000 0# 49来擦除SD0的扇区0-48，保证以前的环境变量都没有了。
 (2)重新开机后先set随便改一个环境变量作为标记然后saveenv然后重启。
-(3)测试方法是，使用：mmc read 0 30000000 17# 32命令将iNand的17开始的32个扇区读出来到内存30000000处，然后md查看。找到显示区域里面的各个环境变量，看读出来的和自己刚才修改的值是否一样。
+(3)测试方法是，使用：mmc read 0 30000000 17# 32命令将iNand的17开始的32个扇区读出来到内存30000000处，然后md查看。
+	找到显示区域里面的各个环境变量，看读出来的和自己刚才修改的值是否一样。
 
 2.12.21.2、常用环境变量的配置移植
 (1)常用的环境变量就是网络相关的那几个，和CONFIG_BOOTCOMMAND、CONFIG_BOOTARGS等。

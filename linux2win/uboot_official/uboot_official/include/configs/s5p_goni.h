@@ -80,8 +80,7 @@
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
 
-/* Actual modem binary size is 16MiB. Add 2MiB for bad block handling */
-#define MTDIDS_DEFAULT		"onenand0=samsung-onenand"
+/* - macro define for env */
 #define MTDPARTS_DEFAULT	"mtdparts=samsung-onenand:1m(bootloader)"\
 				",256k(params)"\
 				",2816k(config)"\
@@ -105,59 +104,7 @@
 
 #define CONFIG_BOOTARGS	"root=/dev/mtdblock8 ubi.mtd=8 ubi.mtd=3 ubi.mtd=6" \
 		" rootfstype=cramfs " CONFIG_COMMON_BOOT
-
-#define CONFIG_UPDATEB	"updateb=onenand erase 0x0 0x100000;" \
-			" onenand write 0x32008000 0x0 0x100000\0"
-
-#define CONFIG_UBI_MTD	" ubi.mtd=${ubiblock} ubi.mtd=3 ubi.mtd=6"
-
-#define CONFIG_UBIFS_OPTION	"rootflags=bulk_read,no_chk_data_crc"
-
-#define CONFIG_ENV_OVERWRITE
-#define CONFIG_SYS_CONSOLE_IS_IN_ENV
-#define CONFIG_EXTRA_ENV_SETTINGS					\
-	CONFIG_UPDATEB \
-	"updatek=" \
-		"onenand erase 0xc00000 0x600000;" \
-		"onenand write 0x31008000 0xc00000 0x600000\0" \
-	"updateu=" \
-		"onenand erase 0x01560000 0x1eaa0000;" \
-		"onenand write 0x32000000 0x1260000 0x8C0000\0" \
-	"bootk=" \
-		"onenand read 0x30007FC0 0xc00000 0x600000;" \
-		"bootm 0x30007FC0\0" \
-	"flashboot=" \
-		"set bootargs root=/dev/mtdblock${bootblock} " \
-		"rootfstype=${rootfstype}" CONFIG_UBI_MTD " ${opts} " \
-		"${lcdinfo} " CONFIG_COMMON_BOOT "; run bootk\0" \
-	"ubifsboot=" \
-		"set bootargs root=ubi0!rootfs rootfstype=ubifs " \
-		CONFIG_UBIFS_OPTION CONFIG_UBI_MTD " ${opts} ${lcdinfo} " \
-		CONFIG_COMMON_BOOT "; run bootk\0" \
-	"tftpboot=" \
-		"set bootargs root=ubi0!rootfs rootfstype=ubifs " \
-		CONFIG_UBIFS_OPTION CONFIG_UBI_MTD " ${opts} ${lcdinfo} " \
-		CONFIG_COMMON_BOOT "; tftp 0x30007FC0 uImage; " \
-		"bootm 0x30007FC0\0" \
-	"ramboot=" \
-		"set bootargs " CONFIG_RAMDISK_BOOT \
-		" initrd=0x33000000,8M ramdisk=8192\0" \
-	"mmcboot=" \
-		"set bootargs root=${mmcblk} rootfstype=${rootfstype}" \
-		CONFIG_UBI_MTD " ${opts} ${lcdinfo} " \
-		CONFIG_COMMON_BOOT "; run bootk\0" \
-	"boottrace=setenv opts initcall_debug; run bootcmd\0" \
-	"bootchart=set opts init=/sbin/bootchartd; run bootcmd\0" \
-	"verify=n\0" \
-	"rootfstype=cramfs\0" \
-	"console=" CONFIG_DEFAULT_CONSOLE \
-	"mtdparts=" MTDPARTS_DEFAULT \
-	"meminfo=mem=80M mem=256M@0x40000000 mem=128M@0x50000000\0" \
-	"mmcblk=/dev/mmcblk1p1\0" \
-	"bootblock=9\0" \
-	"ubiblock=8\0" \
-	"ubi=enabled\0" \
-	"opts=always_resume=1"
+/* - end of macro define */
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_LONGHELP		/* undef to save memory */
@@ -175,29 +122,18 @@
 
 #define CONFIG_SYS_HZ			1000
 
-// /* Goni has 3 banks of DRAM, but swap the bank */
-// #define CONFIG_NR_DRAM_BANKS	3
-// #define PHYS_SDRAM_1		CONFIG_SYS_SDRAM_BASE	/* OneDRAM Bank #0 */
-// #define PHYS_SDRAM_1_SIZE	(80 << 20)		/* 80 MB in Bank #0 */
-// #define PHYS_SDRAM_2		0x40000000		/* mDDR DMC1 Bank #1 */
-// #define PHYS_SDRAM_2_SIZE	(256 << 20)		/* 256 MB in Bank #1 */
-// #define PHYS_SDRAM_3		0x50000000		/* mDDR DMC2 Bank #2 */
-// #define PHYS_SDRAM_3_SIZE	(128 << 20)		/* 128 MB in Bank #2 */
-
-// #define CONFIG_SYS_MONITOR_BASE		0x00000000
-// #define CONFIG_SYS_MONITOR_LEN		(256 << 10)	/* 256 KiB */
-
 /* FLASH and environment organization */
 //#define CONFIG_ENV_IS_IN_ONENAND	1
 #define CONFIG_ENV_IS_IN_ONENAND  	0
-#define CONFIG_ENV_IS_IN_MMC		1
+#define CONFIG_ENV_IS_IN_MMC		1	// -- 等效于#define CONFIG_ENV_IS_IN_MMC
 
 // CONFIG_ENV_IS_IN_ONENAND=0
 // CONFIG_ENV_IS_IN_MMC=y		-- not 1
 
 #define CONFIG_SYS_MMC_ENV_DEV	0
 
-#define CONFIG_ENV_SIZE			(256 << 10)	/* 256 KiB, 0x40000 */
+//#define CONFIG_ENV_SIZE			(256 << 10)	/* 256 KiB, 0x40000 */
+#define CONFIG_ENV_SIZE			0x4000	/* - 16KB, 32blk */
 #define CONFIG_ENV_ADDR			(1 << 20)	/* 1 MB, 0x100000 */
 
 #define CONFIG_USE_ONENAND_BOARD_INIT
@@ -346,6 +282,10 @@
 #define USE_MMC2
 //#define USE_MMC2_8BIT
 #define MMC_MAX_CHANNEL		4
+
+/* - env offset(byte) in sd/mmc */
+#define CONFIG_ENV_OFFSET	(17 * 512)
+
 /* - end of sd/mmc config */
 
 

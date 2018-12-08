@@ -278,17 +278,20 @@ void env_relocate_spec(void)
 	u32 offset;
 	int ret;
 
-	if (init_mmc_for_env(mmc)) {
+	if (init_mmc_for_env(mmc))
+	{
 		ret = 1;
 		goto err;
 	}
 
-	if (mmc_get_env_addr(mmc, 0, &offset)) {
+	if (mmc_get_env_addr(mmc, 0, &offset))
+	{
 		ret = 1;
 		goto fini;
 	}
 
-	if (read_env(mmc, CONFIG_ENV_SIZE, offset, buf)) {
+	if (read_env(mmc, CONFIG_ENV_SIZE, offset, buf))
+	{
 		ret = 1;
 		goto fini;
 	}

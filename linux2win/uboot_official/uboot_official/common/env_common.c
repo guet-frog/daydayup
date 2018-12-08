@@ -178,7 +178,9 @@ void env_relocate(void)
 	env_reloc();
 	env_htab.change_ok += gd->reloc_off;
 #endif
-	if (gd->env_valid == 0) {
+	
+	if (gd->env_valid == 0)
+	{
 #if defined(CONFIG_ENV_IS_NOWHERE) || defined(CONFIG_SPL_BUILD)
 		/* Environment not changable */
 		set_default_env(NULL);
@@ -186,7 +188,9 @@ void env_relocate(void)
 		bootstage_error(BOOTSTAGE_ID_NET_CHECKSUM);
 		set_default_env("!bad CRC");
 #endif
-	} else {
+	}
+	else
+	{
 		env_relocate_spec();
 	}
 }
