@@ -186,7 +186,7 @@ reset:
 	#ldr r1, __bss_end
 	#ldr r2, #0x0			/* error 2 */
 	
-	ldr r0, _bss_start
+	ldr r0, _bss_start		/* - not mov r0, _bss_start */
 	ldr r1, _bss_end
 	mov r2, #0x0
 loop:

@@ -878,7 +878,7 @@ void mpadfb_init()
 {
 //	unsigned short int *pFB;//这里一定要用short类型!
 //	int i;
-	fb_init();//lqm masked for test
+	fb_init();          //lqm masked for test
 	lcd_port_init();
 	lcd_reg_init();
 #ifdef CONFIG_CHECK_X210CV3

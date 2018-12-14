@@ -1,8 +1,7 @@
 
-1.3.3.2、串口输出的意义（做系统控制台）
-	常用的串口监视软件有：超级终端、SecureCRT、minicom
+	// 串口做系统控制台 -- 超级终端、SecureCRT、minicom
 
-1.3.4.0、破坏iNand中的bootloader以从SD2启动
+1.3.4.0、破坏iNand中的bootloader
 	step1: busybox dd if=/dev/zero of=/dev/block/mmcblk0 bs=512 seek=1 count=1 conv=sync
 	step2: sync
 	// 使用linux dd 命令读写磁盘
@@ -10,7 +9,7 @@
 	// of: output file  /dev/block/mmcblk0 		// 输出设备对应inand
 	// bs: block size 扇区大小512字节
 	// seek: 第一个扇区(开始)					// bootloader从扇区1开始
-	// count: 数量一个扇区
+	// count: 扇区数量
 
 	//first boot校验和不通过打印: SD checksum Error, 接下来执行second boot
 
@@ -36,7 +35,7 @@
 	uboot的参数设置: set bootcmd 'movi read kernel 30008000; bootm 30008000'  // default param
 	刷linux+QT镜像后, uboot的参数不用修改(刷的是linux+QT定制的uboot, 默认参数应该相应修改)
 
-	// fastboot flash到inand中, 没有下载到SD卡中
+	// fastboot flash到inand中, 没有下载到SD卡中 -- write read写死channel0
 
 1.3.9.3、x210的dnw刷机
 	step1: 刷x210_usb.bin, 地址0xd0020010

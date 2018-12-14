@@ -67,8 +67,8 @@
 	(3)参考当前版本的uboot的start.S文件的处理技巧	// all:
 
 2.12.7、添加SDRAM初始化
-2.12.9.添加uboot第二阶段重定位，清bss段
-2.12.10.移除oneNand，添加mmc初始化
+2.12.9、添加uboot第二阶段重定位，清bss段
+2.12.10、移除oneNand，添加mmc初始化
 	// grep "R_ARM_RELATIVE" -nR *
 
 2.12.11.CPU时钟信息显示移植1
@@ -89,7 +89,7 @@
 	// MACH_TYPE集中定义在一个文件arch/arm/include/asm/mach-types.h -- 类似于linux kernel
 
 2.12.15.board_init_r移植
-	// 去掉oneNand支持, 添加SD/MMC支持
+	// 去掉oneNand支持, 添加sd/mmc支持
 
 	// cmd_mmc.c mmc读写相关实现
 
