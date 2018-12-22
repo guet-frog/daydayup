@@ -5,7 +5,7 @@
 
 2.15.2.linux内核源码目录结构2
 	(10)ipc	inter process communication, 进程间通信, linux支持的IPC的代码实现
-	
+
 	(12)lib	不同于C语言的标准库函数
 			内核编程中不能使用C语言标准库函数, lib下的库函数用来替代C标准库函数
 			内核编程中要把字符串转成数字只能用lib目录下的atoi函数, 不能用标准C库中的atoi
