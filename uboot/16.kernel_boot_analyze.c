@@ -1,25 +1,13 @@
 
-2.16.6.内核启动的C语言阶段3
-	本节讲解setup_arch函数中的machine查找的部分，初步分析了内核对机器码的定义和存储方式、比对方式、获取方式。
-2.16.7.内核启动的C语言阶段4
-	本节讲解setup_arch函数中对cmdline的处理，重点讲解了cmdline的传递方式、确认方式和其对内核的影响和意义。
-2.16.8.内核启动的C语言阶段5
-	本节讲解start_kernel函数中剩余部分函数调用直到rest_init的部分，并无太多重点细节。
-2.16.9.内核启动的C语言阶段6
-	本节重点讲解了rest_init函数中创建三个内核线程以及对这三个内核线程的介绍，本节课听完后就明白了操作系统最终的走向和归宿。
-2.16.10.init进程详解1
-	本节课从宏观上讲解了init进程的工作和主要作用，交代了操作系统在内核态和用户态下的切换过程，init进程如何一步步发展成为平时看到的操作系统。
-2.16.11.init进程详解2
-	本节对init进程的代码进行分析对比，重点是一些细节和对上节讲到的宏观理论的代码验证和支持。
-2.16.12.cmdline常用参数
-	本节补充讲解uboot给内核传参时常用的一些cmdline参数选项及其含义。
-2.16.13.内核中架构相关代码简介	
-	本节补充讲解内核源码中架构相关的代码部分，并非代码详解而是从宏观上讲述相关的文件夹和文件位置、作用介绍等。
-
 	/*
 		./Makefile
+		./arch/arm/configs/x210ii_qt_defconfig
+		./.config
+		
 		arch/arm/kernel/vmlinux.lds.S
+		
 		arch/arm/kernel/head.S
+		arch/arm/kernel/head_common.S
 		./init/main.c
 		arch/arm/kernel/setup.c
 	*/
@@ -31,16 +19,17 @@
 
 	(6)	kernel的顶层Makefile中两个重要变量: ARCH, CROSS_COMPILE
 
-	// make O=/tmp/mykernel \
-			ARCH=arm \
+	/* Makefile传参 */
+	// make O=/tmp/mykernel 	\
+			ARCH=arm 			\
 			CROSS_COMPILE=/usr/local/arm/arm-2009q3/bin/arm-none-linux-gnueabi-
 
 2.16.1.4、链接脚本分析
-	(1)	找到整个程序的entry		// ENTRY(stext)
+	(1) 程序的入口		// kernel -- head.S 	uboot -- start.S
 
 	(2)	kernel的链接脚本: 编译vmlinux.lds.S生成vmlinux.lds	// 可能是为了使用条件编译的原因
 
-	(6)	head.S kernel启动文件	// uboot中的start.S
+		// link addr = 0x30008000 (0xC0008000)
 
 2.16.2.3、内核运行的硬件条件	/* NOTE: comment */
 	(1)	解压代码运行时先将zImage后段的内核解压开，然后再去调用运行真正的内核入口
@@ -49,8 +38,6 @@
 
 		// theKernel(0, machid, bd->bi_boot_params)
 		// r0 = 0, r1 = macid, r2 = bd->bi_boot_params
-
-2.16.2.4、内核启动要求的传参方式
 
 2.16.3.内核启动的汇编阶段
 	// 校验启动合法性、建立段式映射的页表并开启MMU
@@ -233,16 +220,3 @@ uboot传参中的rootfstype=ext3这一句就是告诉内核rootfs的类型。
 #include <plat/s5pv210.h>		kernel\arch\arm\plat-s5p\include\plat/s5pv210.h
 
 (4)有些同名的头文件是有包含关系的，有时候我们需要包含某个头文件时可能并不是直接包含他，而是包含一个包含了他的头文件。
-
-
-
-
-
-
-
-
-
-
-
-
-

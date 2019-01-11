@@ -487,7 +487,7 @@ void start_armboot (void)
 
 #if defined(CONFIG_X210)
 #if defined(CONFIG_GENERIC_MMC)
-	puts ("SD/MMC:\n");
+	puts ("MMC:\n");
 	mmc_exist = mmc_initialize(gd->bd); // all board interface
 	if (mmc_exist != 0)
 	{

@@ -71,7 +71,7 @@ struct mmc *find_mmc_device(int dev_num)
         
 		if (m->block_dev.dev == dev_num)
         {
-            printf("#####MMC Device %d has found\n", dev_num);
+            //printf("#####MMC Device %d has found\n", dev_num);
             
             return m;
         }
@@ -1241,7 +1241,7 @@ int mmc_initialize(bd_t *bis)
 
 	if (NULL != mmc)
 	{
-		printf("%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));
+		printf("SD:\n%ldMB\n", (mmc->capacity/(1024*1024/(1<<9))));
 	}
 	else
 	{
