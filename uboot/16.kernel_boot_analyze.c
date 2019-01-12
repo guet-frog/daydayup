@@ -9,7 +9,12 @@
 		arch/arm/kernel/head.S
 		arch/arm/kernel/head_common.S
 		./init/main.c
-		arch/arm/kernel/setup.c
+		
+		include/kernel/		-- 内核基本头文件
+		include/net/		-- 各种驱动或功能部件头文件
+		include/asm/		-- include/asm-xxx/的链接
+		
+		kernel				-- arch/arm/kernel		// lib, mm, include
 	*/
 
 2.16.1.3、Makefile分析
@@ -51,11 +56,6 @@
 	(2)	硬件初始化与驱动加载
 	(3)	内核启动后的结局与归宿
 
-2.16.5.内核启动的C语言阶段2
-	(1)	smp()		// smp对称多处理器, 多核心CPU
-	(2)	lockdep()	// 锁定依赖,是一个内核调试模块, 处理内核自旋锁死锁相关问题
-	(3)	cgroup()	// control group, 内核提供的一种来处理进程组的技术
-
 2.16.5.2、打印内核版本信息
 	(1) printk()		// 打印级别设置
 	(6)	linux_banner	// 宏定义在include/generated/
@@ -74,6 +74,13 @@
 
 		// 如何查找取决于如何存放
 		// 链接时将所有具有相同段属性的段链接到一块
+		|
+		| -- 类型: struct proc_info_list{ ... }		// include/asm-arm/procinfo.h
+		|
+		| -- 实例: __arm920_proc_info:				// arch/arm/mm/proc-arm920.S
+		|
+		| -- 链接: .proc.info.init段				// arch/arm/kernel/vmlinux.lds
+
 		// 通过machine_id遍历指定段, 查找并返回machine_desc描述符(指针)
 
 		/* adr r3, 4b */		// 4是符号

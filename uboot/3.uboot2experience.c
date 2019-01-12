@@ -3,6 +3,8 @@
 	(1)uboot和linux kernel等复杂项目, 都不能直接编译, 需要先配置才能编译
 	(2)uboot配置方法: make x210_sd_config	// -- 执行./configmk脚本
 
+	// make <board_name>_config
+	
 2.3.2.3、编译得到uboot.bin
 	(1)检查当前编译环境或者主Makefile中编译工具链设置	// make "CROSS_COMPILE=xxx"有更高优先级
 		// make or make -j4

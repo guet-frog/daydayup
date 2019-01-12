@@ -54,7 +54,6 @@
 		(1)include/config.mk要在配置过程生成(make x210_sd_config)
 		(3)自动配置思想: 编译前配置"make x210_sd_config" 自动生成config.mk文件, 从而可以导出以上环境变量
 		(4)//line2589 -- @$(MKCONFIG) $(@:_config=) arm s5pc11x x210 samsung s5pc110
-           //generated file: include/config.mk
 
 	2.4.3.4 ARCH CROSS_COMPILE
 		(1)ARCH: 配置过程中指定		//ARCH -> CROSS_COMPILE // path(/usr/local/arm) + name(arm-linux-*)
@@ -75,10 +74,8 @@
 		//config.mk line97-107完整交叉编译工具链定义
 
 	2.4.4.3、包含开发板配置项目
-		(1)include/autoconf.mk编译后生成
-		(2)文件内容: 很多CONFIG_开头的变量(宏)
-		   文件作用: 指导整个uboot的编译过程(条件编译)
-			//条件编译是用来实现可移植性(uboot包含了各种开发板的适用代码, 源码用条件编译组合一起)
+		(1)include/autoconf.mk/*编译*/后生成	// CONFIG_开头的宏, 指导整个uboot的编译
+
 		(3)配置过程所需要的源文件 // inlcude/configs/x210_sd.h
 			//头文件里面全都是宏定义, 这些宏定义是对当前开发板的移植			\
 			  每个开发板的移植对应这个目录下的一个头文件						\
@@ -97,7 +94,7 @@
             //dnw方式先下载x210_usb.bin, 然后再下载uboot.bin时设置第二个地址: 0x23E0_0000
 
 2.4.6.uboot主Makefile分析6
-    (1)主Makefile中/*第一个目标*/: all //默认目标, 在uboot根目录下make其实就等于make all
+    (1)主Makefile中/*第一个目标*/: all		//默认目标
     (2)u-boot.elf
     (3)x210_sd_config: unconfig
 
@@ -110,13 +107,6 @@
         $5: samsumg     // VENDOR
         $6:	s5pc110     // SOC
         // $# = 6
-
-    (6)创建的符号链接：
-        ① ./include/asm             -> ./include/asm-arm
-        ② ./include/asm-arm/arch    -> ./include/asm-arm/arch-s5pc110  // for transplant tmp
-        ③ ./include/regs.h          -> ./include/s5pc110.h
-        ④ ./include/asm-arm/arch    -> ./include/asm-arm/arch-s5pc11x
-        ⑤ ./include/asm-arm/proc    -> ./include/asm-arm/proc-armv
 
 2.4.8.uboot配置过程详解2
     (1)创建include/config.mk   // for 主Makefile line123
@@ -139,15 +129,19 @@
     (4)uboot的最终链接起始地址在Makefile中用-Ttext指定   // 配置时设定: TEXT_BASE = 0xC3E0_0000
     (5)在代码段中注意文件排列的顺序   //理论上main链接到后面地址也是可以正常运行, 但是bootROM仅加载前16K
     (6)链接脚本中除了.text  .data .rodata .bss段等/*编译工具*/自带的段之外
-        编译工具还允许自定义段, 譬如uboot总的.u_boot_cmd段就是自定义段    //自定义段很重要
+        编译工具还允许自定义段	// .u_boot_cmd
 
 
     // mkconfig主要做了三件事:
-        创建相应软链接
-        生成./include/config.mk
-        生成./include/config.h		// #include <configs/x210_sd.h>
-
-
+        
+		创建相应软链接
+        
+		创建顶层Makefile包含的文件 	include/config.mk
+        
+		创建开发板相关的头文件 		include/config.h		// #include <configs/x210_sd.h>
+			// CONFIG_
+			// CFG_
+	
 
 
 

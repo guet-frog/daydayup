@@ -84,6 +84,9 @@
 
 // uboot使用/*链接段属性*/的方式存放命令集	-- kernel中常用
 
+// 	程序中根据命令的名字再内存段__u_uboot_cmd_start ~ __u_uboot_cmd_end	\
+	查找cmd_tbl_t结构，然后调用函数 -- common/command.c/find_cmd()
+
 
 
 

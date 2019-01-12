@@ -54,6 +54,14 @@
 		make distclean			// make clean -- error
 		make s5p_goni_config
 		make
+	
+	(2) 链接相关
+	
+	// arch/arm/cpu/u-boot.lds
+	
+	ifneq ($(CONFIG_SYS_TEXT_BASE),)
+		LDFLAGS_u-boot += -Ttext $(CONFIG_SYS_TEXT_BASE)
+	endif
 
 2.12.4.2、分析：为什么烧录运行不正确？	// 两遍SD checksum Error
 	// 烧录方法错误: 同样方法

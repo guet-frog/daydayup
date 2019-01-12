@@ -136,7 +136,20 @@
 	uboot最终是调用theKernel函数来执行linux内核的，uboot调用这个函数（其实就是linux内核）时传递了3个参数。
 	这3个参数就是uboot直接传递给linux内核的3个参数，通过寄存器来实现传参的。
 	（第1个参数就放在r0中，第二个参数放在r1中，第3个参数放在r2中）第1个参数固定为0，第2个参数是机器码，第3个参数传递的就是大片传参tag的首地址。
-
+	
+	// 	u-boot通过标记列表向内核传递参数			\
+		一般设置内存标记，命令行标记				\
+		#define CONFIG_SETUP_MEMORY_TAGS	1		\
+		#define CONFIG_CMDLINE_TAG			1
+	
+	// lib_arm/armlinux.c
+		|
+		| -- setup_memory_tags()
+		|
+		| -- setup_commandline_tag()
+		|
+		| -- do_bootm_linux()
+	
 2.7.7.3、移植时注意事项
 (1)uboot移植时一般只需要配置相应的宏即可
 (2)kernel启动不成功，注意传参是否成功。传参不成功首先看uboot中bootargs设置是否正确，
