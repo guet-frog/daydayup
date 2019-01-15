@@ -74,22 +74,33 @@
 
 		// 如何查找取决于如何存放
 		// 链接时将所有具有相同段属性的段链接到一块
-		|
+		|											// arch/arm/include/asm/procinfo.h
 		| -- 类型: struct proc_info_list{ ... }		// include/asm-arm/procinfo.h
 		|
 		| -- 实例: __arm920_proc_info:				// arch/arm/mm/proc-arm920.S
 		|
 		| -- 链接: .proc.info.init段				// arch/arm/kernel/vmlinux.lds
+		|--------------------------------------------------------------------------
+		| -- 类型: struct proc_info_list{ ... }		// arch/arm/include/asm/mach/arch.h
+		|
+		| -- 实例: MACHINE_START(S3C2440, "SDMK2440"):	// arch/arm/mach-s3c2440/mach-smdk2440.c
+		|
+		| -- 链接: .arch.info.init段				// arch/arm/kernel/vmlinux.lds
 
-		// 通过machine_id遍历指定段, 查找并返回machine_desc描述符(指针)
+		// 通过machine_id遍历指定段, 查找并返回machine_desc描述符(结构体指针)
 
 		/* adr r3, 4b */		// 4是符号
 		/* NOTE: CONFIG_XXX 注意CONFIG开头的宏 .config */
 
 2.16.7.内核启动的C语言阶段4
-	setup_arch()中cmdline相关		// cmdline: uboot给kernel传参时的命令行启动参数 -- bootargs
+	-- setup_arch()中cmdline相关		// cmdline: uboot给kernel传参时的命令行启动参数 -- bootargs
+	 |
+	 | -- parse_tags();
+	 |
+	 | -- parse_cmdline();
 
 	// static char default_command_line[COMMAND_LINE_SIZE] __initdata = CONFIG_CMDLINE;
+	// __tagtable(ATAG_CMDLINE, parse_tag_cmdline);
 
 2.16.8.4、rest_init
 
