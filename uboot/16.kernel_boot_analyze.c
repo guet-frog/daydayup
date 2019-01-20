@@ -83,7 +83,7 @@
 		|--------------------------------------------------------------------------
 		| -- 类型: struct proc_info_list{ ... }		// arch/arm/include/asm/mach/arch.h
 		|
-		| -- 实例: MACHINE_START(S3C2440, "SDMK2440"):	// arch/arm/mach-s3c2440/mach-smdk2440.c
+		| -- 实例: MACHINE_START(S3C2440, "SDMK2440")	// arch/arm/mach-s3c2440/mach-smdk2440.c
 		|
 		| -- 链接: .arch.info.init段				// arch/arm/kernel/vmlinux.lds
 
