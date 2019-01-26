@@ -101,7 +101,16 @@
 
 	// static char default_command_line[COMMAND_LINE_SIZE] __initdata = CONFIG_CMDLINE;
 	// __tagtable(ATAG_CMDLINE, parse_tag_cmdline);
+	
+	-- setup_arch(char **cmdline_p)
+	 |
+	 | -- struct tag *tags = (struct tag *)&init_tags
+	 | -- struct machine_desc *mdesc
 
+	 
+	 // bootargs=console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3
+	 // $$$$$$$$$cmdline:console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3
+	 
 2.16.8.4¡¢rest_init
 
 	// ×Ü½á: -- start_kernel()	\
