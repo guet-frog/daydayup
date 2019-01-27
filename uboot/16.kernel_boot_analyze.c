@@ -61,10 +61,19 @@
 	(6)	linux_banner	// 宏定义在include/generated/
 
 2.16.6.2、Machine查找
-	(1)	setup_arch()		// 确定当前内核对应机器的arch, machine
-
-	(2)	setup_machine(machine_arch_type)	// #define machine_arch_type	2456
-		// include/generated/mach-types.h
+	(1)	-- setup_arch()		// 确定当前内核对应机器的arch, machine
+		 |
+		 | -- struct tag *tags = (struct tag *)&init_tags
+		 | -- struct machine_desc *mdesc
+		 | -- char *from = default_command_line
+		 |
+		 | -- setup_processor()
+		 |
+		 | -- mdesc = setup_machine(machine_arch_type)	// include/generated/mach-types.h
+			|											// #define machine_arch_type	2456
+			| -- mdesc = lookup_machine_type(nr)
+		|
+		| --	   
 
 	(3) -- head-common.S
 	     |
@@ -95,7 +104,7 @@
 2.16.7.内核启动的C语言阶段4
 	-- setup_arch()中cmdline相关		// cmdline: uboot给kernel传参时的命令行启动参数 -- bootargs
 	 |
-	 | -- parse_tags();
+	 | -- parse_tags();		// ATAG_MEM		ATAG_CMDLINE
 	 |
 	 | -- parse_cmdline();
 
