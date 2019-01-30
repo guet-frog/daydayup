@@ -18,23 +18,17 @@
 	// CROSS_COMPILE   ?= /usr/local/arm/arm-2009q3/bin/arm-none-linux-gnueabi-
 
 2.15.3.1、配置编译
-	step1: make x210ii_qt_defconfig
-		// cp arch/arm/configs/x210ii_qt_defconfig .config
-
-	step2: make menuconfig
-		// touch .config or modify .config
-
-		// apt-get install libncurses5-dev		-- 安装 ncurse库
-
-	step3: make
-		// arch/arm/boot/zImage
+	step1: make x210ii_qt_defconfig		// cp arch/arm/configs/x210ii_qt_defconfig .config
+	
+	step2: make menuconfig		// apt-get install libncurses5-dev -- 安装 ncurse库
+	
+	step3: make		// arch/arm/boot/zImage
 
 2.15.4.2、配置的关键是得到.config文件	// -- 类似于x210_sd.h
 	// 读取.config中配置项, 指导整个编译链接过程
 
 2.15.5.menuconfig的使用和演示
-
-	模块化: 单独链接成一个内核模块.ko文件(不链接到zImage), linux系统内核启动后可以动态的加载或卸载这个模块
+	模块化: 单独链接成一个内核模块.ko文件(编进内核或者编进模块), linux系统内核启动后可以动态的加载或卸载这个模块
 
 2.15.6.1、menuconfig本身由一套软件支持
 	// scripts/kconfig/lxdialog -- menuconfig源码

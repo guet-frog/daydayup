@@ -72,8 +72,7 @@
 		 | -- mdesc = setup_machine(machine_arch_type)	// include/generated/mach-types.h
 			|											// #define machine_arch_type	2456
 			| -- mdesc = lookup_machine_type(nr)
-		|
-		| --	   
+		 |
 
 	(3) -- head-common.S
 	     |
@@ -99,7 +98,7 @@
 		// 通过machine_id遍历指定段, 查找并返回machine_desc描述符(结构体指针)
 
 		/* adr r3, 4b */		// 4是符号
-		/* NOTE: CONFIG_XXX 注意CONFIG开头的宏 .config */
+		/* note: CONFIG_XXX注意CONFIG开头的宏 .config */
 
 2.16.7.内核启动的C语言阶段4
 	-- setup_arch()中cmdline相关		// cmdline: uboot给kernel传参时的命令行启动参数 -- bootargs
@@ -110,21 +109,16 @@
 
 	// static char default_command_line[COMMAND_LINE_SIZE] __initdata = CONFIG_CMDLINE;
 	// __tagtable(ATAG_CMDLINE, parse_tag_cmdline);
-	
-	-- setup_arch(char **cmdline_p)
-	 |
-	 | -- struct tag *tags = (struct tag *)&init_tags
-	 | -- struct machine_desc *mdesc
 
-	 
-	 // bootargs=console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3
-	 // $$$$$$$$$cmdline:console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3
+	// bootargs=console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3
+	// $$$$$$$$$cmdline:console=ttySAC2,115200 root=/dev/mmcblk0p2 rw init=/linuxrc rootfstype=ext3
 	 
 2.16.8.4、rest_init
-
 	// 总结: -- start_kernel()	\
 			  |					\
 			  | -- setup_arch()		// 机器码相关, uboot内核传参相关	\
+			  |															\
+			  | -- console_init()										\
 			  |															\
 			  | -- rest_init()
 
@@ -147,25 +141,36 @@
 	// ps -aux 		-- in ubuntu
 	// man 1 ps
 
-2.16.10.init进程详解1
+2.16.10.init进程详解
 2.16.10.1、init进程完成了从内核态向用户态的转变
-(1)一个进程2种状态。init进程刚开始运行的时候是内核态，它属于一个内核线程，
-	然后他自己运行了一个用户态下面的程序后把自己强行转成了用户态。
-	因为init进程自身完成了从内核态到用户态的过度，因此后续的其他进程都可以工作在用户态下面了。
-(2)内核态下做了什么？重点就做了一件事情，就是挂载根文件系统并试图找到用户态下的那个init程序。init进程要把自己转成用户态就必须运行一个用户态的应用程序（这个应用程序名字一般也叫init），要运行这个应用程序就必须得找到这个应用程序，要找到它就必须得挂载根文件系统，因为所有的应用程序都在文件系统中。
-内核源代码中的所有函数都是内核态下面的，执行任何一个都不能脱离内核态。应用程序必须不属于内核源代码，这样才能保证自己是用户态。也就是说我们这里执行的这个init程序和内核不在一起，他是另外提供的。提供这个init程序的那个人就是根文件系统。
+	(1)	一个进程2种状态。init进程刚开始运行的时候是内核态，它属于一个内核线程，
+		然后他自己运行了一个用户态下面的程序后把自己强行转成了用户态。
+		因为init进程自身完成了从内核态到用户态的过度，因此后续的其他进程都可以工作在用户态下面了。
+	(2)	内核态下做了什么？重点就做了一件事情，就是挂载根文件系统并试图找到用户态下的那个init程序。
+		init进程要把自己转成用户态就必须运行一个用户态的应用程序（这个应用程序名字一般也叫init），
+		要运行这个应用程序就必须得找到这个应用程序，要找到它就必须得挂载根文件系统，因为所有的应用程序都在文件系统中。
+		内核源代码中的所有函数都是内核态下面的，执行任何一个都不能脱离内核态。
+		应用程序必须不属于内核源代码，这样才能保证自己是用户态。
+		也就是说我们这里执行的这个init程序和内核不在一起，他是另外提供的。
+		提供这个init程序的那个人就是根文件系统。
 
-	// init进程是在用户态下编译得到
+		// init进程是在用户态下编译得到
 
-(3)用户态下做了什么？init进程大部分有意义的工作都是在用户态下进行的。init进程对我们操作系统的意义在于：其他所有的用户进程都直接或者间接派生自init进程。
+	(3)	用户态下做了什么？init进程大部分有意义的工作都是在用户态下进行的。
+		init进程对我们操作系统的意义在于：其他所有的用户进程都直接或者间接派生自init进程。
 
-(4)如何从内核态跳跃到用户态？还能回来不？
-init进程在内核态下面时，通过一个函数kernel_execve来执行一个用户空间编译连接的应用程序就跳跃到用户态了。注意这个跳跃过程中进程号是没有改变的，所以一直是进程1.这个跳跃过程是单向的，也就是说一旦执行了init程序转到了用户态下整个操作系统就算真正的运转起来了，以后只能在用户态下工作了，用户态下想要进入内核态只有走API这一条路了。
+	(4)	如何从内核态跳跃到用户态？还能回来不？
+		init进程在内核态下面时，通过一个函数kernel_execve来执行一个用户空间编译连接的应用程序就跳跃到用户态了。
+		注意这个跳跃过程中进程号是没有改变的，所以一直是进程1
+		这个跳跃过程是单向的，也就是说一旦执行了init程序转到了用户态下整个操作系统就算真正的运转起来了，
+		以后只能在用户态下工作了，用户态下想要进入内核态只有走API这一条路了。
 
 2.16.10.2、init进程构建了用户交互界面
-(1)init进程是其他用户进程的老祖宗。linux系统中一个进程的创建是通过其父进程创建出来的。根据这个理论只要有一个父进程就能生出一堆子孙进程了。
-(2)init启动了login进程、命令行进程、shell进程
-(3)shell进程启动了其他用户进程。命令行和shell一旦工作了，用户就可以在命令行下通过./xx的方式来执行其他应用程序，每一个应用程序的运行就是一个进程。
+	(1)	init进程是其他用户进程的老祖宗。linux系统中一个进程的创建是通过其父进程创建出来的。
+		根据这个理论只要有一个父进程就能生出一堆子孙进程了。
+	(2)	init启动了login进程、命令行进程、shell进程
+	(3)	shell进程启动了其他用户进程。命令行和shell一旦工作了，用户就可以在命令行下通过./xx的方式来执行其他应用程序，
+		每一个应用程序的运行就是一个进程。
 
 总结：本节的主要目的是让大家认识到init进程如何一步步发展成为我们平时看到的那种操作系统的样子。
 
