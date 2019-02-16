@@ -19,9 +19,9 @@
 
 2.15.3.1、配置编译
 	step1: make x210ii_qt_defconfig		// cp arch/arm/configs/x210ii_qt_defconfig .config
-	
-	step2: make menuconfig		// apt-get install libncurses5-dev -- 安装 ncurse库
-	
+
+	step2: make menuconfig		// apt-get install libncurses5-dev -- 安装ncurse库
+
 	step3: make		// arch/arm/boot/zImage
 
 2.15.4.2、配置的关键是得到.config文件	// -- 类似于x210_sd.h
@@ -44,6 +44,6 @@
 	bool(Y、N)
 
 	// 注意Kconfig文件中的depends
-	// menuconfig中的菜单项、Kconfig中的配置项、.config中的一行、 Makefile中的一行
+	// menuconfig中的菜单项、Kconfig中的配置项、.config中的一行、Makefile中的一行
 
 
