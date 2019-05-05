@@ -2,7 +2,7 @@
 	/*
 		./Makefile
 		./arch/arm/configs/x210ii_qt_defconfig
-		./.config
+		./.config	-- include/config/auto.conf
 		
 		arch/arm/kernel/vmlinux.lds.S
 		
@@ -13,6 +13,11 @@
 		include/kernel/		-- 内核基本头文件
 		include/net/		-- 各种驱动或功能部件头文件
 		include/asm/		-- include/asm-xxx/的链接
+		
+		include/generated	-- 编译生相关头文件
+		
+		arch/arm/mm/proc-arm920.S
+		arch/arm/mach-s3c2440/mach-smdk2440.c
 		
 		kernel				-- arch/arm/kernel		// lib, mm, include
 	*/
@@ -119,7 +124,7 @@
 		/* adr r3, 4b */		// 4是符号
 		/* note: CONFIG_XXX注意CONFIG开头的宏 .config */
 
-	(2) -- console_init()
+	(2) -- console_init()		// 1, console_setup() -- console_cmdline
 		 |
 		 | -- // console driver init
 
@@ -151,7 +156,7 @@
 			   | -- kernel_execve("/linuxrc")
 
 2.16.9.3、进程0、进程1、进程2
-	(2)	进程号从0开始, 进程0属于内核进程, 在用户空间看不到
+	(2)	进程号从0开始, 进程0属于内核进程, 在用户空间(ps -aux)看不到
 	(5)	进程0：idle进程
 		进程1：kernel_init		// init进程
 		进程2：kthreadd			// linux内核的守护进程, 用来保证linux内核正常工作
@@ -182,6 +187,8 @@
 	(2)	根文件系统在哪里？根文件系统的文件系统类型是什么？
 		root=/dev/mmcblk0p2 rw			// SD/MMC Channel0(inand) partition2 -- 0-uboot 1-kernel 2-rootfs
 		rootfstype=ext3
+		
+		// -- 破坏inand partition2
 
 	(3)	挂载rootfs成功，则进入rootfs中寻找应用程序的init程序(进程1)		// run_init_process()
 		init=/linuxrc
@@ -193,7 +200,7 @@
 		这些字符串又会被再次解析从而影响启动过程。
 2.16.12.2、root=
 	(1)这个是用来指定根文件系统在哪里的
-	(2)一般格式是root=/dev/xxx（一般如果是nandflash上则/dev/mtdblock2，如果是inand/sd的话则/dev/mmcblk0p2）
+	(2)一般格式是root=/dev/xxx（一般如果是nandflash上则/dev/mtdblock2，如果是inand/sd的话则/dev/mmcblk0p2）		// mmcblk2p2
 	(3)如果是nfs的rootfs，则root=/dev/nfs。
 
 2.16.12.3、rootfstype=
@@ -216,3 +223,4 @@
 (2)root=/dev/nfs nfsroot=192.168.1.141:/root/s3c2440/build_rootfs/aston_rootfs ip=192.168.1.10:192.168.1.141:192.168.1.1:255.255.255.0::eth0:off  init=/linuxrc console=ttySAC0,115200 
 第二种这种方式对应rootfs在nfs上，这种对应我们实验室开发产品做调试的时候。
 
+	// 视频16.13 18′ -- driver目录与arch/arm/plat-s5p/

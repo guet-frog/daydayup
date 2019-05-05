@@ -11,7 +11,7 @@
 	// seek: 第一个扇区(开始)					// bootloader从扇区1开始
 	// count: 扇区数量
 
-	//first boot校验和不通过打印: SD checksum Error, 接下来执行second boot
+	// first boot校验和不通过打印: SD checksum Error, 接下来执行second boot
 
 1.3.4.1、制作启动SD卡（其实就是烧录uboot到SD卡中） // windows tool or linux dd
 

@@ -4,7 +4,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <stdint.h>
 #include <string.h>
 
 #define	READ_BYTE_NUM	    11

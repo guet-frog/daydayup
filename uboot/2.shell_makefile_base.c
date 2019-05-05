@@ -19,13 +19,6 @@
 		② source xx.sh    	// 类似make xxx
 		③ bash xx.sh      bash是一个脚本程序解释器, 本质上是一个可执行程序(执行bash程序, 把xx.sh作为bash运行时的参数argv[1])
 
-    //  warning: ./test.sh 而不是 test.sh                                                      \
-                运行其它二进制的程序也一样, 直接写test.sh, linux系统会去PATH里查询test.sh      \
-                默认只有/bin, /sbin, /usr/bin，/usr/sbin等在PATH路径中                         \
-                current directory通常不在PATH路径, 所以写成test.sh是找不到命令                 
-                ./test.sh       */OS就在当前目录找该二进制程序
-                // 在PATH中创建符号链接, test.sh即可运行
-
 	//shell下用sed命令解决\r\n -- sed 命令具有替换功能
 
 	(2)shell程序的第一行一般都是： #!/bin/sh   // 指定shell程序执行时被哪个解释器解释执行
@@ -117,7 +110,6 @@
 	(2)uboot和linux kernel本质上都是C语言的项目, 大量project file需要Makefile来管理
 
 2.2.7.2、目标、依赖、命令  // target, prerequisite, command
-
 	make xxx: 使用/*命令*/将/*依赖*/加工成/*目标*/的过程
 
 2.2.7.3 通配符%和Makefile自动推导(规则)
@@ -193,25 +185,11 @@ arm-linux-gcc 	//是不是shell命令
 	(2)反引号括起来执行 // var=`pwd`  var=${shell pwd} -- error
 	// echo自带\n  echo "\n" 两个换行
 
-
 x210_sd_config :	unconfig
 	@$(MKCONFIG) $(@:_config=) arm s5pc11x x210 samsung s5pc110			 // $@
 	@echo "TEXT_BASE = 0xc3e00000" > $(obj)board/samsung/x210/config.mk  // shell中 > 表示创建文件
 
 # mkconfig x210_sd arm s5pc11x x210 samsung s5pc110
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
