@@ -24,9 +24,7 @@
 
 2.16.1.3、Makefile分析
 	(4)	Makefile中刚开始定义了kernel版本号		// 在模块化驱动安装时会需要用到
-
 	(5)	make编译内核时传参		// make O=xxx指定编译目录
-
 	(6)	kernel的顶层Makefile中两个重要变量: ARCH, CROSS_COMPILE
 
 	/* Makefile传参 */

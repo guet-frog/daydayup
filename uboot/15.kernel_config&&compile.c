@@ -15,7 +15,7 @@
 
 2.15.3.1、先确认Makefile
 	// ARCH=arm
-	// CROSS_COMPILE   ?= /usr/local/arm/arm-2009q3/bin/arm-none-linux-gnueabi-
+	// CROSS_COMPILE = /usr/local/arm/arm-2009q3/bin/arm-none-linux-gnueabi-
 
 2.15.3.1、配置编译
 	step1: make x210ii_qt_defconfig		// cp arch/arm/configs/x210ii_qt_defconfig .config
@@ -35,8 +35,6 @@
 
 2.15.7.1、Kconfig的格式
 (2)	驱动移植等工作时, 需要修改Kconfig中的配置项, 将某个设备驱动添加到内核的配置项目中
-	//在linux内核中添加了一个文件夹, 在该文件夹下创建一个Kconfig文件, 在上一层目录的Kconfig中source引入
-
 (7)	内核源码目录树中每一个Kconfig都会/*source引入其所有子目录下的Kconfig*/, 从而所有的Kconfig项目都被包含进menuconfig
 
 2.15.7.2、tristate和bool的含义

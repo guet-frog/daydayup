@@ -1,39 +1,18 @@
 
-2.20.1.X210的bsp介绍
-2.20.1.1、嵌入式linux产品的bsp介绍
-	(1) 大部分的ARM架构的linux平台的bsp的内容和结构都是相似的。
-	(2) bsp一般是芯片厂家/板卡厂家提供的。
+2.20.1.2、 linux+QT bsp	
+	(1) uboot、xboot		// bootloader
+	(2) kernel
+	(3) buildroot			// rootfs
+	(4) tool
+	(5) mk					// mk脚本是用来管理和编译整个bsp
 
-2.20.1.2、X210的linux+QT bsp整体介绍
-	(1) tslib_x210_qtopia.tgz是用来支持QT的触摸屏操作的应用层库
-	(2) xboot和uboot是X210支持的2个bootloader源代码。kernel文件夹中是内核源代码，
-		buildroot文件夹是用来构建根文件系统的文件夹。tools里是一些有用工具。
-	(2) mk脚本是用来管理和编译整个bsp的。
-
-2.20.1.3、mk的帮助信息
-	(1) linux下的惯例就是，执行程序时加-h或者--help就可以看到这个程序执行的帮助信息。
-	(2) mk脚本的主要作用是编译bsp中的所有的源代码（包括bootloader、kernel、rootfs等），
-		但是我们可以完整编译也可以部分编译，我们通过执行mk 后面加不同的参数来指定mk脚本去编译相应的部分。
-		譬如：
-		mk -a	即可编译所有的bsp源代码
-		mk -x	即可只编译xboot
-		mk -ui	即可只编译uboot针对inand版本开发板的源代码
-		mk -r  	即可只编译buildroot，-r只是得到了文件夹形式的rootfs，并没有将其制作成镜像文件。
-		mk -re	即可编译buildroot并且制作得到ext3格式的rootfs镜像
-		mk -rj	即可编译buildroot并且制作得到jffs2格式的rootfs镜像
-
-2.20.1.4、工作示例
-	(1) 编译uboot		./mk -ui
-	(2) 编译内核			
-
-	注：./mk和mk都是执行mk这个脚本文件，区别在于./mk是带路径的，mk是不带路径的。
-		还有source mk，这个和前两个的区别是source执行时不需要mk文件具有可执行权限，
-		而前面两种要求mk必须在当前用户下具有可执行权限
+2.20.1.3、mk的帮助信息		// mk -h, mk --help
 
 2.20.2.mk文件分析
 2.20.2.1、shell程序结构
 	(1) shell脚本程序分为：变量定义、函数、代码。shell脚本程序的结构非常类似于C语言程序
-	(2) shell程序和C语言程序很大的一个差别就是shell没有main函数，shell脚本执行时也是先执行主函数的，
+	(2) shell程序和C语言程序很大的一个差别就是shell没有main函数，
+		shell脚本执行时也是先执行主函数的，
 		不过主函数没有放在一个类似于main这样的函数中，而是直接放在全局下的一些代码。
 	(3) shell程序执行时首先执行变量定义，然后执行主函数，其他函数在主函数代码中被调用执行。
 2.20.2.2、主函数
