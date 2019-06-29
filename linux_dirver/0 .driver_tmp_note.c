@@ -1,34 +1,34 @@
 //5.2.4 18′
-/proc/sys/printk
+ -- /proc/sys/printk
+ -- dmesg
 
-dmsg
-
-//5.2.4 30′
-makefile
+ -- 编译模块的Makefile讲解
 
 //5.2.5 1′
-uname -r
-/lib/modules/3.13.0-32-generic/bulid
+ -- uname -r
+ -- /lib/modules/3.13.0-32-generic/bulid
 
 //5.2.5 33′
-cat /proc/sys/kernel/printk
-#define KERNEL_INFO		6
-printk()打印级别在cmd中的效果
+ -- cat /proc/sys/kernel/printk
+ -- #define KERNEL_INFO		6
+ -- printk()打印级别在cmd中的效果
 
 //5.2.6 1′
-驱动使用模块这种机制来实现
+ -- 驱动使用模块这种机制来实现
 
 //5.2.7 13′
-inline的两个作用
+ -- inline的两个作用		// 防止头文件中定义函数 链接时重复定义
+							// 提高效率
 
-cat /proc/devices		// 读内存
-主设备号(major)既是设备编号 也是设备管理表的下标
+ -- cat /proc/devices		// 读内存
+ -- 主设备号(major)既是设备编号 也是设备管理表的下标
 
 //5.2.10 1′
-/dev/*		// 每一个文件代表一个设备
+/dev/ *		// 每一个文件代表一个设备
 
 //  6′
 如何通过设备文件找到驱动			// -- file_operation[255] kernel驱动集合
+// 主设备号
 
 vi /dev/test 		ls -l /dev/test
 
@@ -57,17 +57,14 @@ inline  -- 效率
 5.3.7 1′
 app调用驱动方法的整个流程
 
-
-5.3.11 
+5.3.11
 结构体变量首元素首地址 与 该结构体变量的地址的关系
 
 5.3.12
-io与内存统一编址		// x86不是 *(volatile unsigned  int *)0x10000000
-
-内核崩溃过 测试前需要将内核重启一次
+io与内存统一编址		// x86不是 *(volatile unsigned int *)0x10000000
 
 5.4.4 4′
-susbsys_initcall(leds_init) 不用调用insmodule，
+susbsys_initcall(leds_init) 不用调用insmod
 leds模块不能设置为M
 
 7′
@@ -166,7 +163,6 @@ misc设备都是字符设备
 9′
 为什么不直接使用字符设备，而使用misc
 udev需要class，因此设备必须 从属于一个类，以前实验是自己创建了一个类
-
 
 dirname $0		获取当前路径
 
