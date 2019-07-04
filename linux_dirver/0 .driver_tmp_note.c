@@ -101,7 +101,7 @@ drivers/gpio/gpiolib.c   line1089
 gpio_desc[id].chip = chip
 将gpio_chip结构体的首地址，挂接在内核内部gpio_desc[]结构体数组中chip元素中
 
-类似于内核用 素组 来管理字符设备驱动
+类似于内核用 数组 来管理字符设备驱动
 
 
 驱动框架：关于硬件的相关操作并没有实现，只是留出接口(通过函数指针)

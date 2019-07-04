@@ -160,7 +160,6 @@ static int __init led_dev_init(void)
 	}
 	
 	device_create(led_class, NULL, g_auto_major, NULL, "led_test");
-	
 #endif /* AUTO_MKNOD */
 
 	return 0;

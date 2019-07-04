@@ -1,10 +1,7 @@
 
 5.2.2.1、常用的模块操作命令
-	(1) lsmod
-	(2) insmod		// insmod xxx.ko
-	(3) modinfo		// modinfo xxx.ko
-	(4) rmmod
-	(5) modprobe、depmod
+	(1) lsmod、insmod、modinfo、rmmod
+	(2) modprobe、depmod
 
 	// 驱动一般实现为模块的方式
 	// 内核源码树下编译驱动，调用内核Makefile		\
@@ -13,12 +10,6 @@
 5.2.2.2、模块的安装与卸载
 	(2)	module_init(chrdev_init)		// insmod xxx.ko时自动调用chrdev_init()
 	(3) module_exit(chrdev_exit)		// rmmod xxx时自动调用chrdev_exit()
-
-5.2.3.2、模块中常用宏
-	(1) MODULE_LICENSE
-	(2) MODULE_AUTHOR
-	(3) MODULE_DESCRIPTION
-	(4) MODULE_ALIAS
 
 5.2.3.3、函数修饰符
 	(1) __init		// #define __init	__section(.init.text) __cold notrace
@@ -30,30 +21,22 @@
 		防止头文件定义的函数，链接时重复定义
 		// 头文件中定义变量，结构体保护宏能防止编译error，链接可能error
 
-5.2.4.1、printk函数详解			// for kernel not app
+5.2.4.1、printk函数详解
 		cat /proc/sys/kernel/printk		// 第一个数字，数字越小级别越高
 		// ubuntu中dmesg查看printk打印信息
 
-	(5) ubuntu中这个printk的打印级别控制没法实践，ubuntu中不管你把级别怎么
-		设置都不能直接打印出来，必须dmesg命令去查看
-
 5.2.4.2、关于驱动模块中的头文件
-	(1) 驱动源代码中包含的头文件和原来应用编程程序中包含的头文件不是一回事
-
-		应用编程中包含的头文件是应用层的头文件，是应用程序的编译器(gcc)提供
-		gcc的头文件路径/usr/include，和操作系统无关
-
-		驱动源码属于内核源码的一部分，驱动源码中的头文件其实就是内核源代码目录
-		下的include目录下的头文件
+		(1) app层头文件由编译器(gcc)提供，gcc的头文件路径/usr/include，和OS无关
+		(2) 驱动源码属于内核源码的一部分，源码树include/目录下
 
 5.2.4.3、驱动编译的Makefile分析
-	(1) KERN_DIR，变量的值就是我们用来编译这个模块的内核源码树的目录
+	(1) KERN_DIR，编译模块的内核源码树目录
 	(2) obj-m += module_test.o					// obj-m
 	(3) make -C $(KERN_DIR) M=`pwd` modules		// make modules
 
-		make -C进入到指定的内核源码树目录下
-		然后在源码目录树下/*调用*/内核源码中定义的模块编译规则去编译这个模块
-		编译完成后把生成的文件还拷贝到当前目录下	// 通过M=`pwd`实现
+	make -C进入到指定的内核源码树目录下
+	然后在源码目录树下/*调用*/内核源码中定义的模块编译规则去编译这个模块
+	编译完成后把生成的文件还拷贝到当前目录下	// 通过M=`pwd`实现
 
 5.2.5.用开发板来调试模块
 	// uname				Linux
@@ -70,15 +53,12 @@
 	(2) 每个设备驱动都需要一个该结构体类型的变量
 	(3) 设备驱动向内核注册时，提供该结构体类型的变量
 
-5.2.7.1、register_chrdev	/* fs.h */
+5.2.7.1、register_chrdev()	/* fs.h */
 
 5.2.7.2、内核如何管理字符设备驱动
 	(1) 内核用结构体数组存储注册的字符设备驱动
 	(3) cat /proc/devices查看内核中已经注册的char devices和block devices
 	(4) 主设备号(major)既是设备编号，也是设备管理表的下标
-
-5.2.8.字符设备驱动代码实践1		// 定义并填充file_operations、注册驱动
-	// make && make cp
 
 5.2.10.1、驱动设备文件的创建
 	(2) 设备文件的关键信息：主次设备号，使用ls -l去查看设备文件
@@ -95,7 +75,7 @@
 
 	(2) copy_to_user()
 
-	// 注意区分复制和mmap的映射
+	// 注意区分copy和mmap的映射
 
 5.2.13.驱动中如何操控硬件区别裸机
 	(1) 寄存器地址不同。物理地址转为虚拟地址

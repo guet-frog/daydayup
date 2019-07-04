@@ -16,6 +16,7 @@ int led_dev_open(struct inode *tmpNode, struct file *tmpFile)
 	
 	return 0;
 }
+
 int led_dev_release(struct inode *tmpNode, struct file *tmpFile)
 {
 	printk(KERN_INFO "led_dev_release() has exe\n");

@@ -2,7 +2,7 @@
 // 2.1
 (1) 测试printk()打印级别设置，在控制终端中打印信息
 (2) 最简单的linux模块编写，通过insmod、lsmod、rmmod测试
-(3) 编译模块需要内核源码树，需要用到kernel的Makefile，以及相关Makefile分析
+(3) 编译模块，需要内核源码树，需要用到kernel的Makefile，以及相关Makefile分析
 
 // 2.2
 (1) 模块安装时，添加设备注册函数register_chrdev()
@@ -21,3 +21,10 @@
 
 // 2.5
 (1) 动态映射io
+
+// 4.1
+(1) 采用led驱动框架编写led驱动
+
+// 4.2
+(1) 采用writel()读写io
+(2) 调用gpiolib框架

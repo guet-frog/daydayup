@@ -16,7 +16,7 @@
 // from MKDEV(200, 0)
 // count 4
 
-5.3.2.1、alloc_chrdev_region自动分配设备号
+5.3.2.1、alloc_chrdev_region()自动分配设备号
 
 5.3.2.2、得到分配的主设备号和次设备号	// MKDEV(), MAJOR(), MINOR()
 	*/note: dev_t device_dec; unsigned int device_major;
@@ -66,16 +66,12 @@
 	(3) device_destory()
 	(4) class_destroy()
 
+	// lrwxrwxrwx 1 0 0 0 Jan  1 13:43 led_device_test -> ../../devices/virtual/led_class_test/led_device_test
+
 5.3.8.1、sys文件系统简介
 	(1) sys文件系统的设计思想
 	(2) 设备类的概念
 	(3) /sys/class/xxx/中的文件的作用
-
-5.3.8.2、
-	(1) class_create()
-	(2) device_create()l
-
-	// lrwxrwxrwx 1 0 0 0 Jan  1 13:43 led_device_test -> ../../devices/virtual/led_class_test/led_device_test
 
 5.3.10.静态映射表建立过程分析
 	(1) 映射表PA和VA相关的宏定义

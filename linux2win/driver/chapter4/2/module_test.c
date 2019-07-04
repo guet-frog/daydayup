@@ -6,9 +6,10 @@
 #include <mach/regs-gpio.h>
 #include <linux/cdev.h>
 #include <linux/device.h>
-//#include <linux/ioport.h>
 #include <linux/io.h>
 #include <linux/leds.h>
+//#include <include/asm/gpio.h>
+#include <linux/gpio.h>
 
 #define LED_MAJOR		100
 #define AUTO_MAJOR		0
@@ -36,6 +37,11 @@
 	// unsigned int gpj0_data;
 // } GPJ0_t;
 
+
+//--------------------gpiolib------------------------
+#define GPIO_J3		175
+#define LABEL		"GPJ0"
+
 static void s5pv210_led_set(struct led_classdev *led_dev,
 								enum led_brightness value);
 
@@ -51,17 +57,51 @@ static struct led_classdev led_dev =
 static void s5pv210_led_set(struct led_classdev *led_dev,
 								enum led_brightness value)
 {
+	//unsigned int tmpValue = 0;
+	int ret = -1;
+	
 	//printk(KERN_INFO "s5pv210_led_set has exe\n");
 	rGPJ0CON |= GPJ0CON_VALUE;
 	if (0 == value)
 	{
 		// close led
-		rGPJ0DAT |= ((0x1<<3) | (0x1<<4) | (0x1<<5));
+		// rGPJ0DAT |= ((0x1<<3) | (0x1<<4) | (0x1<<5));
+		
+		// use io interface
+		// tmpValue = readl(GPJ0DAT);
+		// tmpValue |= ((0x1<<3) | (0x1<<4) | (0x1<<5));
+		// writel(tmpValue, GPJ0DAT);
+		
+		// use gpiolib
+		ret = gpio_request_one(GPIO_J3, GPIOF_DIR_OUT, LABEL);
+		// if (0 != ret)
+		// {
+			// printk(KERN_INFO "gpio_request_one() exe error\n");
+			// return;
+		// }
+		
+		printk(KERN_INFO "ret = %d\n", ret);
+		
+		__gpio_set_value(GPIO_J3, 1);
+		//gpio_free(GPIO_J3);
 	}
 	else
 	{
-		// open led
-		rGPJ0DAT &= ~((0x1<<3) | (0x1<<4) | (0x1<<5));
+		// tmpValue = readl(GPJ0DAT);
+		// tmpValue &= ~((0x1<<3) | (0x1<<4) | (0x1<<5));
+		// writel(tmpValue, GPJ0DAT);
+		
+		ret = gpio_request_one(GPIO_J3, GPIOF_DIR_OUT, LABEL);
+		// if (0 != ret)
+		// {
+			// printk(KERN_INFO "gpio_request_one() exe error\n");
+			// return;
+		// }
+		
+		printk(KERN_INFO "ret = %d\n", ret);
+		
+		__gpio_set_value(GPIO_J3, 0);
+		//gpio_free(GPIO_J3);
 	}
 }
 
