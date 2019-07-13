@@ -44,12 +44,12 @@
 
 static void s5pv210_led_set(struct led_classdev *led_dev, enum led_brightness value);
 
-// static struct led_classdev led_dev =
-// {
-	// .name = "led_test_4",
-	// .brightness = 10,
-	// .brightness_set = s5pv210_led_set,
-// };
+static struct led_classdev led_dev =
+{
+	.name = "led_test_4",
+	.brightness = 10,
+	.brightness_set = s5pv210_led_set,
+};
 
 
 

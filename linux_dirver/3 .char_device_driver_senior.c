@@ -11,11 +11,6 @@
 5.3.1.4、编程实践
 	(1) register_chrdev_region(), cdev_init(), cdev_add(), unregister_chrdev_region()
 
-// 200 0 1 2 3
-
-// from MKDEV(200, 0)
-// count 4
-
 5.3.2.1、alloc_chrdev_region()自动分配设备号
 
 5.3.2.2、得到分配的主设备号和次设备号	// MKDEV(), MAJOR(), MINOR()
@@ -29,7 +24,6 @@
 	// cdev->owner = THIS_MODULE;
 	// cdev->ops = &fops;
 
-5.3.5.字符设备驱动注册代码分析1
 5.3.5.1、老接口分析
  -- register_chrdev()
   |

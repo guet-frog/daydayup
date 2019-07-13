@@ -15,8 +15,7 @@ int main(void)
 {
 	int fd = -1, ret = -1;
 	
-	//fd = open("/dev/led_test", O_RDWR);
-	fd = open("/sys/devices/virtual/leds/led_test_4/brightness", O_RDWR);
+	fd = open("/dev/led_test", O_RDWR);
 	if (fd < 0)
 	{
 		perror("open");
@@ -24,22 +23,27 @@ int main(void)
 	}
 	printf("app -- open /dev/led_test file success\n");
 	
-
-	ret = write(fd, "1", 1);
-	if (ret < 0)
-	{
-		perror("write");
-		exit(-1);
-	}
-	else
-	{
-		printf("app -- write %d bytes\n", ret);		// ret = 0
-	}
-	
-	sleep(2);
-	
 	ret = write(fd, "0", 1);
-
+	sleep(2);
+	ret = write(fd, "1", 1);
+	sleep(2);
+	ret = write(fd, "0", 1);
+	sleep(2);
+	ret = write(fd, "1", 1);
+	
+	ret = write(fd, "abc", 3);
+	ret = write(fd, "123", 3);
+	
+	// if (ret < 0)
+	// {
+		// perror("write");
+		// exit(-1);
+	// }
+	// else
+	// {
+		// printf("app -- write %d bytes\n", ret);		// ret = 0
+	// }
+	
 	// ret = read(fd, g_read_buff, BYTE_CNT);
 	// if (ret < 0)
 	// {
@@ -52,7 +56,7 @@ int main(void)
 		// printf("app -- g_read_buff = %s\n", g_read_buff);	// ret = 0
 	// }
 	
-	//sleep(3);
+	sleep(3);
 	
 	ret = close(fd);
 	if (ret < 0)
