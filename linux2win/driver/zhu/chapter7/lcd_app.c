@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 	printf("xres_virtual = %d, yres_virtual = %d\n", var_info.xres_virtual, var_info.yres_virtual);
 	printf("height = %d, width = %d\n", var_info.height, var_info.width);
 	
-	draw_back(&var_info, vFb, RED);
+	draw_back(&var_info, vFb, GREEN);
 	
 	close(fd);
 	

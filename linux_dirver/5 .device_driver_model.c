@@ -6,8 +6,6 @@
 	(4) udev
 
 5.5.1.2、为什么需要设备驱动模型
-	(2) ，目的是在设备越来越多，功耗要求等新特性要求
-		的情况下让驱动体系更易用、更优秀。
 	(3) 2.6 版本中正式引入设备驱动模型，设备驱动模型负责统一实现和维护一些
 		特性，诸如：电源管理、热插拔、对象生命周期、用户空间和驱动空间的交
 		互等	// 统一管理驱动，简化驱动编写
@@ -23,12 +21,10 @@
 		表、对象上锁、对用户空间的表示
 	(3) 设备驱动模型中的各种对象其内部都会包含一个kobject
 	(4) 地位相当于面向对象体系架构中的总基类
-
 5.5.2.2、kobj_type
 	(1) 很多书中简称为ktype，每一个kobject都需要绑定一个ktype来提供相应功能
 	(2) 关键点1：sysfs_ops，提供该对象在sysfs中的操作方法（show和store）
 	(2) 关键点2：attribute，提供在sysfs中以文件形式存在的属性，其实就是应用接口
-
 5.5.2.3、kset
 	(1) kset的主要作用是做顶层kobject的容器类
 	(2) kset的主要目的是将各个kobject（代表着各个对象）组织出目录层次架构
@@ -76,41 +72,29 @@
 
 	// platform_device属于device
 
-struct platform_device {
-	const char	* name;			// 平台总线下设备的名字
+struct platform_device
+{
+	const char	* name;
 	int		id;
-	struct device	dev;		// 所有设备通用的属性部分
-	u32		num_resources;		// 设备使用到的resource的个数
-	struct resource	* resource;	// 设备使用到的资源数组的首地址
-
-	const struct platform_device_id	*id_entry;	// 设备ID表
-
-	/* arch specific additions */
-	struct pdev_archdata	archdata;			// 自留地，用来提供扩展性的
-};
-
-struct platform_driver {
-	int (*probe)(struct platform_device *);		// 驱动探测函数
-	int (*remove)(struct platform_device *);	// 去掉一个设备
-	void (*shutdown)(struct platform_device *);	// 关闭一个设备
-	int (*suspend)(struct platform_device *, pm_message_t state);
-	int (*resume)(struct platform_device *);
-	struct device_driver driver;				// 所有设备共用的一些属性
-	const struct platform_device_id *id_table;	// 设备ID表
+	struct device	dev;
+	u32		num_resources;
+	struct resource	* resource;		// 资源数组首地址
+	const struct platform_device_id	*id_entry;
+	struct pdev_archdata	archdata;	// specific data
 };
 
 5.5.5.platform平台总线工作原理2
 5.5.5.1、平台总线体系的工作流程
-	(1)第一步：系统启动时在bus系统中注册platform		// sys/bus -- 内核bus子系统
+	(1)第一步：系统启动时在bus系统中注册platform			// sys/bus -- 内核bus子系统
 	(2)第二步：内核移植的人负责提供和注册platform_device	// mach-x210.c
 	(3)第三步：写驱动的人负责提供和注册platform_driver
 	(4)第四步：platform的match函数发现driver和device匹配后，调用driver的probe
 			   函数来完成驱动的初始化和安装，然后设备就工作起来了
 
 	// 第二步：mach-x210.c中添加相应的 struct platform_device xxx_device
-	
+
 	// 1、4步自动完成。需要完成2、3步，提供platform_device和platform_driver
-	
+
 5.5.5.2、代码分析：platform本身注册
 	(1) 每种总线（不光是platform，usb、i2c那些也是）都会带一个match方法
 		match方法用来对总线下的device和driver进行匹配。理论上每种总线的
@@ -137,10 +121,11 @@ static int platform_match(struct device *dev, struct device_driver *drv)
 
 
 // 定义device结构体，调用接口注册
-static struct platform device smdk_backlight_device = {
+static struct platform device smdk_backlight_device =
+{
 	.name = "pwm-backlight",
 	.id  = -1,
-}
+};
 
 ret = platform_device_register(&smdk_backlight_device);
 
@@ -148,21 +133,24 @@ ret = platform_device_register(&smdk_backlight_device);
 drivers/video/backlight
 static int __init pwm_backlight_init(void)
 {
-	return platform_drier_register(&pwm_backlight_driver );
+	return platform_driver_register(&pwm_backlight_driver );
 } 
-static struct platform_driver_register()
 
 //device.h
 //mach-mini2440.c
 5.5.6.platform平台总线工作原理3
 5.5.6.1、以leds-s3c24xx.c为例来分析platform设备和驱动的注册过程
-(1)platform_driver_register
-(2)platform_device_register
+	(1) platform_driver_register
+	(2) platform_device_register
+
 5.5.6.2、platdata怎么玩			// 类似于resource结构体
-(1)platdata其实就是设备注册时/*提供的设备有关的一些数据*/（譬如设备对应的gpio、使用到的中断号、设备名称····）
-(2)这些数据在设备和驱动match之后，会由设备方转给驱动方。驱动拿到这些数据后，通过这些数据得知设备的具体信息，然后来操作设备。
-(3)这样做的好处是：驱动源码中不携带数据，只负责算法（对硬件的操作方法）。
-现代驱动设计理念就是算法和数据分离，这样最大程度保持驱动的独立性和适应性。
+	(1) platdata其实就是设备注册时/*提供的设备有关的一些数据*/
+		（譬如设备对应的gpio、使用到的中断号、设备名称····）
+	(2) 这些数据在设备和驱动match之后，会由设备方转给驱动方。驱动拿到这些数据后，
+		通过这些数据得知设备的具体信息，然后来操作设备。
+	(3) 这样做的好处是：驱动源码中不携带数据，只负责算法（对硬件的操作方法）。
+		现代驱动设计理念就是算法和数据分离，这样最大程度保持驱动的独立性和适应性
+
 5.5.6.3、match函数的调用轨迹
 5.5.6.4、probe函数的功能和意义
 
@@ -188,9 +176,9 @@ static struct platform_driver_register()
 5.5.9.平台总线实践环节3
 5.5.9.1、测试platform_device和platform_driver相遇时会怎样
 5.5.9.2、probe函数
-(1)probe函数应该做什么
-(2)probe函数的数据从哪里来
-(3)编程实践
+	(1) probe函数应该做什么
+	(2) probe函数的数据从哪里来
+	(3) 编程实践
 
 5.5.10.平台总线实践环节4
 
@@ -227,10 +215,5 @@ struct device_attribute dev_attr_led1 =
 	.show = x210_led_read,
 	.store = x210_led_write,
 }
-
-
-
-
-
 
 

@@ -33,7 +33,7 @@
 	(1) 环境变量就是操作系统的全局变量, 环境变量对操作系统来说命名和意义都是唯一的
 	(2) linux系统环境变量一部分linux系统自带的, 一部分是自己扩充的
 	(3) PATH(系统自带): 系统在查找可执行程序时搜索的路径范围
-		// ~/.bashrc	export PATH=/usr/local/arm/arm-2009q3/bin:$PATH
+		 ~/.bashrc	export PATH=/usr/local/arm/arm-2009q3/bin:$PATH
 
 	// bash是linux标准默认的shell (linux一般默认使用bash作为shell脚本解释器)
 	// 很多linux发行版里默认带的就是bash shell

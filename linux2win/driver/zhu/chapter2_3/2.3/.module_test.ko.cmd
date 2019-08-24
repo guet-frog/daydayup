@@ -1,0 +1,1 @@
+cmd_/home/aston/linux2win/driver/chapter2_3/2.3/module_test.ko := /usr/local/arm/arm-2009q3/bin/arm-none-linux-gnueabi-ld -EL -r  -T /home/aston/src/kernel/scripts/module-common.lds --build-id -o /home/aston/linux2win/driver/chapter2_3/2.3/module_test.ko /home/aston/linux2win/driver/chapter2_3/2.3/module_test.o /home/aston/linux2win/driver/chapter2_3/2.3/module_test.mod.o

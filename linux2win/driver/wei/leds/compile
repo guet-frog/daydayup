@@ -1,0 +1,6 @@
+make
+
+cp app *.ko ~/src/rootfs/rootfs/driver_test
+ls -l ~/src/rootfs/rootfs/driver_test
+
+make clean

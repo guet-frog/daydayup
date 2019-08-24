@@ -1,137 +1,124 @@
 
-第二部分、章节介绍
-5.8.1.什么是input子系统
-	本节全面介绍input子系统的概念和来源、解决的主要问题，目的是让大家对linux中输入类设备有一个全面了解
-5.8.2.input设备应用层编程实践1
-	本节实践编写应用层程序，操作键盘和鼠标这些常见input类设备，目的是让大家先学会使用输入类设备，后面再来分析驱动。
-5.8.3.input设备应用层编程实践2
-	本节接着上节对读上来的数据进行解析，分析其规律并且和设备本身特性进行关联分析。
-5.8.4.input子系统架构总览1
-	本节详细介绍input子系统的三层结构以及各层的功能特点。
-5.8.5.input子系统架构总览2
-	本节介绍input子系统下编写驱动的路线和方法。
-5.8.6.输入核心层源码分析1
-	本节分析输入核心层，主要是模块装载和开放给其他层的接口的分析。
-5.8.7.输入核心层源码分析2	
-	本节接着分析输入核心层，主要是handler和device的匹配、安装部分的源码分析。
-5.8.8.输入事件驱动层源码分析
-	本节对输入事件层源码分析，主要以evdev.c为例分析了event handler的安装函数、数据上报函数的实现。
-5.8.9.输入设备驱动层源码分析1
-	本节分析输入设备驱动层，以x210自带的按键驱动为例进行分析。
-5.8.10.输入设备驱动层源码分析2	
-	本节接着分析按键驱动，主要是一些源码细节探究。
-5.8.11.中断方式按键驱动实战1
-	本节开始按键驱动实战，先找到内核提供的模版，并且对模版程序进行分析讲解。
-5.8.12.中断方式按键驱动实战2	
-	本节以模版驱动为基础，结合x210开发板的情况进行驱动移植、编译、测试、修改。
-	
-	
-
-第三部分、随堂记录	
-5.8.1.什么是input子系统
-5.8.1.1、何为输入设备
-5.8.1.2、linux中输入设备的编程模型
-(1)命令行界面的输入类设备应用接口
-(2)GUI界面带来的麻烦、不同的输入类设备也会带来麻烦
-(3)struct input_event
 5.8.1.3、input子系统简介
-(1)linux的input子系统解决了什么问题
-(2)input子系统分4个部分：应用层 + input event + input core + 硬件驱动
-(3)input子系统如何工作
-(4)事件驱动型GUI框架，如QT、VC等。
+	(2) input子系统分4个部分：应用层 + input event + input core + 硬件驱动
 
-
-5.8.2.input设备应用层编程实践1
 5.8.2.1、确定设备文件名
-(1)应用层操作驱动有2条路：/dev目录下的设备文件，/sys目录下的属性文件
-(2)input子系统用的/dev目录下的设备文件，具体一般都是在 /dev/input/eventn
-(3)用cat命令来确认某个设备文件名对应哪个具体设备。我在自己的ubuntu中实测的键盘是event1，而鼠标是event3.
+	(1) 应用层操作驱动有两种方法：/dev目录下的设备文件，/sys目录下的属性文件	// /dev/input/eventn
 
 5.8.2.2、标准接口打开并读取文件
-5.8.2.3、解析struct input_event
+	(3) struct input_event				// #include <linux/input.h>
 
-
-5.8.3.input设备应用层编程实践2
-5.8.3.1、解析键盘事件数据
-5.8.3.2、解析鼠标事件数据
-
-
-5.8.4.input子系统架构总览1
 5.8.4.1、input子系统分为三层
-(1)最上层：输入事件驱动层，evdev.c和mousedev.c和joydev.c属于这一层
-(2)中间层：输入核心层，input.c属于这一层
-(3)最下层：输入设备驱动层，drivers/input/xxx 文件夹下
+	(1) 上层：	事件驱动层		// evdev.c、mousedev.c、joydev.c
+	(2) 中间层：核心层			// input.c
+	(3) 下层：	设备驱动层		// drivers/input/xxx
+
 5.8.4.2、input类设备驱动开发方法
-(1)输入事件驱动层和输入核心层不需要动，只需要编写设备驱动层
-(2)设备驱动层编写的接口和调用模式已定义好，驱动工程师的核心工作量是对具体输入设备硬件的操作和性能调优。
-(3)input子系统不算复杂，学习时要注意“标准模式”四个字。
-
-
-5.8.5.input子系统架构总览2
-
+	(1) 事件驱动层、核心层不需要编写、
+	(2) 调用核心层定义的接口，完成设备驱动层
 
 5.8.6.输入核心层源码分析1
-5.8.6.1、核心模块注册input_init
-(1)class_register
-(2)input_proc_init
-(3)register_chrdev
-5.8.6.2、设备驱动层的接口函数
-(1)input_allocate_device
-(2)input_set_capability
-(3)input_register_device
+5.8.6.1、核心模块注册input_init()
+	(1) class_register()			// 其他文件中实现device_register()
+	(2) input_proc_init()
+	(3) register_chrdev()
 
+	// class_create()	class_register()
+
+5.8.6.2、核心层为设备驱动层提供的接口函数	// 核心层为事件驱动层提供的接口函数
+	(1) input_allocate_device()
+	(2) input_set_capability()
+	(3) input_register_device(struct input_dev *dev)
+
+	// register -- 定义硬件相关结构体变量并填充，调用相应接口函数(框架实现)注册
 
 5.8.7.输入核心层源码分析2
 5.8.7.1、handler和device的匹配
-(1)input_attach_handler
-		input_match_device		匹配device和handler
-		handler->connect(handler, dev, id)		连接device和handler
-5.8.7.2、事件驱动层的接口函数
-(1)input_register_handler
-(2)input_register_handle
+ -- input_for_each_entry(handler, &input_handler_list, node)	// 遍历、绑定
+  |
+  | -- input_attach_handler(dev, handler);
+	 |
+	 | -- input_match_device()		// 匹配device和handler
+	 |
+	 | -- handler->connect(handler, dev, id)	// 匹配上后，挂接device和handler
 
+//  handler属于最上层(输入事件驱动层)
+//  handler作用：为应用层提供接口(/dev/input/eventX)访问驱动层
 
-5.8.8.输入事件驱动层源码分析
-5.8.8.1、input_handler
-5.8.8.2、evdev_connect
-5.8.8.3、evdev_event
+//  内核用链表来管理handler，遍历handler与device(usb、serial)匹配	\
+	注册一个新设备时，新设备与4类handler进行匹配					\
+	绑定后在应用层生成相应的设备文件，为应用层提供访问接口			\
+	绑定后设备产生输入事件后，上报到相应handler						\
+	handler将数据按照一定格式放入缓冲区，并唤醒read阻塞的app
 
+// Handlers: Keyboard Handlers、Mouse Handlers、Joystick Handler、Event Handler(多数)
 
-5.8.9_10.输入设备驱动层源码分析1_2
+5.8.7.2、核心层为事件驱动层提供的接口函数
+	(1) input_register_handler(&mousedev_handler)		// mousedev.c
+	(2) input_register_handler(&evdev_handler)			// evdev.c
+
+	static const struct input_device_id evdev_ids[] = 
+	{
+		{ .driver_info = 1, },		// match all devices
+	}
+
+5.8.8.事件驱动层源码分析
+	(1) struct input_handler
+		{
+			void *private;			// for special data
+			void (*event)(...);		// 处理底层上报的数据，生成struct input_event结构体变量。app使用
+			void (*match)(...);		// 没有使用，使用核心层提供的match()
+			int (*connect)(...);	// 当handler和device匹配后，调用connect
+			
+			const struct file_operations *fops;		// 映射app层的fops
+		}
+
+	(2) -- evdev_read()
+		 |
+		 | -- if (count < input_event_size())	// read(fd, &buf, sizeof(struct input_event));
+		 |
+		 | -- retval = wait_event_interruptible();		// block
+		 |
+		 | -- input_event_to_user();		// copy_to_user()
+
+	(3) -- evdev_connect()
+		 |
+		 | -- device_initialize(&evdev->dev)
+		 |
+		 | -- device_add(&evdev->dev)		// device_register() -- /dev/input/eventxxx
+
+	(3) -- evdev_event()
+		 |
+		 | -- struct input_event event;
+		 |
+		 | -- event.xxx = xxx; 	// event填充
+		 |
+		 | -- evdev_pass_event()
+		    |
+			| -- client->buffer[client->head++] = *event	// event放入缓冲区
+			|
+			| -- kill_fasync(&client->fasync, SIGIO, POLL_IN)	// 通知应用层
+
 5.8.9.1、先找到bsp中按键驱动源码
-(1)锁定目标：板载按键驱动
-(2)确认厂家提供的BSP是否已经有驱动
-(3)找到bsp中的驱动源码
-5.8.9.2、按键驱动源码初步分析
-(1)模块装载分析
-(2)平台总线相关分析
-(3)确定重点：probe函数
+	(1) cat /dev/input/event0		// 按下按键，判断是否有反应，判断驱动是否存在
+	(2) /driver/input/keyboard		// 由Makefile判断哪些文件被编译，或直接去源码树下检查
+	(3) cat /sys/input/eventx/name 	// 通过设备name属性文件，在源码中搜索相关文件
+
 5.8.9.3、源码细节实现分析
-(1)gpio_request
-(2)input_allocate_device
-(3)input_register_device
-(4)timer
+	(1) gpio_request()
+	(2) input_allocate_device()
+	(3) input_register_device()
+	(4) timer()
 
-
-5.8.11.中断方式按键驱动实战1
-5.8.11.1、模板
-(1)input类设备驱动模式非常固定，用参考模版修改即可
-(2)新建驱动项目并粘贴模版内容
-5.8.11.2、模板驱动的解析
-5.8.11.3、着手移植驱动
-
+5.8.11.1、模板	// input_programming.txt
 
 5.8.12.中断方式按键驱动实战2
-5.8.12.1、驱动移植细节
-5.8.12.2、驱动实践
+// mach-s5pv210/include/mach/irqs.h		-- OS对中断的统一编号
+// kernel/include/linux/interrupt.h
+// proc/interrupts
 
+// 应用层没有syc打印 -- 驱动中没有set_bit(EV_SYNC, input->evbit)
 
-
-
-
-
-
-
-
-
-
+// timer.expires = jiffies + (HZ/100)
+// 时间点 和 时间段
+// jiffies 当前时间点

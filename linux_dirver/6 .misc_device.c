@@ -15,6 +15,3 @@
 
 5.6.5.2、ioctl
 	(1) 为什么需要ioctl（input output control，输入输出控制）
-
-
-// 如何判断kernel中是否有该驱动的实现 -- 可以通过make menuconfig的查找功能

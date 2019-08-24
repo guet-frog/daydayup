@@ -109,11 +109,8 @@ int printf(const char *fmt, ...)
 
 ============================================================================2018-7-31 21:38:33
 // makefile
-	GNU链接器几个开关项的解释：-lm -lc -lgcc  
-	-lm 代表链接器将连接GCC的数学库libm.a  
-	-lc 代表链接器将连接GCC的标准C库libc.a  
-	-lgcc 代表链接器将连接GCC的支持库libgcc.a 
-
+	GNU链接器开关项
+	-lm -lc -lgcc				// libm.a libc.a(GCC标准C库) libgcc.c(GCC支持库)
 	-g 可执行程序包含调试信息
 	-o 指定输出文件名
 	-c 只编译不链接

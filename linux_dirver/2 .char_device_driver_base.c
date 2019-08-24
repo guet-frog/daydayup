@@ -44,7 +44,7 @@
 	// Ubuntu内核源码树		/lib/modules/3.13.0-32-generic/build
 
 5.2.6.1、系统整体工作原理
-	(1) 应用层->API->设备驱动->硬件
+	(1) 应用层 -> API -> 设备驱动 -> 硬件
 	(2) API：open、read、write、close等
 	(3) 驱动源码中提供真正的open、read、write、close等函数实体
 
@@ -93,5 +93,4 @@
 	(2) ioremap() 传入物理地址，返回虚拟地址
 	(3) iounmap()
 	(4) release_mem_region()		// 注意先后顺序
-
 
