@@ -1,3 +1,170 @@
+
+'''
+#ThreadLocal变量虽然是全局变量，但每个线程都只能读写自己线程的独立副本
+#ThreadLocal解决了参数在一个线程中各个函数之间互相传递的问题
+import threading
+import time
+
+#g_name = None
+g_name = threading.local()  # g_name虽然是全局属性，但是对于线程是安全的
+
+def process_thread(name):
+    #global g_name
+    #g_name = name
+    
+    g_name.name = name      #对象动态添加属性，也可以被限制
+    
+    time.sleep(1)
+    #print(g_name)
+    print(g_name.name)
+    
+t1 = threading.Thread(target=process_thread, args=("aa",))
+t2 = threading.Thread(target=process_thread, args=("bb",))
+
+t1.start()
+t2.start()
+
+print("end")
+'''
+
+'''
+def main():
+    a = 100
+    func()
+    
+if "__main__" == __name__:
+    main()
+'''
+
+'''
+from multiprocessing import Process
+from multiprocessing import Queue
+#from queue import Queue            # 使用在进程中，达不到预期的效果
+import time
+
+#q = Queue(5)                       # 多进程，需要注意全局变量，不能用于信息传递
+
+def process1(q):
+    for i in range(10):
+        q.put(i)
+        print("AAAA - %d", q.size())
+        time.sleep(1)
+        
+    print("p1 end")
+
+def process2(q):
+    for i in range(5):
+        print(q.qsize())
+        a = q.get(True)
+        #print(q.get())
+        print("BBBB")
+        time.sleep(3)
+
+if "__main__" == __name__:
+    q = Queue(10)
+    
+    p1 = Process(target = process1, args = (q, ))
+    p2 = Process(target = process2, args = (q, ))
+    
+    p1.start()
+    p2.start()
+    
+    print("the end")
+'''
+
+'''
+from multiprocessing import Process
+import os
+import time
+
+def func():
+    for i in range(10):
+        print("AAAA")
+        time.sleep(1)
+        
+def func1():
+    for i in range(5):
+        print("BBBB")
+        time.sleep(1)
+
+if __name__ == "__main__":
+    p1 = Process(target = func)
+    p2 = Process(target = func1)
+    
+    p1.start()
+    p1.join()
+    
+    p2.start()
+    
+    #p2.join()
+    
+    print("the end")
+'''
+
+'''
+import threading 
+
+g_info = threading.local()
+
+def func1():
+    std = g_info.name
+    print("thread = %s, %s"%(threading.current_thread().name, std))
+    
+def thread(name):
+    g_info.name = name
+    func1()
+    
+t1 = threading.Thread(target = thread, args=("zhangsan", ), name = "test1")
+t2 = threading.Thread(target = thread, args=("lisi", ))
+
+t1.start()
+t2.start()
+
+t1.join()
+t2.join()
+
+print("the end")
+'''
+
+'''
+from threading import Thread, Lock, enumerate
+import time
+
+def func1():
+    for i in range(8):
+        mutex1.acquire()
+        #mutex1.acquire(blocking = True, timeout = 5)       # 超时机制
+        print("AAAA")
+        mutex1.release()
+        time.sleep(1)
+
+def func2():
+    for i in range(5):
+        mutex1.acquire()
+        #time.sleep(2)
+        print("BBBB")
+        mutex1.release()
+        time.sleep(2)
+
+mutex1 = Lock()
+mutex2 = Lock()
+
+p1 = Thread(target = func1)
+p1.start()
+
+p2 = Thread(target = func2)
+p2.start()
+
+p1.join()
+
+while True:
+    print("the end")
+    print("current thread num = %d"%len(enumerate()))
+    time.sleep(1)
+'''
+
+#两个线程对全局变量进行互斥访问
+'''
 from threading import Thread
 import time
 
@@ -39,6 +206,21 @@ p2.join()
 
 print("AAAA")
 print("g_cnt = %d"%g_cnt)
+'''
+
+'''
+#windows不能运行
+from multiprocessing import Process
+import os
+
+def func():
+    for i in range(3):
+        print("AAAA")
+        
+p = Process(target=func)
+p.start()
+p.join()
+'''
 
 '''
 from multiprocessing import Process
