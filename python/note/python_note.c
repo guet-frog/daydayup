@@ -1,53 +1,71 @@
 
 #if linux基础
-       参数 选项
-    ls /bin -h			// 不一样的命令选项不同 "-"
-
+	   参数   选项
+    ls /bin   -h		// 不一样的命令选项不同 "-"
+	
     通配符'?'			// 正则表达式
     ls 1?3.txt
     ls 1[12345]3.txt
     ls 1[1-5]3.txt
-
+	
     重定向
     ls > xxx.txt
     ls >> xxx.txt
     cat 1.txt 2.txt >> xxx.txt		// 文件合并
-
+	
     ls /bin -l | more		// f(前) b
-
+	
     ls;ls -alh
-
-    ctrl + c 	取消命令 -- 输入很长的情况下?
-
+	
+    ctrl + c 	取消输入的命令
+	
     tree
-
+	
     ls -s xxx.txt xxx_softlink.txt		// 源文件 目标软链接
     ls -l 查看文件硬链接数
-
+	
     grep "ntfs"	xxx.txt
     grep -n "ntfs" xxx.txt
     grep -v "ntfs" xxx.txt	// 反向查找
     grep "^ntfs" xxx.txt	// 以ntfs开头查找
     grep "ntfs$" xxx.txt	// 以ntfs结尾查找
-
+	
     find / -name "*name*"
-
+	
     tar -cvf test.tar *.py		// 打包
     tar -xvf test.tar
-
+	
     tar -zcvf xxx.tar.gz *.py	// 压缩
     tar -zxvf xxx.tar.gz
-
+	
     tar -jcvf xxx.tar.bz2 *.py
     tar -jxvf xxx.tar.bz2
-
+	
     cal、data
-
+	
     ssh python@192.168.1.1			// windows Xshell
     who		// 查看有哪些用户登录
-
+	
     vi /etc/apt/sources.list
     sudo apt-get update
+	
+	// 重定向及管道查找
+	ifconfig | grep '192'
+	
+	ssh xxx@192.168.1.1
+	
+	外网访问本地局域网服务器，借助其他软件如：花生壳。通常使用外网服务器如：阿里云		// 原来的虚拟机添加一些功能
+	
+	who命令 查看当前用户登录信息
+	
+	crtl + A / ctrl + E
+	
+	cat /etc/group
+	AAA:x:1001:		// AAA用户组组名
+	
+	chmod 777 test_dir -R		//
+	
+	网站显示信息，网站后台服务程序一般两种：/Apache /Nginx
 #endif
 
 #if python基础知识
@@ -691,7 +709,8 @@
 	
 	if  __name__ == '__main__':
 		print("BBBB")
-		p = Process(target = subprocess)	// 创建子进程对象 -- 子进程函数名
+		p = Process(target=subprocess)	// 创建子进程对象 -- 子进程函数名
+										// target=subprocess 整体为一个参数，等号两边不要加空格
 		print("子进程准备执行")
 		p.start()
 		p.join()	// 阻塞
@@ -757,9 +776,16 @@
 
 #if 网络编程
 	IP地址 127.0.0.1 可以代表本机ip地址，http://127.0.0.1 可以测试本机中配置的web服务器
+	// 0.0.0.0
+	127.0.0.1 是一个环回地址。并不表示“本机”。0.0.0.0才是真正表示“本网络中的本机”。
+	在实际应用中，一般我们在服务端绑定端口的时候可以选择绑定到0.0.0.0，这样我的服务访问方就可以通过我的多个ip地址访问我的服务。
+	比如我有一台服务器，一个外网地址A,一个内网地址B，如果我绑定的端口指定了0.0.0.0，那么通过内网地址或外网地址都可以访问我的应用。但是如果我只绑定了内网地址，那么通过外网地址就不能访问。所以如果绑定0.0.0.0,也有一定安全隐患，对于只需要内网访问的服务，可以只绑定内网地址
 	
 	from socket import *
 	fd = socket(AF_INET, SOCK_DGRAM)
+	
+	fd.sendto(data, addr)				// tcp connected后也可以调用sendto()
+	data, addr = fd.recvfrom(1024)
 
 	// ----------------------------------------------
 	// udp发送接收数据流程
@@ -779,7 +805,7 @@
 		 ...(阻塞)	  <---		sendto()
 		   ↓
 		 close()
-	 
+		
 	// ----------------------------------------------
 	// 下载
 	// ----------------------------------------------
@@ -801,21 +827,31 @@
 		
 		网络字节序，大端发送
 		udp.port = 69
-	
+		
 	// ----------------------------------------------
 	// tcp
 	// ----------------------------------------------
-		web服务器一般用tcp		// http协议
-	
-	// 服务器多个套接字，客户端只有一个套接字
-	
+		// SOCK_DGRAM -> SOCK_STREAM
+		
+		// 服务器多个套接字，客户端只有一个套接字
+		
+		connect发送syn J到服务器
+		服务器accept解除阻塞，发送syc K，ack J+1 到客户端
+		客户端收到后，connect返回，发送ack K + 1 到服务器
+		服务器收到后，accept返回
+		
+		// 0 == len(fd.read())		另一端已经发送FIN -- 应用层调用了 fd.close()
+		
+		web网站并发量大，无需频繁操作一般用短连接。数据库的连接一般用长连接
+		
+		
 	// ---------------------------------
 	// tcp服务器建立
 	// ---------------------------------
 		(1) socket创建套接字				// socket默认创建主动套接字
 		(2) bind绑定ip和port
-		(3) listen将套接字转为被动链接		// 主动套接字转为被动套接字
-		(4) accept等待客户端的链接，返回一个新的套接字
+		(3) listen将套接字转为被动连接		// 主动套接字转为被动套接字
+		(4) accept等待客户端的连接，返回一个新的套接字
 		(5) recv/send接收发数据		// send -- sendto
 	
 	// 万维网购买域名，在github搭建好H1HO博客，将域名绑到这个服务器，将来访问域名直接访问博客(不需要买服务器)
@@ -825,6 +861,7 @@
 	// ----------------------------------
 	// ---------------------------------------- connection
 		client						server
+		
 									listen
 		syn_sent   	   syn-->		syn_recv
 		
@@ -859,9 +896,12 @@
 	// ----------------------------------------
 	// tcp服务器实现
 	// ----------------------------------------
-		socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-		// 服务器调用四次挥手的第一次，服务器需要等待2MSL，在此时间段，改端口不允许使用 -- 防止服务器意外关闭，重启不能使用该端口
+		socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)	// 目的：不必等待2MSL时间结束，再使用此端口
+		// 服务器调用四次挥手的第一次，服务器需要等待2MSL，在此时间段，该端口不允许使用 -- 防止服务器意外关闭，重启不能使用该端口
 		// 客户端使用每次随机端口
+		// 得到一个socket实例，修改实例一些参数，通过setsockopt方法
+		// SOL_SOCKET		SOL : socket option level，设置到socket级别 -- 这次设置到什么级别 (如：SOL_IP, SOL_TCP, SOL_UDP, SOL_LINGER)
+		// SO_REUSEADDR  1 -- 设置REUSEADDR选项为1
 		
 	select相较于使用accept效率提高 -- select底层将可接收的数据的套接字提供到上层
  	
@@ -869,6 +909,129 @@
 	
 	// ----------------------------------------
 	协程、greenlet可以根据需求指定何时切换，切换指定任务
+	
+	tonador框架使用gevent实现多任务(协程)
+#endif
+
+#if web服务器
+	http协议用于从万维网(www)服务器传输超文本到本地浏览器的传送协议
+	通过使用网页浏览器、网络爬虫或者其它的工具，客户端发起一个HTTP请求到服务器上指定端口（默认端口为80）
+	在用户代理和源服务器中间可能存在多个“中间层”，比如代理服务器、网关或者隧道（tunnel）
+	
+	xml中记录了文本的样式标签 -- word2007 docx(2003 doc)以后，普通文本添加格式的解决方式 -- 用xml
+	
+	超文本标记语言 -- 既有文本又有样式
+	同一个文本既包含内容又包含样式 -- 打开时，经过浏览器渲染
+	
+	浏览器最核心工作 解析字符串 -- 解析字符串算法		// ie firefox opera safari edge		-- ie 678910版本所支持不同
+	浏览器中JS解析器
+	Google JSV8引擎(类似于python2 python3解析器版本)，提升JS运行速度
+	抽离V8引擎，单独运行JS脚本，脱离浏览器
+	
+	HTML语言 标签标记了哪些浏览器版本可以支持
+	
+	改变浏览器的默认行为 -- <h1 style-"color:red;">hello world</h1>
+	把这些样式单独提出来，放入一个文件，xxx.css
+	让浏览器提供特定的行为，不再是简单的展示 -- JavaScript
+	
+	element		// 当前页面的样式 -- 如百度图片显示的位置
+	console		// js交互工具 -- 类似python交互 -- 查看大公司网站后端实现源码
+	source		// 加载当前页面时，所涉及到的资源
+	network		// 访问页面时所有网络相关操作
+				// Headers/Request Headers -- HTTP报文，请求服务器报文
+				// HTTP请求方式 -- 规定行为
+				   GET		获取数据
+				   POST		修改数据
+				   PUT		保存数据
+				   DELETE	删除数据
+				   OPTION	询问服务器的某种支持特性
+				   HEAD		返回报文头
+	起始行 -- GET / HTTP/1.1				// 提取请求方式 请求路径。 请求协议
+	请求头 -- 类似于python字典的组织方式
+	/r/n
+	请求体
+	
+	服务器报文恢复解析
+	起始行 -- 200 OK		HTTP状态码			// 500 服务器代码问题，前端无关  -- 404 NOT FOUND
+	响应头 -- 键值对形式，以 冒号 分隔
+	/r/n
+	响应体
+	<html>
+	</html>
+	
+	// 请求头、响应头报文，文本形式(大字符串)，通过\r\n分隔，
+	
+	//输入网址，拿到页面的流程
+	客户端发送时，形成请求报文
+	服务器接收后，解析字符串，执行特性行为，形成响应报文(字符串)
+	客户端收端服务器的响应，将响应体解析(Response) -- 浏览器渲染HTML源文件
+	
+	静态服务器
+	
+	https -> http  // 添加安全传输
+	
+	前端到后端传输数据
+	放在请求体 		如登录用户名 密码，头像信息等
+	放入请求头		如百度框写入信息 在URL中体现，/ ? 		-- 标准的get方式没有请求体，通过 ? 传输数据，网址从第一个?开始所有都是数据
+					无论get post put都可以用URL传输数据，-- URL不仅仅代表资源，? 后都是数据 -- 与本次请求相关的参数
+					查询字符串Query String: ?key1=value1&key2=value2
+	
+	http 无状态		// 问题：登录淘宝后  才可以使用淘宝的购物车 -- 框架使用别的方式解决
+	
+	http提出针对 超文本传输、网页传输。  -- 不仅仅网页，APP可以使用http协议传输
+	
+	服务器开发，框架jangle，tonador。
+	服务器角度开发：主要针对于 send() 和 receiver() 之间，对用户数据的处理，形成用户需要的数据，可能是网页，也可能是某种特定格式的数据，返回给客户端
+	客户端角度开发：爬虫(类似于浏览器的，通讯客户端)
+	
+	服务器执行脚本，实现动态网站
+	
+	爬虫(sprider)
+	百度可以搜索到很多网站
+	百度搜索相关关键字，相关关键字的资源全部被列举出来
+	-- 百度在不停爬取整个互联网 -- 访问过本地网站并记录关键字和链接地址
+	-- 搜索引擎公司原理，爬虫 + 搜索算法
+	
+	
+	爬虫 访问 sina.com
+	服务器响应请求，index.html  页面资源(带有格式信息)
+	拿到页面资源，解析页面信息(字符串)，提取出所有的超链接，搜索链接信息，、
+	另一方面记录拿到的页面资源，将链接与页面对应起来(通过分析关键字，与页面的关系)，通过算法分析页面信息中除标签之外的关键字记录
+	将链接与关键字存入数据库，保存映射关系(每访问一个页面，提取页面特征值和链接地址)，最终将互联网大部分网站记录下来
+	
+	爬虫程序并不知道有多少网站，主动去访问所有网站(通过种子链接)，挖掘所有资源，爬遍所有资源 -- 访问时有策略问题
+	
+// -----------------------------------------
+// 	多进程实现web服务器
+// -----------------------------------------
+	client_socket, client_addr = server_socket.accept()		// 返回值
+	p = Process(target=handle_client, args=(client_socket,))
+	p.start()
+	client_socket.close()		// 关闭父进程的client_socket
+	
+	client_socket.send(bytes(str, "utf-8"))		// python3必须要转成byte类型，python2不需要
+	client_socket.close()		// http短连接需求
+	
+	print("%s %s connected", %client_address)		// 元祖自接拆包
+	
+	try:
+		file = open(file_name, "rb")	// 考虑到可能打开图片
+	except IOError:
+		print("file is not exist")
+	else:
+		file_data = file.read()
+		file.close()
+	
+#if database
+	// -------------------------------------
+	目的存储数据，优化读写(数据库算法核心)，大量数据快速查找
+	
+	关系型数据库，共用E-R设计模型 -- 核心实现代码不同，存取方式算法等，但是数据结构设计都是基于E-R
+	
+	
+	SQLite(轻量级) 移动端使用多，手机、平板、智能家电
+	和普通硬盘读取文本文件区别 -- 结构化存储优化，读写速度优化 (提供检索能力(不需要按行读取分析))
+#endif
 	
 #endif
 
@@ -925,13 +1088,91 @@
 	
 	pip2安装到python2，pip3安装到python3
 	
+	作为启动文件，__name__ == "__main__"
+	作为包，__name__ == 包名	
+	
+#if xxx1
+	《树莓派编程：从Python入门》
+	
+	vs code
+	
+	#!/usr/bin/env python3		// chmod a+x hello.py
+	
+	浮点数也就是小数，之所以称为浮点数
+	整数和浮点数在计算机内部存储方式不同，整数运算永远是精确的(包括除法)，而浮点数运算则可能会有四舍五入的误差
+	
+	静态语言在定义变量时必须指定变量类型，如果赋值的时候类型不匹配，就会报错。
+	
+	ASCII、Unicode、UTF-8		-- utf-8 without BOM
+	
+	由于Python的字符串类型是str，在内存中以Unicode表示，一个字符对应若干个字节。如果要在网络上传输，或者保存到磁盘上，就需要把str变为以字节为单位的bytes。
+
+	tuple = ("a", "b", ["A", "B"])		// tuple的每个元素，指向永不变
+	tuple[2][0] = "X"
+	tuple[2][1] = "Y"
+	
+	尽量少用break continue，逻辑分叉多。这两个关键字通常配合if使用
+	
+	list的查找效率问题。dict消耗更多内存，用在高速查找场合
+	
+	in关键字判断是否存在
+	
+	set和dict类似，也是一组key的集合，但不存储value。由于key不能重复，所以，在set中，没有重复的key
+	set和dict的唯一区别仅在于没有存储对应的value -- key为不可变对象(最常用的key为str)
+	
+	要始终牢记的是，a是变量，而'abc'才是字符串对象！有些时候，我们经常说，对象a的内容是'abc'，但其实是指，a本身是一个变量，它指向的对象的内容才是'abc'
+	
+	为什么要设计str、None这样的不变对象呢？因为不变对象一旦创建，对象内部的数据就不能修改，这样就减少了由于修改数据导致的错误。此外，由于对象不变，多任务环境下同时读取对象不需要加锁，同时读一点问题都没有。我们在编写程序时，如果可以设计一个不变对象，那就尽量设计成不变对象
+	
+	数据类型检查，内置函数isinstance()		// isinstance(x, (int, float))
+	
+	函数参数：	位置参数
+				默认参数 -- 放在必选参数后。调用时可以不设置、按位置设置、指定名称设置 -- 定义默认参数必须指向不可变对象 (举例)
+				可变参数 -- 传入参数的个数是可变的(自动组装成一个tuple)
+				关键字参数 -- 传入多个含参数名的参数(自动组装成一个dict)
+				命名关键字参数 -- 限制关键字参数的名字
+				
+	给定一个list或tuple，可以通过for循环来遍历这个list或tuple，这种遍历称之为迭代(iteration)
+	判断一个对象是否是可迭代对象 -- from collection import Iterable
+	
+	列表生成式 -- python内置用来创建list的生成式
+	a = [x for x in range(10)]		// list
+	list(range(10))
+	
+	a = [0 for x in range(10)]
+	list(0 for x in range(10))
+	// -----------------------
+	a = [range(10)]
+	// -----------------------
+	b = (0 for x in range(10))		// generator
+	// -----------------------
+	
+	[d for d in os.listdir(".")]
+	
+	[i.lower() for i in a if isinstance(i, str)]	// 所有的字符串 转 小写
+	
+	通过列表生成式，可以直接创建一个列表，受到内存限制，列表容量有限
+	不必创建完整的list，在循环的过程中推算出后续的元素，这种一边循环一边计算的机制称为生成器 -- generator
+	
+	创建generator的方法：(1) (2)
+	
+	generator保存的是算法，每次调用next(g)，计算出g的下一个元素值，一般使用for循环遍历 -- generator是可迭代对象
+	
+	// -------------------------------------------------------------
+	// 接收一个函数、一个序列(iterable)
+	// filter()函数返回iterator，是一个惰性序列，要强迫filter()完成计算结果，需要用list()并返回list
+	
+	map(func, [1, 2, 3])		// <map object at 0x00000132814378B0>
+	list(map(func, [1, 2, 3]))	// list
+	
+	list(map(str, [1, 2, 3]))
+	
+	reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)	// 把结果和序列剩余元素继续运算
 #endif
 
+#endif
 
-
-// 192.168.31.119
-
-
+#if tmp
 threading.current_thread().name
 
 对象没有使用__slots__修饰，可以任意添加属性
@@ -941,7 +1182,7 @@ threading.current_thread().name
 python的多线程由于GIL原因是伪多线程
 python中多核cpu，多进程效率高于多线程
 
-
+#endif
 
 
 
