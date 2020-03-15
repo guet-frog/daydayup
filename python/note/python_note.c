@@ -1050,6 +1050,58 @@
 	// ctrl + C -- 向程序发送 kill -9 信号
 	// ctrl + z -- 将程序转为后台运行 -- bg命令查看当前终端的后台程序 -- 将后台程序转为前台运行fg
 	
+// ----------------------------------------------
+// 服务器执行python脚本
+// ----------------------------------------------
+	web服务器需要识别，用户请求执行动态脚本
+	解析客户请求file_name  -- file_name.endswith(".py")		// 判断客户请求是静态资源还是脚本
+	考虑到web服务器的可扩展性，应该解析所需脚本，动态执行相应脚本
+	m = __import__(file_name[1:-3])	// 切片包名，动态加载
+	response_body = m.application(env, self.start_response)		// 需要返回客户响应(一个完整的http报文) -- status(起始行)、header(响应头)由start_response()搞定。application() return 响应体
+																// start_response()由服务器传入，用来接收 状态码 和 报头
+	respose = self.response_headers + "\r\n" + response_body
+	脚本编写与web服务器调用相关接口规定 -- WSGI: 1. 脚本必须包含一个可调用的接口(如:application )
+
+	// WSGI规定
+	1. 传递给服务器可以是类、可以函数，只要服务器可以当做函数执行的
+	2. 可执行对象必须要接收两个参数
+		(1) envi			// 服务器解析浏览器报文，调用WSGI指定的接口函数(可能需要用到用户一些请求信息)
+		(2) start_response	// 函数指针，由web服务器传入提供 -- 状态码，响应头(键值对的形式)
+		
+		
+		// 定义接口 -- WSGI规定脚本的行为
+		// 参数     -- 定义服务器的行为
+		
+		def application():		// 定义统一接口
+			return "xxx"		// 定义接口的需求: 产生给用户的响应，返回给前端
+			
+		// 返回给用户特定需求，-- 接口执行时，很可能需要用到用户的相关请求信息  如：GET (路径不管) 以及一些参数信息
+		//					   -- 接口需要参数(input或request -- envi)，本次用户请求的相关信息，要求以字典方式
+		
+		// 返回给用户的信息，应该包含起始行、响应头、响应体 -- WSGI要求只返回响应体
+		// -- 如何返回特定的响应头信息，如: "Content-Type": "text/html" -- 第二个参数
+	
+		for header in headers:
+			response_headers += "%s: %s\r\n" % header		// header是元组，直接拆包
+		self.response_headers = response_headers			// 由application()调用，不能用return返回，放到对象中，通过对象属性返回值
+	
+	start_response(self, ) 和 handle_client(self, )共享一个self，同是一个对象，使用属性传递信息
+	
+	python寻找包的路径，先当前路径，再标准库		// sys.path -- 查询路径
+	sys.path.insert(1, "xxx_dir")		// 先当前，再指定的路径，再标准库
+
+// ----------------------------------------------
+// web框架
+// ----------------------------------------------
+	整个网站只有一个入口 -- 不再对应多个模块文件入口
+	
+	path = env["PATH_INOF"]		// 确定字典中有这个键值对
+	path = env.get("PATH_INOF")
+	
+	def __call__(self, env, start_response):
+		for url, handler in self.urls:
+			if path == url:
+				handler(env, start_response)		// 路由分发
 	
 #if database
 	// -------------------------------------
@@ -1202,14 +1254,14 @@
 #endif
 
 #if tmp
-threading.current_thread().name
+	threading.current_thread().name
 
-对象没有使用__slots__修饰，可以任意添加属性
+	对象没有使用__slots__修饰，可以任意添加属性
 
-前端 阿贾克斯(页面局部刷新) 使用到异步		// 如网络中经常使用
+	前端 阿贾克斯(页面局部刷新) 使用到异步		// 如网络中经常使用
 
-python的多线程由于GIL原因是伪多线程
-python中多核cpu，多进程效率高于多线程
+	python的多线程由于GIL原因是伪多线程
+	python中多核cpu，多进程效率高于多线程
 
 #endif
 
