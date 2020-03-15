@@ -1189,7 +1189,7 @@
 	
 	// -------------------------------------------------------------
 	// 接收一个函数、一个序列(iterable)
-	// filter()函数返回iterator，是一个惰性序列，要强迫filter()完成计算结果，需要用list()并返回list
+	// filter()函数返回iterator，是一个惰性序列，要强迫filter()完成计算结果，需要用list()获得所有结果，并返回list
 	
 	map(func, [1, 2, 3])		// <map object at 0x00000132814378B0>
 	list(map(func, [1, 2, 3]))	// list
@@ -1197,6 +1197,12 @@
 	list(map(str, [1, 2, 3]))
 	
 	reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)	// 把结果和序列剩余元素继续运算
+	
+	filter(is_odd, [1, 2, 3, 4, 5])		// Iterator 惰性序列 -- list()
+	
+	// sorted()也是一个高阶函数，用sorted()排序的关键-- 实现某个映射函数
+	sorted([36, 5, -12], key=abs)
+	sorted(["bob", "about", "Zoo"], key=str.lower, reverse=True)
 #endif
 
 #endif
