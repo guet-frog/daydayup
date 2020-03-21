@@ -21,7 +21,7 @@
 	
     tree
 	
-    ls -s xxx.txt xxx_softlink.txt		// 源文件 目标软链接
+    ln -s xxx.txt xxx_softlink.txt		// 源文件 目标软链接
     ls -l 查看文件硬链接数
 	
     grep "ntfs"	xxx.txt
@@ -41,7 +41,7 @@
     tar -jcvf xxx.tar.bz2 *.py
     tar -jxvf xxx.tar.bz2
 	
-    cal、data
+    cal、date
 	
     ssh python@192.168.1.1			// windows Xshell
     who		// 查看有哪些用户登录
@@ -125,8 +125,6 @@
     
     for遍历比较方便
     while需要处理长度、下标
-	
-	break continue这两个语句都 必须配合if语句使用
 #endif
 
 #if 字符串、列表、元组、字典  
@@ -134,7 +132,7 @@
 //  字符串
 // ----------------------------------------------
 	python3字符串采用Unicode编码
-
+	
     切片(字符串、列表、元组)
     切片的语法：[起始:结束:步长]    // 左闭右开
     
@@ -1207,7 +1205,7 @@
 	
 	ASCII、Unicode、UTF-8		-- utf-8 without BOM
 	
-	由于Python的字符串类型是str，在内存中以Unicode表示，一个字符对应若干个字节。如果要在网络上传输，或者保存到磁盘上，就需要把str变为以字节为单位的bytes。
+	由于Python的字符串类型是str，在内存中以Unicode表示，一个字符对应若干个字节。如果要在网络上传输，或者保存到磁盘上，就需要把str变为以字节为单位的bytes
 
 	tuple = ("a", "b", ["A", "B"])		// tuple的每个元素，指向永不变
 	tuple[2][0] = "X"
@@ -1291,7 +1289,7 @@
 	__name -- python解释器对外改成 _Student__name
 	
 	一个实例的数据类型是某个子类，那它的数据类型也可以被看做是父类
-	具体调用xxx()方法是作用在具体对象上，有运行时该对象的确定类型决定 -- 多态作用
+	具体调用xxx()方法是作用在具体对象上，由运行时该对象的确定类型决定 -- 多态作用
 	
 	对扩展开放：允许新增Animal子类
 	对修改封闭：不需要修改依赖Animal类型的xxx()函数
@@ -1320,7 +1318,7 @@
 	with open("./gbk.txt", "w") as f:
 		f.write("hello world\n")
 		
-	StringIO和ByteIO是在内存中操作str核bytes的方法，使得和读写文件具有一致的接口
+	StringIO和ByteIO是在内存中操作str和bytes的方法，使得和读写文件具有一致的接口
 	
 	os.name		// posix，nt -- os模块的某些函数跟操作系统相关
 	
