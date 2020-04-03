@@ -221,7 +221,7 @@
 	tuple.index()
 	tuple.count()
 	
-	元祖只有一个元素时，(a,)
+	元组只有一个元素时，(a,)
 
 // ----------------------------------------------
 //	字典
@@ -346,7 +346,7 @@
 		列表
 		字典
 	
-	// 不可变类型才能作为 字典的key -- unhashable type: 'list'	(把任意字符串转化成 绝对不相同且长度一样的值)
+	// 不可变类型才能作为 字典的key -- unhashable type: 'list'
 	// 字典的存储方式 -- 将key进行hash运算得到内存地址
 
 // ----------------------------------------------
@@ -390,9 +390,9 @@
 	os.rename(old_name, new_name)
 	os.remove(doc_name)
 	
-	f.write(srt(list))		// 参数是str类型 -- 带[]
+	f.write(str(list))		// 参数是str类型 -- 带[]
 	global card_info
-	card_info = eval(f.read())		// eval -- ???
+	card_info = eval(f.read())		// eval -- 执行字符串表达式，并返回表达式的值
 	
 	// ------------------------------------------
 	try:
@@ -433,7 +433,9 @@
 		
 		f_write.write(content)
 		
-	像open()函数返回的这种有个read()方法的对象，在Python中统称为file-like Object。除了file外，还可以是内存的字节流，网络流，自定义流等等。file-like Object不要求从特定类继承，只要写个read()方法就行。
+	像open()函数返回的这种有个read()方法的对象，在Python中统称为file-like Object。
+	除了file外，还可以是内存的字节流，网络流，自定义流等等。
+	file-like Object不要求从特定类继承，只要写个read()方法就行。
 	StringIO就是在内存中创建的file-like Object，常用作临时缓冲。
 #endif
 
@@ -556,24 +558,7 @@
 	先在当前路径搜索该模块，再到安装路径搜索
 	
 	导入一个模块时，将所有模块内的代码执行一遍
-	
 	print(__name__)
-
-// ----------------------------------------------
-	import xxx
-	
-	class xxx(object):
-		xxx
-	
-	def func:
-		pass
-	
-	def main:
-		pass
-	
-	if __name == "__main__":
-		main()		// 模块测试代码
-// ----------------------------------------------
 
 	__all__ = ["test"]		// 管理全局的方法、类、变量		-- from xxx import *
 							// 放入__init__.py文件
@@ -588,7 +573,7 @@
 	import sys
 	sys.argv			// 给程序传参
     
-    // 当模块不在当前目录，不再默认目录
+    // 当模块不在当前目录，不在默认目录
     import sys
     sys.path.append("../")
     
@@ -1206,7 +1191,7 @@
 	ASCII、Unicode、UTF-8		-- utf-8 without BOM
 	
 	由于Python的字符串类型是str，在内存中以Unicode表示，一个字符对应若干个字节。如果要在网络上传输，或者保存到磁盘上，就需要把str变为以字节为单位的bytes
-
+	
 	tuple = ("a", "b", ["A", "B"])		// tuple的每个元素，指向永不变
 	tuple[2][0] = "X"
 	tuple[2][1] = "Y"
@@ -1256,7 +1241,7 @@
 	
 	创建generator的方法：(1) (2)
 	
-	generator保存的是算法，每次调用next(g)，计算出g的下一个元素值，一般使用for循环遍历 -- generator是可迭代对象
+	generator保存的是算法，每次调用next(g)，计算出g的下一个元素值，一般使用for循环遍历 -- generator是可迭代对象 -- 设置生成器index为初始值
 	
 	// -------------------------------------------------------------
 	// 接收一个函数、一个序列(iterable)
@@ -1387,5 +1372,3 @@
 #if database
 
 #endif
-
-
