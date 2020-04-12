@@ -289,7 +289,68 @@
 
 #endif
 
+#if JS
+	js插入到页面中有三种方法
+	行间事件：标签有 行间事件属性 -- 行间事件属性onclick每个标签都有 onclick="alert('hello world')"
+	
+	// 内嵌式 -- 使用script标签实现
+	<script type="text/javascript">
+	
+		// 浏览器 加载完成后，执行匿名函数
+		window.onload = function(){
+			// 使用script中内置的document对象 -- 通过id获取元素
+			document.getElementId('div1').tittle = "haha";		// 修改标签属性，修改样式属性
+			
+			oDiv.onclick = myalert();	// 立即调用
+			oDiv.onclick = myalert;		// 点击调用
+			
+			oBtn01.onclick = change01;
+			function change01(){
+				oDiv.className = 'sty01';	// class="sty01" -- 改变样式
+			}
+		}
+	</script>
+	
+// ----------------------------------------------
+	oBtn.onclick = function(){		// 如果这个函数其他地方不调用 -- 匿名函数
+		alert('ok')
+	}
 
+// ----------------------------------------------
+	if(oDiv.style.display == 'block'){ 	// oDiv.style.display执行时 去读取 行间样式(不是去样式类中去读取)，开始div无style属性
+		oDiv.style.display = 'none';	// 虽然div.style.display = block，但是 读出值 = ''
+	}
+	else
+	{
+		oDiv.style.display = 'block';
+	}
+	
+	<div class="box" id="box"></div>	// 原始
+	<div class="box" id="box" style="display:block"></div>	// 第一次点击
+	<div class="box" id="box" style="display:none"></div>	// 第二次点击
+	
+	return阻止默认行为，如：阻止表单默认行为 
+	-- 点击submit，默认按照action地址提交数据。某些时候不需要表单提交，通过ajax提交
+	-- 修改默认右键菜单
+	
+// ----------------------------------------------
+	数组常用方法
+	var sTr = aRr.join("-");	// 1-2-3-4
+	var sTr2 = aRr.join("");	// 1234
 
+	aRr.push(5);
+	aRr.pop();
+	
+	aRr.unshift(0)	// 从第一个添加
+	aRr.shift()		// 从第一个删除
+	
+	aRr.reverse()
+	
+	aRr.indexOf()	// 第一次出现的索引值
+	
+	aRr.splice(2, 1, 'a')	// 从第二个开始，删除一个元素，追加一个元素'a'
+	
+	var aLi = document.getElementsByTagName("li");		// 通过标签获取元素
+	var aLi = oList.getElementsByTagName("li");			// 限定某个ul范围
 
- ·
+#endif
