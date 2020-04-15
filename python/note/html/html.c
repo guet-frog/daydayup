@@ -352,5 +352,68 @@
 	
 	var aLi = document.getElementsByTagName("li");		// 通过标签获取元素
 	var aLi = oList.getElementsByTagName("li");			// 限定某个ul范围
+	
+// ----------------------------------------------
+	DOM 文档对象模型 操作html和css的方法
+	BOM 浏览器对象模型 操作浏览器的一些方法 -- 语言在浏览器环境运行，操作浏览器的一些方法
+	window.onload = function(){} -- 浏览器加载完成后，产生onload事件属性。调用浏览器onload事件属性完成一些操作
+	window加载完成后，执行匿名函数
+	alert() -- 浏览器行为 -- 弹窗（如果想统一各种浏览器的弹框，需要自己做 -- 弹窗一般用定位实现）
+	弹窗 -- 浏览器行为，但是可以放在JS代码中使用
+	
+// ----------------------------------------------
+	a = 12  b = '34'  a + b -- 1234
+	
+	str.split('')	// 字符串切割成数组
 
+	str.charAt(0)	// 如判断某个选择器是 id选择器 还是 类选择器 '#div' '.div'
+	
+	str.indexOf()	// 查找字符串中是否包含某个 字符串
+	
+	str.substring()
+	
+	str.toUpperCase()
+	str.toLowerCase()
+	
+// ----------------------------------------------
+	g = NaN			// not a number
+	if (g == NaN)		// false
+	alert(NaN == NaN)	// false
+	
+	isNaN(g)
+	
+	程序调试方法 -- alert、console.log、document.tittle
+	
+	在原有系统添加新功能，防止覆盖掉原有功能 -- 封闭函数(新功能用封闭函数包起来)
+	(function(){
+		var calc = function(){
+			var docElement = document.documentElements;		// 获取页面html标签
+			
+			docElement.style.fontSize = docElement.clientwidth;
+		}
+		calc();		// 刚开始执行一次
+		window.addEventListener('resize', calc);	// 绑定一个监听，当窗口改变尺寸时(resize)，执行calc
+		
+	})();	// 定义封闭函数，(); -- 立即执行
+	
+	定义变量前，全局搜索判断有无重名
+	
+// ----------------------------------------------
+	闭包：函数嵌套，子函数可以调用父函数的局部变量，局部变量不会被回收
+	一般闭包赋值给全局变量，全局变量不会被回收  -- 闭包内部使用的局部变量也不会被回收
+
+	页面关闭之后，全局变量被清空
+	
+	var aLi = document.getElementsByTagName('li');
+	
+	alert(aLi.length);
+	
+	document.referrer -- 登录完又跳回首页
+	var backurl = document.referrer;
+	window.location.href = backurl;
+	
+// -----------------------------------------------
+	<div>欢迎<span id="span01"></span>访问我的主页</div>
+	var oSpan = document.getElementById('span01');
+	oSpan.innerHTML = '张三'
 #endif
