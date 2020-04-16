@@ -333,6 +333,8 @@
 	-- 点击submit，默认按照action地址提交数据。某些时候不需要表单提交，通过ajax提交
 	-- 修改默认右键菜单
 	
+	// JS修改CSS样式，实现变化效果
+	
 // ----------------------------------------------
 	数组常用方法
 	var sTr = aRr.join("-");	// 1-2-3-4
@@ -416,4 +418,11 @@
 	<div>欢迎<span id="span01"></span>访问我的主页</div>
 	var oSpan = document.getElementById('span01');
 	oSpan.innerHTML = '张三'
+	
+	函数末尾规范加;
+	
+	JS没有对象
+	函数是一个类，有自己的属性
+	
+	选项卡 -- 闭包实现，jQuery实现
 #endif
