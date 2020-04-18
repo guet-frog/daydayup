@@ -249,7 +249,7 @@
 	登录成功 -- 通过JS 动态添加 行间样式 <style="display=block"> -- JS从后台数据库读取用户是否登录
 	用margin将logo撑下来，没有产生塌陷 -- logo设置了左浮动
 
-	在页面中调整 背景图的 left top值
+	在页面中调整 背景图的 left top值1
 	
 	搜索框如果需要用到form提交 -- 有刷新的提交(整个页面刷新) -- 用ajax提交
 	
@@ -333,7 +333,16 @@
 	-- 点击submit，默认按照action地址提交数据。某些时候不需要表单提交，通过ajax提交
 	-- 修改默认右键菜单
 	
-	// JS修改CSS样式，实现变化效果
+	// JS修改CSS样式，实现变化效果 --  001复习封闭函数-闭包30′  -- 程序执行流程
+	aBtn[i].onclick = function(){
+	
+		for (var i = 0; i < aBtn.length; i++)
+		{
+			aBtn.className = '';
+		}
+		
+		this.className = 'cur';
+	}
 	
 // ----------------------------------------------
 	数组常用方法
@@ -425,4 +434,103 @@
 	函数是一个类，有自己的属性
 	
 	选项卡 -- 闭包实现，jQuery实现
+	
+// --------------------------------------------------
+	实际开发中，用jQuery或公司封装的JS库  -- 原生JS和CSS有兼容性问题
+	
+	后台开发一般用jQuery，考虑到与其他厂家后台对接
+	
+	压缩 -- 去掉程序空格 换行 代码混淆(简单变量)
+	
+	window.onload = function(){		// 页面渲染完成开始执行
+		var oDiv = document.getElementById('div');
+		alert(oDiv.innerHTML);
+	}
+	
+	$(document).ready(function(){		// 页面节点加载完成开始执行 -- 开发常用
+		var $div = $('#div');
+		alert($div.html());
+	})
+	
+	可以对选择器进行修饰(类似于伪类)，$('#ul1 li:first')	// 选择id为ul1元素下的第一个li
+	
+	$('.list li') 不能回到父级
+	$('.list').children()  可以通过end()回到父级
+	$('.list').children().css({background:'gold', height:'20px'}).end().css({background:'green'})
+	
+	siblings() -- 方便实现选项卡  -- (选择集转移 选择器常用)
+	
+	alert($('.div1').css('fontSize'));	// 不设置值 -- 读
+	
+	alert(this) -- object HTMLInputElement -- input元素
+	如果需要再jQuery中使用JS元素 -- $(this)
+	$(function(){
+		$('#btns input').click(function(){
+			// this是原生对象 -- jQuery对象 $(this)
+			$(this).addClass('cur').siblings().removeClass('cur')
+			
+			// 需要通过按钮索引关联的选项卡
+			// -- jQuery完成工作： 1.存索引值 -- 不用通过闭包存 2.选取剩余元素 -- 不用通过循环
+			$('#contents div').eq($(this).index()).addClass('active').siblings().removeClass('active')  // -- 链式调用
+			
+			$(this).index()		// 获取当前按钮所在层级范围的索引值 -- 原生JS this没有index()方法			
+		})
+	})
+	
+	开发环境， 生产环境 -- 放到线上
+	
+// ----------------------------------------------
+	jQuery操作属性
+	class属性由 addClass、removeClass、toggleClass操作
+	style属性由 css({fontSize:'30px', color:'red'})操作
+	
+	alert($('.box').html())	-- 可以读可以写，也可以写结构(加入标签结构)
+	$('.box').html('AAAA')
+	
+	alert($('.box').attr('class'))		// 读
+	$('.box').attr({title:'BBBB'})		// 写
+	
+	alert($('#check').prop('checked'))	// 读
+	$('#check').prop({checked:true})
+	
+	常用html() attr() prop()
+	
+// ----------------------------------------------
+	层级菜单 -- 先写结构 -- 再写样式 -- 再写JS
+	
+// ----------------------------------------------
+	jQuery运动框架 -- jQuery动画和JS函数相似，设置元素样式变化
+	
+	<div id="div1" class="box"></div>		// 程序使用id，class给样式用 -- 前端维护样式，只修改class
+	
+	动画曲线 -- include jQuery UI
+	jQuery特殊效果（淡入、淡出、向上卷起）是由动画实现
+	
+	$('.list li').each(function(a){		// 不管写什么变量，第一个字都是索引值 index
+		$(this).html(a);
+	})
+	
+	做效果前，先看结构（手风琴） -- li包img实现，浮动定位(一个定位到最左边，剩下定位到最右边，再用一个容器整体裁切)，右边超出部分拆切掉，设置left值可以实现展示效果
+	
+	$('#accordion li').click(function(){
+		$(this).animate({left:$(this).index()*20});		// 第三个移动前两个也要相应移动
+		
+		$(this).prevAll().each(function(index){		// 前两个分别移动过去
+			//alert(index);
+			
+			//$(this).animate({left:index*20});		// 动画执行慢，index提前被遍历
+			
+			$(this).animate({left:$(this).index()*20})
+		});
+	});
+	
+// ----------------------------------------------
+	获取元素尺寸
+	获取元素相对浏览器绝对位置  offset()   -- 左上角
+	
+	没有定位属性，left:'50%' top:0  -- 居中没有作用
+	
+	var pos = $('div').eq(2).offset();
+	console.log(pos);
+	console log返回一个对象 -- 类似与一个json格式
 #endif
