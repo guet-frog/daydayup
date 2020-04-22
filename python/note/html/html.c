@@ -93,7 +93,7 @@
 	&gt;	&lt;		// 实体字符
 	
 	html块
-	div便签没有具体的语义(关键的地方用有语义的，大部分地方无语义用div -- div + css)，没有默认的样式，表示 块		// span -- 给一行某几个字添加样式
+	div标签没有具体的语义(关键的地方用有语义的，大部分地方无语义用div -- div + css)，没有默认的样式，表示 块		// span -- 给一行某几个字添加样式
 	// 作用给特定一块内容加样式
 	
 	搜索引擎爬网，尽量用语义化标签，网页规范，提高网站排名
@@ -141,7 +141,7 @@
 	css出现之前，有些html 标签是带有样式 -- html 标签只负责网页结构 内容，样式由css完成
 	实际开发中，将标签中的样式重置，再设置新的样式
 	
-	样式 如何与 段落关联  -- 选择器
+	样式 如何与 标签关联  -- 选择器
 	
 	标签选择器(通用选择器) -- div 匹配页面上所有的div
 	
@@ -214,12 +214,10 @@
 	
 	定位 -- 设置父级为relative 子级为absolute 通过开发者工具调整left top值
 	
-	
 	开发者工具 -- 左边是元素，右边 标签对应的样式(点击右边样式文件 -- 样式可能被压缩成一行 -- 点击{})
 #endif
 
 #if php
-
 	php压缩图片的两种方式 -- 另存为，另存为web
 	
 	图片放大，本来2个像素，第三个像素由前两个相加求平均值得出
@@ -290,16 +288,18 @@
 #endif
 
 #if JS
+// ----------------------------------------------
 	js插入到页面中有三种方法
-	行间事件：标签有 行间事件属性 -- 行间事件属性onclick每个标签都有 onclick="alert('hello world')"
+	
+	行间事件：标签有 行间事件属性	-- 该方式嵌入页面，主要用于事件  -- 一般行间调用的事件提取到javascript中调用，结构与行为分离
+	<input type="button" name="" onclick="alert("AAAA");">		-- 行间事件属性onclick每个标签都有
 	
 	// 内嵌式 -- 使用script标签实现
 	<script type="text/javascript">
-	
 		// 浏览器 加载完成后，执行匿名函数
 		window.onload = function(){
 			// 使用script中内置的document对象 -- 通过id获取元素
-			document.getElementId('div1').tittle = "haha";		// 修改标签属性，修改样式属性
+			document.getElementById('div1').tittle = "haha";		// 修改标签属性，修改样式属性
 			
 			oDiv.onclick = myalert();	// 立即调用
 			oDiv.onclick = myalert;		// 点击调用
@@ -311,6 +311,28 @@
 		}
 	</script>
 	
+	<script type="text/javascript" src="js/index"></script>
+	
+// ----------------------------------------------
+	基本数据类型：number、string、boolean、undefined、null
+	复合数据类型：object
+	
+// ----------------------------------------------
+	获取页面的元素，可以对元素进行读、写操作
+	window.onload = function(){
+		var oDiv = document.getElementById('div1');
+	}
+	
+	html、js的属性写法一致
+	"class"属性写成"className"
+	"style"属性里面的属性，驼峰式 -- style.fontSize
+	
+	var tmp = 'color'
+	oA.style.color = 'red'
+	oA.style[tmp] = 'red'
+	
+	innerHTML -- 读取或写入标签包着的内容
+	
 // ----------------------------------------------
 	oBtn.onclick = function(){		// 如果这个函数其他地方不调用 -- 匿名函数
 		alert('ok')
@@ -320,7 +342,7 @@
 	if(oDiv.style.display == 'block'){ 	// oDiv.style.display执行时 去读取 行间样式(不是去样式类中去读取)，开始div无style属性
 		oDiv.style.display = 'none';	// 虽然div.style.display = block，但是 读出值 = ''
 	}
-	else
+	else 	
 	{
 		oDiv.style.display = 'block';
 	}
@@ -484,6 +506,8 @@
 	class属性由 addClass、removeClass、toggleClass操作
 	style属性由 css({fontSize:'30px', color:'red'})操作
 	
+	jQuery样式操作 -- 操作行间样式、操作样式类名
+	
 	alert($('.box').html())	-- 可以读可以写，也可以写结构(加入标签结构)
 	$('.box').html('AAAA')
 	
@@ -533,4 +557,179 @@
 	var pos = $('div').eq(2).offset();
 	console.log(pos);
 	console log返回一个对象 -- 类似与一个json格式
+	
+// ----------------------------------------------
+	h5表单控件属性 autofocus -- 
+	
+	输入框相关：
+	blur()		// 元素失去焦点
+	focus()		// 元素获得焦点			-- 类似于H5表单控件属性 autofocus，不用点直接可以输入
+	change()	// 表单元素值发生变化
+	
+	click()
+	
+	mouseenter()
+	mouseleave()
+	hover()
+	
+	keyup()		// input框快速交互 -- 判断用户名重名，判断输完通过ajax传到后台
+	
+	resize()
+	
+	submit()
+	
+// ----------------------------------------------
+	绑定的事件触发时，系统会自动产生event事件对象，包含一些常用属性  -- console.log(event)
+	
+	事件委托 -- 提高性能
+	利用事件冒泡，把事件加在父级，判断事件来源某个子集，执行相应操作
+	减少事件绑定次数 -- 多个子元素
+	让新加入的子元素也可以拥有相同操作
+	
+	// 对大量子元素进行操作使用事件委托
+	$('.list').delegate('li', 'click', function(){
+		alert($(this).html());
+	})
+	
+// ----------------------------------------------
+	创建节点 var $div = $('<div>')
+	插入节点 $('#div1').append($span)
+	删除节点 $p.remove()
+	
+// ----------------------------------------------
+	整屏滚动
+	画面切换时，移动的效果 -- CSS3动画实现
+	底部切换按钮		   -- JS动画实现
+	
+	// 图片初始样式	
+	<div class="main_con">
+	<div class="left_img"><img src="./001.png"></div>
+	</div>
+	
+	// 再塞一个moving进去 -- 通过js  -- 权重增加，盒子样式变了 -- 未修改的样式保持不变 3′
+	<div class="moving">
+		... 
+	</div>
+	
+	// mousewheel 插件 -- 判断鼠标上滑还是下滑
+	$(window).mousewheel(function(event, dat){})
+	
+	高频触发事件，使用函数截流 -- 定时器
+	$(window).mousewheel(function(event, data){
+		clearTimeout(timer);		// 200ms内连续触发，取消上一次，只保留最后一次
+		timer = setTimeout(function(){		/* - setInterval 反复执行 */
+			
+		}, 200)
+	})
+	
+	鼠标点击换页
+	$points = $('.points li');			// 1. 选中li	
+	
+	$points.click(function(){			// 2. 绑定事件
+										// 3. 首先 点 的样式改变$(this).addClass('active')
+										// 4. 其他的 点 改变其他样式 $(this).siblings().removeClass('active')
+		$(this).addClass('active').siblings().removeClass('active');
+										// 5. 切换到当前屏 -- 当前屏 = li index
+		$('.pages_con').animate({top:-$h*$(this).index}, 300)
+										// 6. 相应动画
+		$pages.eq($(this).index()).addClass('moving').siblings().removeClass('moving');
+	})
+	
+// ----------------------------------------------
+	cookie在同源(同源)请求时携带，影响性能 -- 图片或css等静态资源，放在另一个域中，传输中不会携带cookie
+	
+	cookie插件依赖jQuery，先导入jQuery，再导入cookie JS文件
+	
+	检查 -> application -> storage		// cookie读写需要服务器环境下运行
+	
+	node server
+	
+	地址栏输入 localhost:8888 就开始找index文件 -- localhost:8888/001cookie.html -- 指定页面
+	icon文件放在根目录下，浏览器自动放在tittle中
+	
+	// cookie读写
+	$.cookie('mycookie', 'ok!', {expires:7, path:'/'});
+	var val = $.cookie('mycookie');
+	
+	用途：如存用户名，自动填入到输入框中
+		  点击我知道了，最近不再弹出
+		  
+	<div class="pop_con">
+		<p class="hasknow">我知道了</p>
+	</div>
+	
+	$(function(){
+		
+		var read = $.cookie('hasread');		// 读cookie
+		
+		if (read == undefined)
+		{
+			$(".pop_con").show();
+		}
+		
+		$('.hasknow').click(function()		/* 通过样式给元素绑定一个事件 */	-- 一个样式对应多个元素???
+		{
+			$.cookie('hasread', 'ok', {expires:7, path:'/'});	// 保存cookie
+			$('.pop_con').hide();	/* 通过样式找到元素，隐藏元素 */
+		})
+	})
+
+	购物车商品存数据库中
+	
+	H5新增本地存储方式，不需要服务器环境，
+	LocalStorage 最大存5M -- 类似cookie，但是没有日期限制
+	sessionStorage 窗口(整体浏览器)关闭时清空 -- 安全
+	
+	cookie http传输时会携带传输，这两种不会
+	
+// ----------------------------------------------
+	jQueryui
+	$('.scroll_bar').draggable({
+		axis:'x',
+		containment:'parent',
+		drag:function(ev, ui){
+			console.log(ui.position.left);
+			var nowleft = ui.position.left;
+			$('.slide_count').val(parseInt(nowleft*100/570));
+		}
+	})
+	
 #endif
+
+
+ “<head>”标签和“<body>”标签是它的第一层子元素，“<head>”标签里面负责对网页进行一些设置以及定义标题，设置包括定义网页的编码格式，外链css样式文件和javascript文件等，设置的内容不会显示在网页上，标题的内容会显示在标题栏，“<body>”内编写网页上显示的内容
+ 
+ 搜索引擎会使用标题将网页的结构和内容编制索引，所以网页上使用标题是很重要的
+ 语义化的标签，就是在布局的时候多使用语义化的标签，搜索引擎在爬网的时候能认识这些标签，理解文档的结构，方便网站的收录
+ 
+ <a href="http://www.itcast.cn/" title="跳转的传智播客网站">传智播客</a>  -- 悬停显示tittle
+ 
+ <a href="#mao1">标题一</a>
+ <h3 id="mao1">AAAA</h3>
+ 
+ 无序列表 <ul> <li>列表文字</li> </ul>
+ 
+ <link rel="stylesheet" type="text/css" href="css/main.css">
+ 
+ <style type="text/css">
+	div{width:100px; height:100px}
+ </style>
+ 
+ <div style="width:100px; height:100px">AAAA</div>
+ 
+ 应用文本常用css设置
+ css颜色表示法三种
+ 
+ css选择器
+ <div>...</div>						div{color:red}
+ <div id="box">...</div>			#box{color:red}
+ <div class="box big">...</div>		.box{color:red} .big{font-size:20px}
+ 
+ 常用的伪类选择器有hover，鼠标悬浮再元素上时的状态
+ 伪元素选择器before和after，可以通过样式再元素中插入内容
+ 
+ content -> padding -> border -> margin
+ 
+ 这三种元素，可以通过display属性来相互转化，不过实际开发中，块元素用得比较多，所以我们经常把内联元素转化为块元素，少量转化为内联块，而要使用内联元素时，直接使用内联元素，而不用块元素转化了
+ 
+ 
