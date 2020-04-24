@@ -675,9 +675,9 @@
 	.done(function(data){
 		for (var i = 0; i < data.s.length; i++)
 		{
-			var $li = $('<li>' + data.s[i] + '<li>');
+			var $li = $('<li>' + data.s[i] + '<li>');		/* - 创建节点，塞入元素 */
 			
-			$li.prependTo('.list');
+			$li.prependTo('.list');		/* - 插入节点 */
 		}
 	})
 	
@@ -744,7 +744,7 @@
 	
 // ----------------------------------------------
 	jQueryui
-	$('.scroll_bar').draggable({
+	$('.scroll_bar').draggable({		// 常用 drag
 		axis:'x',
 		containment:'parent',
 		drag:function(ev, ui){
@@ -753,6 +753,13 @@
 			$('.slide_count').val(parseInt(nowleft*100/570));
 		}
 	})
+	
+// ----------------------------------------------
+	移动端将几种事件封装出三种操作 -- 点击、拖动、滑动（封装后的操作）
+	点击 -- touchstart + touchend
+	滑动 -- touchstart + touchmove
+	
+	zeptos -- jQuery太大了
 	
 #endif
 
