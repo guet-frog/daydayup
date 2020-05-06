@@ -763,6 +763,523 @@
 	
 #endif
 
+#if django
+#if 流程
+	操作数据库 -- 数据库可能发生变更
+	处理用户浏览器请求
+	呈现处理结果 -- html模板(页面格式)
+	
+	django流程(MVT)：
+	客户端请求 -> 视图View(本质是一个方法) -> 如果需要数据则取调用模型model
+	-> 获取到数据，视图View做处理(逻辑判断) -> 处理完成后要呈现结果，去查找相应的模板
+	-> 补全模板信息(html)，最终需要呈现的html内容准备完成 -> 由浏览器返回到客户端
+	-> 客户端渲染html+css，执行JS
+	
+	模型当中不直接编写sql语句，可以编写但是设计目的是不直接使用sql语句
+	模型中一个对象，对应表中的一行
+	一个表对应一个对象的集合 -- python中列表实现表
+
+	// ------------------------------------------
+	创建（python开发，为了python开发）虚拟环境，以适应于不同版本开发	// ubuntu虚拟环境
+	bin
+	include
+	lib			// 其他固定，
+				// 默认安装到usr/local/dist-packages/ -- 第三方库安装到site-packages
+	local
+	share
+	
+// 查看当前环境安装的包
+	pip list
+	pip freeze 	// 省略 pip setuptools wheel
+	
+	往服务器部署时，需要将本地开发环境导出，通过pip freeze，然后直接安装
+	
+	pip install django==1.8.2		// 不确定包 -- 开发规定版本 或 pip.org查找 -- 通过pip安装
+									// 不加版本号，默认安装最新版本
+									// 非源码安装
+
+	django-admin startproject test1		// 注意执行该命令时，需要有操作当前用户的权限 -- 注意目录权限
+	ls test1	// 创建项目基本文件，如：配置文件
+	-- manage.py
+	 |
+	 | -- test1	// 这个包不再添加新文件
+		|
+		| -- __init__.py	// 需要有这个文件，有无内容不重要，表示test1目录是一个包
+			 setting.py		// 如：注册迁移时的APP; 单独配置数据库 -- sqlite3 -- 文档型数据库，物理上在当前项目创建一个文件路径即可
+			 urls.py		// 配置用
+			 wsgi.py		// 部署、发布用
+			 
+	 | -- 其他代码
+
+// ----------------------------------------------
+	django三个组成部分：模型、视图、模板
+	模型 -- 通过模型类 完成和数据库交互
+	
+	图书表
+	英雄表
+		属性hbook -- 和图书表关系(图书-英雄 1对多)，直接存储图书对象 -- 数据库层面本质还是一个id
+	
+	设置环境：Project/settings/Project:projects/Project Interpreter
+	
+	python manage.py startapp booktest		// 开启应用booktest
+	-- booktest
+	 | -- admin.py		// 管理用
+	 | -- __init__.py
+	 | -- migrations		// 迁移，根据当前项目逻辑类生成数据库脚本，并将脚本映射到数据库中
+	    | -- __init__.py
+	 | -- models.py		// 用户定义模型类
+	 | -- tests.py		// django自带的测试模块
+	 | -- views.py		// 定义视图、函数
+	
+	// 管理模块admin、模型、视图，没有创建模板 -- 因为视图不确定，不能确定模板
+	
+	// models.py
+	form django.db import models
+	class Bookinfo(models.Mode):		// 非普通类，作为模型类，这个类创建的对象要操作数据库 -- 继承mode类，django中已经定义
+		btittle=models.CharField(max_length=20)		// 定义类属性
+	
+	定义模型类的作用：
+		根据定义生成sql语句并创建表		// 根据类属性新建字段，类属性的值(类型) 对应 数据库的类型
+		创建对象，进行其他操作 -- 可以映射到数据库(不用写特定sql语句)，执行insert update delete
+		-- 在django中不需要面向数据库具体写sql语句 -- 通过模型类
+	
+	// 运行一个项目
+	python manage.py runserver 8080
+	
+	迁移操作：
+	(0) 向应用中注册，编辑setting.py文件 -- INSTALL_APPS = ()	// 添加所有需要安装的应用 -- 注册到项目  -- 添加第三方包也需要注册
+	(1) 先生成迁移，根据模型类生成 所选择数据库 特定的 sql语句 -- python manage.py makemigrations
+		-- booktest/migrations/0001_initial.py	-- 用于成sql语句
+	(2) 执行迁移
+		根据生成的迁移文件，去数据库中执行特定的sql语句，创建表 -- python manage.py migrate
+		
+	迁移的目的，根据当前 模型类 生成 数据库表
+	如果数据库以有，不用迁移重新生成表，配置DATABASES={}参数	
+	
+	python manage.py shell 	// 很多操作依赖manage.py
+	
+	>>> from booktest.models import *
+	
+	BookInfo.objects.all()		// 默认调用对象的__str__方法 返回一个列表	-- object指向一个manage对象
+	object是类属性 -- BookInfo类 调用 类 属性
+	b = BookInfo()
+	b.btittle = 'aaa'	// 操作的不是类属性，-- 操作的是实例属性
+	b.save()			// 通过实例属性 去对应 类属性 -- 进行sql语句映射
+	
+	只修改模型类方法，数据库不需要迁移，数据库 表中存的是数据(字段)，方法是对数据的处理(数据库不存储)方法不需要迁移
+	需要重新开启shell 导入模型类
+	
+	MVC MVP模型，开发面向对象，内部转化成sql语句 -- BookInfo.objects.all()并没有执行select，产生执行结果
+	
+	模型开发完成(数据库表建好)，下一步向数据库中添加数据 -- django管理站点
+	(1) 创建超级用户 python manage.py createsuperuser
+	(2) 运行项目（后登录） python manage.py runserver		-- 默认使用8000端口
+	(3) 进入管理登录页面 127.0.0.1:8000/admin
+	(4) 在管理页面的group中添加相应的模型类 -- 将模型类注册到管理组中，定义模型类在models.py，注册到admin.py
+	
+	admin使用	// 编辑维护模型类
+	在admin.py文件中注册 admin.site.register(模型类, admin类)		// admin site类中的register方法
+	编辑管理时 列表页显示样式和添加修改页的显示样式，通过admin类参数设置
+	在admin.site.register()注册之前，定义一个类继承model.modelAdmin类，定义相关属性设置显示效果
+	
+// ----------------------------------------------
+	处理客户端信息 -- 视图
+	
+	请求http信息方式，响应http信息放在另一个对象
+	
+	from django.http import request, response		// django封装request信息，response信息需要构造
+	
+	def index(request):						// 默认至少接收一个参数request
+		return HttpResponse('hello world')	// 必须返回HttpResponse对象，或者这个类的子类
+		
+	def index(request):
+		temp = loader.get_template('index.html')
+		return HttpResponse(temp.render())
+	
+	def index(request):
+		return render(request,'index.html')
+		
+	视图定义好，如何请求 -- 需要配置route -- 配置url
+	
+	urls.py		// 除了url配置，其他配置在settings.py
+	urlpatterns = [
+		url(r'^admin/', include(admin.site.urls)),		// 可以请求admin的原因
+	]
+	地址栏去匹配url正则表达式，使用匹配上的视图(方法)去处理 -- 视图被执行
+	
+	完成视图，配置其url。一个视图与一个正则唯一匹配（一个请求过来只能一个正则去匹配，调用某一个视图）
+	项目中一般由多个应用，一般不在根级目录配置url。一般在自己的应用中配置url
+	
+// ----------------------------------------------
+	在工程目录下，创建模板目录templates，创建与视图名相同的模板
+	
+	需要再setting.py中配置模板路径 TEMPLATES 'DIRS' -- os.path.join(BASE_DIR, 'templates')	// 拼接目录
+	
+// ----------------------------------------------
+	首先定义model类(可以现在shell下测试)，生成迁移(只做一次，目的生成表)。
+	启用管理站点，在创建好的表中，维护数据 -- 后台管理
+	编写视图，配置url为了视图被调用。视图被调用后，使用模型获取数据  -- 开发中有哪些视图 提前设计规定好，url已配置好，正则表达式规则已确定
+	获取数据后，呈现数据，使用模板中定义好的html					 -- 开发前有哪些模板也已经确定
+	用视图加载模板，并传递上下文context，完成解析，得出最终html
+	通过response返回，客户端浏览器渲染执行
+	
+	url(r'^(\d+)$', views.show)		// 通过正则表达式 传参 到 视图方法，默认传参request
+	
+// ----------------------------------------------
+	(1) 创建虚拟环境
+	(2) 安装django
+	(3) 创建项目		// 配置数据库、配置应用、配置模板
+	(4) 创建应用
+	
+	(5) 在models.py中定义模型类		// 循环5-8
+	(6) 定义视图	// 视图的要求								
+	(7) 配置url
+	(8) 创建模板
+	
+	开发完成，运行测试这个项目
+	在开发阶段，django提供一个轻量级的服务器，python manage.py runserver
+#endif
+
+#if 模型
+	字段说明
+	
+	对于关系如何进行相互访问
+	BookInfo	// 一本书对应多个英雄，一对多的关系，关系应该存在多的那一端
+				// 表中每一行数据，就是一个BookInfo对象
+	
+	HeroInfo
+		book = models.ForeignKey(BookInfo)	// 保存book对象，本质存的是id，访问id两种方法
+											// hero.book.id
+											// hero.book_id		// 表中有book_id字段
+											
+	book.heroinfo_set	// 通过书对象找到英雄 -- 书中没有英雄属性
+	hero.book			// 通过英雄对象找到对应的书
+
+	任何一个模型类都有一个管理器，用于和数据库交互(模型类不能直接和数据库交互)
+	如果不适用默认管理器，可以自定义管理器，可以达到更改查询集的效果 -- 重写管理器的一些方法
+	
+	books1 = model.Manager()	// 仍使用默认管理器 -- 没有objects管理器
+	books2 = BookInfoManager()	// 重写了默认管理器的方法
+								// 自定义管理器作用
+	
+	管理器对象实现ORM功能（映射操作：将对象的操作转换成数据库语句。将数据库查询返回的数据转化成对象，如果有多个对象，则以列表形式返回）
+	
+	MVC框架中的ORM部分完成数据库映射 -- django中ORM为管理器
+	管理器需要知道 哪个模型类 和 哪个表 映射 -- 将管理器作为模型类的一个属性
+	管理器：将模型类的对象 和 数据库中的数据 映射起来
+	模型类中如果不自定义管理器，默认有一个objects管理器
+	
+	管理器是模型类的一个数据，用于将对象与数据变映射
+	
+// ----------------------------------------------
+	模型类完成，数据库迁移完成，向数据库中增加、修改、删除数据 -- admin
+	
+// ----------------------------------------------
+	filter(键1=值1)
+	get()				// 拿一个
+	count()				// 返回总条数
+	
+	惰性执行：创建查询集不会带来任何数据库的访问，直到调用数据时，才会访问数据 -- 迭代、序列化、与if合用
+	print([e.tittle for e in Entry.objects.all()])	// 以取数据
+	
+	querylist = Entry.objects.all()			// 未取数据
+	print([e.tittle for e in querylist])	// 取数据
+	printt([e.tittle for e in querylist])	// 使用本地缓存数据，不用重新拿数据
+	
+#endif
+
+#if 视图
+	用户浏览器输入网址请求
+	django获取地址信息，除去域名和端口部分
+	匹配正则，调用方法，方法：接收request及正则中获取的值，处理并返回response对象
+	// request类型HTTPRequest -- 该对象由django接收报文完成后构造
+	
+	url配置：
+	-- projects
+	 | -- test1
+	 | -- test2
+	    | -- manage.py		// os.environ.setdefault('test2.setting')
+		| -- test2
+	       | -- settings.py	// ROOT_URLCONF = 'test2.urls'
+		   | -- urls.py		// urlpatterns = [] -- 这里包含每个应用的urls.py文件，每个应用的url放在单独应用中
+		| -- booktest
+		   | -- urls.py		// 创建
+		   | 
+	
+	// 通过url如何找到视图， url参数
+	
+	cur_path = os.path.join(BASE_DIR, 'aaa')
+
+// ----------------------------------------------
+	request对象：
+	使用表单，且明确指定method=post时为POST，其他默认为GET方式
+	
+	// 在views.py，视图方法中处理request传参
+	a1 = request.GET.get('a')
+	a1 = request.GET['a']
+	
+	a2 = request.GET.getlist('a')	// 一个键多个值
+	
+	GET请求方式的键值：../?a=1&b=2&c=3
+	POST请求方式的键值：input控件的name属性作为键，value属性作为值，通过POST提交
+	
+	接收通过键来接收，控件中没有写name属性，则不会提交
+	<input type="text" name="uname">		// 无value属性，提交报文中存在uname信息
+	<input type="submit" value="提交">		// 同样是input，提交报文中无
+	
+	// ?后面键值对信息，url方式不能获取
+	www.baidu.com/2020?a=1
+	url(r'(\d{4})')		// 值写在地址里面可以接收 -- get方式不能获取
+
+// ----------------------------------------------
+	response对象
+	
+	cookie：存储在 浏览器中 的一段文本信息
+			cookie由服务器设置，填充到response中，浏览器接收后，以键值方式存储，
+			再次访问该网站，则携带相应cookie，添加到request head中 -- 跨域名不能共享该cookie信息
+			指定时间的两种方式 -- 默认不设定两周过期
+			
+	httpresponse有两个子类：HttpResponseDirect重定向用，JsonResponse
+	重定向，登录页面实现
+
+// ----------------------------------------------
+	状态保持
+	session的过期时间设置
+	session如何存储，如何修改
+	服务器如何区分session
+	
+	cookie中携带session id，服务 器通过id区分不同用户		// session依赖cookie
+	
+#endif
+
+#if 模板
+	变量					// {{ var }}
+	标签 {% 代码块 %}		// 执行代码段
+	过滤器
+	注释					// 单行注释、多行注释
+
+	浏览器不能解析DTL，在发给浏览器之前django先将模板语言解析，形成最终HTML字符串
+
+	def index(request):
+		tmp = loader.get_template('index.html')
+		context = RequestContext(request, {})
+		return HttpResponse(tmp.render(context))
+
+// ----------------------------------------------
+	定义模板
+	def index(request):
+		hero = HeroInfo.objects.get(pk=1)		// hero = HeroInfo(hname='abc')
+		context = {'hero':hero}
+		
+		list = HeroInfo.objects.all()	// list = HeroInfo.objects.filter(idDelete = True)
+		context = {'list':list}
+		
+		return render(request, 'index.html', context)
+	
+	{% for hero in list %}
+		{% if forloop.counter|divisbleby:"2" %}		// 过滤器：基于前面值 做运算
+													// 过滤器相当于方法调用 val|func() 变量调用方法，需要参数 :"xxx"
+			<li style="color:red">{{ forloop.counter }}:{{ hero.showname }}</li>
+		{% else %}
+		
+		{% endif %}
+	
+	{% endfor %}
+	
+// ----------------------------------------------
+	反向解析
+	配置视图的url时
+	redirect
+	模板标签中	
+	
+	// 链接地址不能硬编码，根据url配置规则生成，维护简单
+	<a href="{% url 'booktest:show' %}"></a>
+
+// ----------------------------------------------
+	CSRF
+	需要CSRF打开，且自己的网站内部请求能访问到页面
+	只有post请求需要用到CSRF验证 -- get也需要(get请求不需要csrf验证)
+	需要csrf防御时，添加token标签
+	{% csrf_token %}
+	
+	localhost/a.html
+	
+// ----------------------------------------------
+	验证码
+	return HttpResponse(value, 'image/png')		// 视图统一返回结果，浏览器通过MIME type来执行 -- text/html text/css text/js
+	
+	/* 页面1：首先加载表单页面，文本框 + img标签 */
+	/* - <img src="verifyCode"> 图片标签也需要配接口 */
+	request.session['code'] = value 	// 加载表单页面时，对应的视图要生成验证且保存验证码到session
+	
+	/* 页面2：<form action="verifyTest2" method="post"> */
+	需要视图接收验证码，校验验证码
+	code1 = request.POST['code1']
+	code2 = request.session['code']		// 存 ，提交，取session对比
+	
+// ----------------------------------------------
+	浏览器请求index页面，服务器将'booktest/index.html'转化成字符串发送给浏览器
+	浏览器解析到img标签，会再次向服务器发送请求
+	
+	类似于反向解析，任何一个地址都不使用硬编码 -- 静态文件。可以隐藏实际目录
+	
+#endif
+
+#endif
+
+#if selenium
+// ----------------------------------------------课程总体介绍
+	自动化测试常用selenium、QTP
+	loaderrunner性能测试
+	
+	selenium基础
+	自动化需求分析
+	自动化用例设计
+	脚本开发
+	脚本封装重构
+	基础函数封装
+	参数化
+	PageObject
+	日志的收集
+	报告的生成
+	TestNG使用
+	持续集成
+	
+	Jenkins -- 做持续集成。创建工程 -> 点击立即构建 -> console output
+	
+	自动化基础：自动化用例编写、selenium优势及原理、自动化环境搭建
+	
+	selenium基础：	-- selenium基础教程
+	常见8大元素定位(表格)，
+	常见元素处理
+	下拉框元素处理
+	不同窗口切换（常用语自动化测试）
+	元素的进阶（如果当前页面没有出现该元素，如何才能出现）
+	元素的等待
+	
+	登录流程简单，购物流程复杂
+	
+	读取配置文件，数据驱动（TestNG）
+	
+	JenKins无界面环境下，防止不同浏览器的原因造成case执行失败。
+	case执行失败有log日志，同时可以设置截图信息
+	
+	需求不断更新的，不适合做自动化测试
+	
+	如果系统为windows，不用selenium
+	
+	文字化自动化测试用例 -- 编码实现
+	
+	手工用例
+	用例ID，模块，前提条件，步骤，预期结果，实际结果
+	
+// ----------------------------------------------自动化测试用例编写
+	检查元素，查看元素id信息
+	
+// ----------------------------------------------selenium工作原理
+	脚本创建driver，然后启动server，将浏览器绑定在特定的端口上
+	脚本创建session发送请求，服务器响应请求，回复信息
+	
+// ----------------------------------------------
+//	selenium基础知识回顾
+// ----------------------------------------------
+	// --------------------------------
+	// IDE环境配置
+	// --------------------------------
+	jdk：JAVA_HOME CLASSPATH PATH		// java -version
+	计算机->属性->高级系统设置->高级->环境变量->系统变量
+	创建JAVA_HOME系统变量
+	创建CLASSPATH系统变量
+	
+	// ------------------------------------------
+	// 创建工程
+	// ------------------------------------------
+	eclipse创建java工程 -> 选择next，添加jar包(selenium-java.jar)
+	
+	
+	
+	打开百度网实例
+	package com.mushishi.selenium;
+	import java.sql.Driver;
+
+	// --------------------------------
+	// 元素定位
+	// --------------------------------
+		public class selenium {
+		WebDriver driver;	// 先定义
+		
+		System.setProperty("webdriver.firefox.marionette", "path_name");	// 配置环境变量
+		driver = new FirefoxDriver();	// 初始化driver
+		driver.findElement(By.tagName("input")).sendKeys("user");
+		driver.findElement(By.name("password")).sendKeys("xxx");
+		driver.findElement(By.id("auto-signin")).click();
+		
+		driver.findElement(By.linkText("立即注册")).click();
+		driver.findElement(By.partialLinkText("直接")).click();
+		
+		drvier.manage().window().maximize();
+		driver.get("http://www.imooc.com");
+		driver.findElement(By.className("search-input")).click();
+		driver.findElement(By.className("search-input")).sendKeys("xxx");
+		
+		WebElement element = driver.findElement(By.className("nav-item"));	// 元素对象类型WebElement
+		List<WebElement> elements = element.findElement(By.tagName("li"));
+		elements.get(3).click();
+	}
+	
+	// --------------------------------
+	// 常见元素处理
+	// --------------------------------
+	文本框：sendKeys、clear、getAttribute
+	
+	单选框：click、clear、isSelected
+		driver.get("http://www.imooc.com/user/setprofile");		// 更快加载
+		用xpath只能定位一个
+	
+	多选框：click、clear(不可使用，重复点击取消选中)、isSelected、isEnabled
+	
+	按钮：click、isEabled
+	
+	表单：
+		检查元素界面 -> Network -> 观察手动提交表单做的操作 -> 对应logo接口 -> Form Data
+	
+		driver.findElement(By.id("signup-form")).submit();
+		selenium以表单方式提交，只是把参数拼接到当前url后面，实际提交url不是这个地址
+	
+		driver.get("www.immoc.com");
+		driver.findElement(By.id("xxx")).submit();	// 获取url，将input请求拼接起来，构成简单的接口测试
+	
+	上传文件：
+		//按钮隐藏，修改style，通过JS定位 -- JS修改元素属性信息，让元素变的可操作
+		在console测试
+		document.getElementByClassName("js-avator-link")
+		[a.js-avator-link]	// 数组，length = 1
+		document.getElementByClassName("js-avator-link")[0].style.bottom = 0;
+		
+		driver转化成JS
+		String jsString = "document.getElementByClassName("js-avator-link")[0].style.bottom = 0;";
+		JavascriptExecutor js = (JavascriptExecutor)driver;
+		js.executeScrpit(jsString);
+		
+		driver.findElement(By.id("upload")).sendKeys("C:\\user\\test.jpg");	// input框->sendKeys 注意路径转义字符
+	
+	下拉框定位
+		选择对应的元素 Text、value、Index
+		不选择对应的元素 deselectAll、deselectByValue、deseletByVisibleText
+		获取选择项的值 getAllselectOptions、getFirstSelectedOption.getText
+		
+		Select list = new Select(locator);	// 通过selenium自带的类 -- 仅对select标签有效
+		
+		组合定位，只需要选取前级
+		复合型，定位冲突时，通过层级定位
+	
+		悬停出现的页面 中的元素如何定位 -- ???
+		
+		
+	
+#endif
+
+#if 
 
  “<head>”标签和“<body>”标签是它的第一层子元素，“<head>”标签里面负责对网页进行一些设置以及定义标题，设置包括定义网页的编码格式，外链css样式文件和javascript文件等，设置的内容不会显示在网页上，标题的内容会显示在标题栏，“<body>”内编写网页上显示的内容
  
