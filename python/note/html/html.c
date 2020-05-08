@@ -1275,8 +1275,42 @@
 	
 		悬停出现的页面 中的元素如何定位 -- ???
 		
+	元素进阶操作
+		常用鼠标操作：鼠标左击、右击(contextClick)、双击(doubleClick)、悬停(moveToElement)
+		左击:	Action action = new Actions(driver);
+				action.click().perform()	// 需要提交 -- 没有perform不会执行
+				
+	特殊窗体
+		窗体分类：iframe切换、弹窗处理、对话框
+		switchTo()、getWindowHandlers()
 		
+		切换页面时，首先记录下当前页面handle	// curWindowsHandle = driver.getWindowHandler();
+		切换后，拿到所有页面handle，判断新页面	// s.equals(windowHande){ continue; }
+		
+	三种等待分类
+		强制等待	// Thread.sleep()
+		显式等待	// 
+		隐式等待	// 调试用
+		
+	// id class不唯一时，使用css、xpath定位，万能定位，web自动化中xpath常用。 -- 移动端自动化中xpath，效率低
+		
+// ----------------------------------------------
+	登录自动化设计
 	
+	自动化用例设计，再将用例翻译成脚本
+	并不是将所有的功能用例，翻译成自动化用例
+	自动化测试将很多逻辑业务去掉，保留大部分冒泡测试用例(子功能、小模块的冒泡测试用例)
+	更多是用来检验线上功能的正确性，或者监控线上功能
+	
+	fiddler监控接口
+	
+	Maven：构建、文档生成、报告、依赖		// 属于Apache
+	添加到eclipse
+	
+	读取配置文件：properties
+		load			// 加载 常用
+		setProperty
+		getProperty		// 读取 常用
 #endif
 
 #if 
