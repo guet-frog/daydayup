@@ -1135,14 +1135,21 @@
 	selenium基础
 	自动化需求分析
 	自动化用例设计
+	
 	脚本开发
+	
 	脚本封装重构
+	
 	基础函数封装
 	参数化
+	
 	PageObject
+	
 	日志的收集
 	报告的生成
+	
 	TestNG使用
+	
 	持续集成
 	
 	Jenkins -- 做持续集成。创建工程 -> 点击立即构建 -> console output
@@ -1153,7 +1160,7 @@
 	常见8大元素定位(表格)，
 	常见元素处理
 	下拉框元素处理
-	不同窗口切换（常用语自动化测试）
+	不同窗口切换（常用于自动化测试）
 	元素的进阶（如果当前页面没有出现该元素，如何才能出现）
 	元素的等待
 	
@@ -1306,11 +1313,38 @@
 	
 	Maven：构建、文档生成、报告、依赖		// 属于Apache
 	添加到eclipse
+	Maven创建工程，通过修改pom.xml文件添加相应的包 -- Maven repository -- // 不需要手动下载离线包，也不用再工程中build path中添加相应库
 	
 	读取配置文件：properties
 		load			// 加载 常用
 		setProperty
 		getProperty		// 读取 常用
+		
+	testNG自动化测试框架 -- 配置Maven仓库时放在系统盘，没有权限更新仓库
+						 -- 安装testNG的三种方式，不一定要 右键创建testNG类，以及 右键testNG运行
+	
+	PO模型 page object
+	分层设计：元素层、操作层、业务层
+	driver及基类的封装：
+		handle
+		business
+		testcase
+		DriverBase
+		SelectDriver
+		CaseBase
+		page
+		
+	
+	一个页面上的元素（如输入框）与其他页面只是名字不同，定位信息不同
+	
+	抽取功能测试部分测试用例，编写自动化用例 -- 冒烟测试的详细版
+	
+	使用fiddler配合下单流程的功能测试
+	
+	courseInfoText=tagName>span		// tagName定位 
+	
+	模态框的处理
+		
 #endif
 
 #if 
@@ -1350,4 +1384,6 @@
  
  这三种元素，可以通过display属性来相互转化，不过实际开发中，块元素用得比较多，所以我们经常把内联元素转化为块元素，少量转化为内联块，而要使用内联元素时，直接使用内联元素，而不用块元素转化了
  
+ 一般div有很多层时，尽量不要使用外层
  
+ 进入其他页面，再返回该页面，之前定位信息失效 -- selenium机制决定
