@@ -1,0 +1,14 @@
+
+vi /etc/passwd      linux保存用户信息文件
+    root:x:0:0:root:/root:/bin/bash
+    aston:x:1000:1000:AstonUbuntu:/home/aston:/bin/bash
+    每一行代表一个用户信息
+    1 用户名
+    2 密码
+    3 uid 用户唯一编号 -- 三大类用户，root用户 系统用户1-999 一般用户
+    4 group id
+    5 用户全名 -- 一般用户名与用户全名相同
+    6 home目录
+    7 命令解析器
+
+vi /etc/group       linux用户组信息
