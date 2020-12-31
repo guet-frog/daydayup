@@ -269,7 +269,7 @@
 	元组遍历
 		for tmp in tuple:
 	
-	字典遍历
+	字典遍历				// -- 字典一般也不用遍历应该
 		遍历字典的key
 			for key in dict.keys():					// keys
 		
@@ -580,7 +580,7 @@
     sys.path.append("../")
     
     // 重新导入模块
-    form imp import *       // 导入reload功能
+    from imp import *       // 导入reload功能
     reload(xxx模块)
 	
 #endif

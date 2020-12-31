@@ -12,3 +12,14 @@ vi /etc/passwd      linux保存用户信息文件
     7 命令解析器
 
 vi /etc/group       linux用户组信息
+	root:x:0:
+	1 组名
+	2 密码
+	3 组编号
+	4 组成员
+	
+-rw-rw-r-- 1 aston aston 52 Nov 16 a.c
+	1 文件访问权限
+	2 文件个数 -- 如果是目录，则表示目录里面有多少个文件
+	3 文件拥有者
+	4 文件所属的组
