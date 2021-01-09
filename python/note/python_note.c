@@ -41,6 +41,8 @@
     tar -jcvf xxx.tar.bz2 *.py
     tar -jxvf xxx.tar.bz2
 	
+	-C 指定解压目录
+	
     cal、date
 	
     ssh python@192.168.1.1			// windows Xshell
