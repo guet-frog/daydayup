@@ -200,12 +200,54 @@
 	再次add Tree
 
 /** season2-1-4 uboot相关 */
-	首先查看顶层目录的Makefile
-	查看配置(目标) -- 确定板级相关信息								-- 找到lds
+	uboot工作流程分析
+		step1 程序入口
+		step2 第一阶段 bl1 		// bl0 -- bootrom
+		step3 第二阶段 bl2
+		
+	step1：
+		首先查看顶层目录的Makefile
+		查看配置(目标) -- 确定板级相关信息								-- 找到lds
+		
+		查看板级链接脚本信息 -- /board/samsung/smdk2440/u-boot.lds
+		-- 找到代码段最开始为 /cpu/s3c2440/start.o 		-- 找到对应start.c 或者 start.s
+		-- 找到入口 ENTRY(_start)						-- 找到_start标号，找到整个uboot的入口
+		
+		cpu/s3c2440/start.s
 	
-	查看板级链接脚本信息 -- /board/samsung/smdk2440/u-boot.lds		-- 找到start.s
+	step2：		// 只关心做了什么，不关心怎么做
+		设置中断向量表
+		设置cpu为svc模式
+		刷新I/D cache
+		...
+		ldr pc, _start_armboot		// 绝对跳转 -- board.c
+		
+		LDFLAGS += -Bstatic -T $(LDSCRIPT) -Ttext $(TEXT_BASE) $(PLATFORM_LDFLAGS)
+		// 链接器脚本地址0x00000000被覆盖
+		board/samsung/smdk2440/config.mk
+		
+		bl lowlevel_init		// lowlevel_init 0x30008394 -- 没有跳转到内存中
+								// b指令相对跳转
+								// 链接地址 并不一定是 PC指针的值
+								
+	step3：只关心硬件初始化，不关心纯软件初始化（环境变量等）
+		串口
+		LCD
+		网卡
+		main_loop()		// 解析命令、执行命令
+		
+	高版本uboot分为两个bin文件
+	spl/	-- bootloader1
 	
-	cpu/s3c2440/start.s
+	arch/arm/cpu/armv7/u-boot.lds
+	arch/arm/cpu/armv7/start.o
+	
+	reset:
+		b save_boot_param		// cpu.c -- 只有一个函数声明(无实现体)也能调用的原因，弱函数，关联一个别名函数
+		
+		
+		void save_boot_param(u32 r0, u32 r1, u32 r2, u32 r3) __attribute__((weak, alias("save_boot_param_default")));
+	
 #endif
 
 #ifdef latter_part
