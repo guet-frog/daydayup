@@ -11,7 +11,7 @@
 	echo ${a}
 
 	echo $ab
-	echo ${a}b
+	echo ${a}b		// echo ${a}{b}
 
 	echo $		// 通过tab自动补全 查看系统变量
 	echo $PWD
@@ -19,7 +19,7 @@
 	echo $HOME
 	echo $PATH
 
-	array=(1 2 3 4 5)			// a=3 -> (3 2 3 4 5)
+	array=(1 2 3 4 5)			// a=3 -> (3 2 3 4 5)	-- a=(1, 2, 3, 4, 5)
 	echo ${array[*]}
 	echo ${#array[*]}
 
@@ -29,6 +29,7 @@
 
 	echo "hello world\n"
 	echo -e "hello world\n"
+	echo -e "\n"
 
 	((a=a+1))
 	
@@ -47,10 +48,11 @@
 	. file.sh		// source简写
 	
 	vi ~/.bash_profile	
+	
+	PATH="$HOME/bin:$PATH"
 #endif
 
 /** 字符串 */
-
 	echo ${s:0:5}		// awk切片
 	echo ${#s}			// 计算长度 -- ${#array[*]}
 
@@ -79,8 +81,8 @@
 	字符串比较
 	[ "$a" = "hello world" ]		// 精准匹配
 
-	[-z "$b"]		// 判断为空
-	[-n "$b"]
+	[ -z "$b" ]		// 判断为空
+	[ -n "$b" ]		// nozero			// [ -n $b ]
 	echo ${#a}	// 长度为0 判断为空
 
 	-e file 	// 文件存在 exist
@@ -102,28 +104,28 @@
 
 /** 逻辑控制 if、for、while */
 #if
-	if [ condition ]; then...; fi
+	if [ condition ]; then ...; elif [ condition ]; then ...; else ...; fi
 
 	[ -f a.c ] && echo is file 		// if结构简写 -- 有不同点
 	[ -f aa.c ] && echo is file || echo not file
 
 	// 按次数循环
-	for ((i=0;i<10;i++));do echo $i;done
+	for ((i=0;i<10;i++)); do echo $i; done
 
-	array = (1 2 3 4 5)	// error
+	array=(1 2 3 4 5)
 	echo $array			// 1
 	echo $array[*]		// 1[*]
 	echo ${array[*]}	// 1 2 3 4 5		// x=1234 ${x}_aa
 
 	// 迭代循环
 	s="aa bb cc dd"
-	echo $s 		// echo "$s"效果一样
+	echo $s
 	s="aa bb cc dd"; for x in $s; do echo $x; done	// for x in "$s"效果不一样
 
 	while [ $i -lt 5 ]; do echo $i; ((i=i+1)); done
 
 	while read line; do echo $line; done < /tmp/tmp		// while ... done; 整体是一个命令 再  < /a.c
-	i=0; while read line; do if [ $((((i=i+1))%2)) -gt 0 ]; then echo $line >> tmp.txt; fi; done < ./a.c
+	i=0; while read line; do ((i=i+1)); if [ $((i%2)) -gt 0 ]; then echo $line >> tmp.txt; fi; done < ./a.c
 
 	// if while 后面可以为 命令(read line)	-- 命令都有返回值
 #endif
